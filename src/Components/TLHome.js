@@ -57,7 +57,7 @@ function TLHome() {
   // Fetch user and team data
   const fetchUserData = async (userId) => {
     try {
-      let response = await axios.get(`https://hrbackend-e58m.onrender.com/TlHome/${userId}`);
+      let response = await axios.get(`https://hrbackend-1.onrender.com/TlHome/${userId}`);
       let data = response.data;
       setUserData(data.user);
       setTeamData(data.Team);
@@ -79,7 +79,7 @@ function TLHome() {
 
     try {
         // Fetch user data and team details from the server
-        let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/getUserData/${id}`, reqOption);
+        let JSONData = await fetch(`https://hrbackend-1.onrender.com/getUserData/${id}`, reqOption);
         let JSOData = await JSONData.json();
 
         // Extract user details and team details from the response
@@ -102,7 +102,7 @@ function TLHome() {
   };
 
   try {
-    let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/getTeamrequirements/${userId}`, reqOption);
+    let JSONData = await fetch(`https://hrbackend-1.onrender.com/getTeamrequirements/${userId}`, reqOption);
     let JSOData = await JSONData.json();
     console.log(JSOData);
 
@@ -147,7 +147,7 @@ const viewRequirement = async (id) => {
       method: 'GET',
     };
     try {
-      let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/getrequirements/${id}`, reqOption);
+      let JSONData = await fetch(`https://hrbackend-1.onrender.com/getrequirements/${id}`, reqOption);
       let JSOData = await JSONData.json();
       console.log(JSOData);
       setViewReq([JSOData]); // Wrap in an array to iterate properly in the table
@@ -160,7 +160,7 @@ const viewRequirement = async (id) => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`https://hrbackend-e58m.onrender.com/userDetailsofAssignedRequirement/${id}`, reqOption);
+    const response = await fetch(`https://hrbackend-1.onrender.com/userDetailsofAssignedRequirement/${id}`, reqOption);
     let data = await response.json();
     setAssignedUsersData(data);
     
@@ -169,7 +169,7 @@ const viewRequirement = async (id) => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`https://hrbackend-e58m.onrender.com/userDetailstoAssignRequirement/${id}/${userId}`, reqOption);
+    const response = await fetch(`https://hrbackend-1.onrender.com/userDetailstoAssignRequirement/${id}/${userId}`, reqOption);
     let data = await response.json();
     setUserData(data);
     setSelectedReqId(id);
@@ -187,7 +187,7 @@ const assignReqToUser = async (userId) => {
   // If the user confirms, proceed with the assignment
   if (isConfirmed) {
       try {
-          const response = await axios.post(`https://hrbackend-e58m.onrender.com/assignReq/${userId}/${ReqId}`, 
+          const response = await axios.post(`https://hrbackend-1.onrender.com/assignReq/${userId}/${ReqId}`, 
           {
               headers: {
                   'Content-Type': 'application/json'
@@ -219,7 +219,7 @@ const Reqcounts = async () => {
   };
 
   try {
-    const response = await fetch(`https://hrbackend-e58m.onrender.com/getTeamRequirementsCount/${userId}`, reqOption);
+    const response = await fetch(`https://hrbackend-1.onrender.com/getTeamRequirementsCount/${userId}`, reqOption);
     let data = await response.json();
 
     // Log the complete data for debugging
@@ -363,7 +363,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`https://hrbackend-e58m.onrender.com/${showUserData.userDetails.ProfilePic}`}
+              src={`https://hrbackend-1.onrender.com/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
@@ -878,7 +878,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`https://hrbackend-e58m.onrender.com/${showUserData.userDetails.ProfilePic}`}
+              src={`https://hrbackend-1.onrender.com/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
