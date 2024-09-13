@@ -75,14 +75,14 @@ function Requirements() {
 
     const fetchRequirements = async () => {
         try {
-            const response = await fetch('https://hrbackend-e58m.onrender.com/getrequirements');
+            const response = await fetch('https://hrbackend-1.onrender.com/getrequirements');
             const data = await response.json();
             SetRequirements(data);
 
             const counts = {};
             for (let req of data) {
                 try {
-                    const candidateRes = await axios.get(`https://hrbackend-e58m.onrender.com/adminviewactions/${req._id}`);
+                    const candidateRes = await axios.get(`https://hrbackend-1.onrender.com/adminviewactions/${req._id}`);
                     counts[req._id] = candidateRes.data.candidateCount || 0;
                 } catch (err) {
                     counts[req._id] = 0;
@@ -99,7 +99,7 @@ function Requirements() {
             try {
                 const counts = {};
                 for (let req of requirements) {
-                    const response = await axios.get(`https://hrbackend-e58m.onrender.com/api/requirements/${req._id}/claimedByCount`);
+                    const response = await axios.get(`https://hrbackend-1.onrender.com/api/requirements/${req._id}/claimedByCount`);
                     counts[req._id] = response.data.claimedByCount || 0;
                 }
                 setClaimedByCounts(counts);
@@ -113,7 +113,7 @@ function Requirements() {
 
     const fetchClaimedUsersDetails = async (requirementId) => {
         try {
-            const response = await axios.get(`https://hrbackend-e58m.onrender.com/api/requirements/${requirementId}/claimedByDetails`);
+            const response = await axios.get(`https://hrbackend-1.onrender.com/api/requirements/${requirementId}/claimedByDetails`);
             setShowClaimedUsers(response.data.claimedUsers);
             setShow(true);
         } catch (error) {
@@ -123,7 +123,7 @@ function Requirements() {
 
     const fetchRecruiterDetails = async (reqId) => {
         try {
-            const response = await axios.get(`https://hrbackend-e58m.onrender.com/api/recruiters/${reqId}`);
+            const response = await axios.get(`https://hrbackend-1.onrender.com/api/recruiters/${reqId}`);
             setRecruitersData(response.data.recruiters);
             setShowA(true);
             console.log(response.data)
@@ -134,7 +134,7 @@ function Requirements() {
    
     const fetchCandidates = async (recruiterId, reqId) => {
         try {
-            const response = await axios.get('https://hrbackend-e58m.onrender.com/api/candidates', {
+            const response = await axios.get('https://hrbackend-1.onrender.com/api/candidates', {
                 params: {
                     recruiterId,
                     reqId
@@ -151,7 +151,7 @@ function Requirements() {
     }
     const requirementDetails = async (id) => {
         try {
-            const response = await axios.get(`https://hrbackend-e58m.onrender.com/getrequirements/${id}`);
+            const response = await axios.get(`https://hrbackend-1.onrender.com/getrequirements/${id}`);
             SetRequirementData(response.data); // Ensure this returns an object
             setLgShow(true);
         } catch (err) {
@@ -160,7 +160,7 @@ function Requirements() {
     };
     const CandidateData = async(id)=>{
         try {
-            const response = await axios.get(`https://hrbackend-e58m.onrender.com/candidate/${id}`);
+            const response = await axios.get(`https://hrbackend-1.onrender.com/candidate/${id}`);
            
             console.log(response.data)
                 setCandidateDetails(response.data);   
@@ -185,7 +185,7 @@ function Requirements() {
         
         if (confirmDelete) {
           try {
-            const response = await fetch(`https://hrbackend-e58m.onrender.com/api/candidates/${candidateId}`, {
+            const response = await fetch(`https://hrbackend-1.onrender.com/api/candidates/${candidateId}`, {
               method: 'DELETE',
             });
       
@@ -530,7 +530,7 @@ function Requirements() {
     <Table striped bordered hover className="table-sm">
         <tbody>
         <tr>
-      <td> <Image  src={`https://hrbackend-e58m.onrender.com/${candidateDetails.candidateImage}`} style={{width:"100px",borderRadius:"100px"}} alt='Candidate Image' ></Image>
+      <td> <Image  src={`https://hrbackend-1.onrender.com/${candidateDetails.candidateImage}`} style={{width:"100px",borderRadius:"100px"}} alt='Candidate Image' ></Image>
       </td>
     </tr>
             <tr>
@@ -630,7 +630,7 @@ function Requirements() {
     <td>
   {typeof candidateDetails.updatedResume === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`https://hrbackend-e58m.onrender.com/${candidateDetails.updatedResume}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://hrbackend-1.onrender.com/${candidateDetails.updatedResume}`} target="_blank" rel="noopener noreferrer">
         View Resume
       </a>
     </div>
@@ -645,7 +645,7 @@ function Requirements() {
     <td>
   {typeof candidateDetails.ornnovaProfile === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`https://hrbackend-e58m.onrender.com/${candidateDetails.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://hrbackend-1.onrender.com/${candidateDetails.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
         View Ornnova Profile
       </a>
     </div>
