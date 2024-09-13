@@ -114,7 +114,7 @@ const UserType = getDecryptedData("User Type")
 
   const fetchRequirements = async (userId) => {
     try {
-      const response = await axios.get(`https://hrbackend-e58m.onrender.com/getHomeReqData/${userId}`);
+      const response = await axios.get(`https://hrbackend-1.onrender.com/getHomeReqData/${userId}`);
       // const data = await response.json();
       const data = response.data;
       const newData = data.filter(req => req.update === 'New' && !req.claimedBy.some(claim => claim.userId === userId));
@@ -126,7 +126,7 @@ const UserType = getDecryptedData("User Type")
       const counts = {};
       for (let req of claimedData) {
         try {
-          const res = await axios.get(`https://hrbackend-e58m.onrender.com/viewactions/${req._id}/${userId}`);
+          const res = await axios.get(`https://hrbackend-1.onrender.com/viewactions/${req._id}/${userId}`);
           counts[req._id] = res.data.candidates.length || 0;
         } catch (err) {
           // console.error(`Error fetching candidates for ${req._id}:`, err);
@@ -204,7 +204,7 @@ const UserType = getDecryptedData("User Type")
     };
 
     try {
-      const response = await fetch(`https://hrbackend-e58m.onrender.com/claim/${id}`, {
+      const response = await fetch(`https://hrbackend-1.onrender.com/claim/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user),
@@ -226,7 +226,7 @@ const UserType = getDecryptedData("User Type")
 
   const viewCandidates = async(id)=>{
     try {
-      const response = await axios.get(`https://hrbackend-e58m.onrender.com/viewactions/${id}/${userId}`)
+      const response = await axios.get(`https://hrbackend-1.onrender.com/viewactions/${id}/${userId}`)
       setCandidateData(response.data.candidates);
       handleShow()
     } catch (error) {
@@ -268,7 +268,7 @@ const getDropdownTitle = () => {
   
     if (confirmDelete) {
       try {
-        const response = await fetch(`https://hrbackend-e58m.onrender.com/api/candidates/${candidateId}`, {
+        const response = await fetch(`https://hrbackend-1.onrender.com/api/candidates/${candidateId}`, {
           method: 'DELETE',
         });
   
@@ -291,7 +291,7 @@ const getDropdownTitle = () => {
 
   const updateCandidate = async(id)=>{
     try {
-      const response = await axios.get(`https://hrbackend-e58m.onrender.com/candidate/${id}`)
+      const response = await axios.get(`https://hrbackend-1.onrender.com/candidate/${id}`)
       console.log(response.data)
       setUpdateCandidateDetails(response.data);
       handleUpdateShow();
@@ -323,7 +323,7 @@ const getDropdownTitle = () => {
     const candidateId = updateCandidateDetails._id; // Assuming _id is the identifier for the candidate
 
     try {
-      const response = await axios.put(`https://hrbackend-e58m.onrender.com/candidates/${candidateId}`, updateCandidateDetails);
+      const response = await axios.put(`https://hrbackend-1.onrender.com/candidates/${candidateId}`, updateCandidateDetails);
 
       if (response.status === 200) {
         alert('Candidate details updated successfully ✅');
@@ -339,7 +339,7 @@ const getDropdownTitle = () => {
   };
   const requirementDetails = async (id) => {
     try {
-        const response = await axios.get(`https://hrbackend-e58m.onrender.com/getrequirements/${id}`);
+        const response = await axios.get(`https://hrbackend-1.onrender.com/getrequirements/${id}`);
         SetRequirementData(response.data); // Ensure this returns an object
         setLgShow(true);
     } catch (err) {
@@ -605,7 +605,7 @@ const getDropdownTitle = () => {
               <Table striped bordered hover className="table table-sm">
   <tbody>
     <tr>
-      <td> <Image  src={`https://hrbackend-e58m.onrender.com/${selectedCandidate.candidateImage}`} style={{width:"100px",borderRadius:"100px"}} alt='Candidate Image' ></Image>
+      <td> <Image  src={`https://hrbackend-1.onrender.com/${selectedCandidate.candidateImage}`} style={{width:"100px",borderRadius:"100px"}} alt='Candidate Image' ></Image>
       </td>
     </tr>
     <tr>
@@ -705,7 +705,7 @@ const getDropdownTitle = () => {
     <td>
   {typeof selectedCandidate.updatedResume === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`https://hrbackend-e58m.onrender.com/${selectedCandidate.updatedResume}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://hrbackend-1.onrender.com/${selectedCandidate.updatedResume}`} target="_blank" rel="noopener noreferrer">
         View Resume
       </a>
     </div>
@@ -719,7 +719,7 @@ const getDropdownTitle = () => {
     <td>
   {typeof selectedCandidate.ornnovaProfile === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`https://hrbackend-e58m.onrender.com/${selectedCandidate.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://hrbackend-1.onrender.com/${selectedCandidate.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
         View Ornnova Profile
       </a>
     </div>
@@ -796,7 +796,7 @@ const getDropdownTitle = () => {
                         <label><strong>Candidate Image:</strong></label>
                         <div>
                             <img
-                                src={`https://hrbackend-e58m.onrender.com/${updateCandidateDetails.candidateImage}`}
+                                src={`https://hrbackend-1.onrender.com/${updateCandidateDetails.candidateImage}`}
                                 style={{ width: "100px", borderRadius: "100px" }}
                                 alt='Candidate Image'
                             />
