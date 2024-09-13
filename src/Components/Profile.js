@@ -38,7 +38,7 @@ let userData= async(email)=>{
  let reqOption={
     method:"GET",
   }
-  let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/loggedinuserdata/${email}`,reqOption);
+  let JSONData = await fetch(`https://hrbackend-1.onrender.com/loggedinuserdata/${email}`,reqOption);
   let JSOData = await JSONData.json();
   setloginUserData(JSOData);
  
@@ -61,7 +61,7 @@ useEffect(()=>{
               <Card style={{width:"320px",margin:"20px"}}>
             <Card.Header><b style={{fontFamily:"monospace",textDecoration:"underline",margin:"10px"}}><img style={{width:"30px",margin:"20px"}} variant="top" src='/Images/icon.png' />Employee Code:</b>{item.EmpCode}</Card.Header>
             <Card.Body>
-                   <Card.Img style={{}} variant="top" src={`https://hrbackend-e58m.onrender.com/${item.ProfilePic}`} /> 
+                   <Card.Img style={{}} variant="top" src={`https://hrbackend-1.onrender.com/${item.ProfilePic}`} /> 
               <Card.Title><b style={{fontFamily:"monospace",textDecoration:"underline",margin:"20px"}}>Employee Name:</b> {item.EmployeeName}</Card.Title>
               <ListGroup className="list-group-flush">
               <ListGroup.Item></ListGroup.Item>
