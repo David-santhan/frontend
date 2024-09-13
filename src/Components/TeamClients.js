@@ -39,7 +39,7 @@ function TeamClients() {
   // Fetch user and team data
   const fetchUserData = async (userId) => {
     try {
-      let response = await axios.get(`https://hrbackend-e58m.onrender.com/TlClients/${userId}`);
+      let response = await axios.get(`https://hrbackend-1.onrender.com/TlClients/${userId}`);
       let data = response.data;
  
       setUserData(data.user);
@@ -61,7 +61,7 @@ function TeamClients() {
 
   const readClientList = async (id) => {
     let reqOption = { method: "GET" };
-    let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/ClientsList/${id}`, reqOption);
+    let JSONData = await fetch(`https://hrbackend-1.onrender.com/ClientsList/${id}`, reqOption);
     let JSOData = await JSONData.json();
     setClientList(JSOData);
     // setSelectedClientId(id);
