@@ -106,7 +106,7 @@ function UserActions() {
     useEffect(() => {
         const fetchRequirement = async () => {
             try {
-                const response = await axios.get(`https://hrbackend-e58m.onrender.com/actions/${id}/${userId}`);
+                const response = await axios.get(`https://hrbackend-1.onrender.com/actions/${id}/${userId}`);
                 // console.log('Fetched requirement:', response.data); // Check the data structure
                 setRequirValues(prevValues => ({
                     ...prevValues,
@@ -131,7 +131,7 @@ function UserActions() {
         };     
         const fetchUserData = async (email) => {
             try {
-                const response = await fetch(`https://hrbackend-e58m.onrender.com/loggedinuserdata/${email}`);
+                const response = await fetch(`https://hrbackend-1.onrender.com/loggedinuserdata/${email}`);
                 const data = await response.json();
                 setLoginUserData(data);
             } catch (err) {
@@ -194,7 +194,7 @@ function UserActions() {
 //             }
 //         };
 
-//         const response = await fetch('https://hrbackend-e58m.onrender.com/candidates', {
+//         const response = await fetch('https://hrbackend-1.onrender.com/candidates', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json' // Send data as JSON
@@ -261,7 +261,7 @@ function UserActions() {
 //       formData.append('candidate[ornnovaProfile]', ornnovaProfileRef.current.files[0]); // Assuming this is a File object
 //       formData.append('candidate[candidateImage]', candidateimageRef.current.files[0]); // Assuming this is a File object
 
-//       const response = await fetch('https://hrbackend-e58m.onrender.com/candidates', {
+//       const response = await fetch('https://hrbackend-1.onrender.com/candidates', {
 //           method: 'POST',
 //           body: formData // Send as FormData
 //       });
@@ -328,7 +328,7 @@ const sendCandidateDataToDatabase = async () => {
   if (candidateimageRef.current?.files[0]) formData.append('candidateImage', candidateimageRef.current.files[0]);
 
   try {
-      const response = await fetch('https://hrbackend-e58m.onrender.com/Candidates', {
+      const response = await fetch('https://hrbackend-1.onrender.com/Candidates', {
           method: 'POST',
           body: formData // Send FormData object
       });
