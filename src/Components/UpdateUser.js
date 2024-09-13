@@ -32,7 +32,7 @@ function UpdateUser() {
     });
 
     useEffect(() => {
-        axios.get(`https://hrbackend-e58m.onrender.com/getUserdatatoUpdate/${id}`)
+        axios.get(`https://hrbackend-1.onrender.com/getUserdatatoUpdate/${id}`)
             .then(res => {
                 setUserValue({
                     ...userValue,
@@ -80,7 +80,7 @@ function UpdateUser() {
       console.log("Updated User Data:", updatedUserData);
   
       try {
-          const response = await axios.put(`https://hrbackend-e58m.onrender.com/updateUser/${id}`, updatedUserData);
+          const response = await axios.put(`https://hrbackend-1.onrender.com/updateUser/${id}`, updatedUserData);
           alert(response.data.msg);
           navigate("/Users");
       } catch (err) {
@@ -110,7 +110,7 @@ function UpdateUser() {
 
     const gettingUsersData = async () => {
         try {
-            const response = await fetch("https://hrbackend-e58m.onrender.com/getUserDataToADDtoTeam", {
+            const response = await fetch("https://hrbackend-1.onrender.com/getUserDataToADDtoTeam", {
                 method: "GET"
             });
 
@@ -136,7 +136,7 @@ function UpdateUser() {
             {userType === 'Admin' ? <AdminTopNav /> : <UserTopNav />}
 
             <Form onSubmit={handleSubmit} style={{ backgroundColor: "aliceblue", padding: "30px", borderRadius: "20px", margin: "15px" }}>
-                <Image src={`https://hrbackend-e58m.onrender.com/${userValue.profile}`} style={{ width: "100px", borderRadius: "100px" }} alt="Profile" />
+                <Image src={`https://hrbackend-1.onrender.com/${userValue.profile}`} style={{ width: "100px", borderRadius: "100px" }} alt="Profile" />
 
                 <h3 style={{ textAlign: "center", fontFamily: "initial" }}>
                     <b><img style={{ width: "35px", borderRadius: "50px" }} src='/Images/icon.png' alt="icon" /> Update {userValue.usertype}</b>
