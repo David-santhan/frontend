@@ -62,7 +62,7 @@ const userType = getDecryptedData("User Type")
 
 const readClientList = async (id) => {
   let reqOption = { method: "GET" };
-  let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/ClientsList/${id}`, reqOption);
+  let JSONData = await fetch(`https://hrbackend-1.onrender.com/ClientsList/${id}`, reqOption);
   let JSOData = await JSONData.json();
   setClientList(JSOData);
   // setSelectedClientId(id);
@@ -80,7 +80,7 @@ useEffect(()=>{
         let reqOption={
           method:"GET"
         }
-        let JSONData= await fetch("https://hrbackend-e58m.onrender.com/ClientsList",reqOption)
+        let JSONData= await fetch("https://hrbackend-1.onrender.com/ClientsList",reqOption)
         let JSOData= await JSONData.json();
         setClientsList(JSOData);
        
@@ -97,7 +97,7 @@ useEffect(()=>{
                     method: "DELETE",
                     
                 };
-                let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/deleteClient/${id}`, reqOption);
+                let JSONData = await fetch(`https://hrbackend-1.onrender.com/deleteClient/${id}`, reqOption);
                 let JSOData = await JSONData.json();
     
                 if (JSOData.status === "success") {
@@ -122,7 +122,7 @@ useEffect(()=>{
       let reqOption = {
           method: "GET"
       };
-      const response = await fetch(`https://hrbackend-e58m.onrender.com/userDetailsofAssignedClient/${id}`, reqOption);
+      const response = await fetch(`https://hrbackend-1.onrender.com/userDetailsofAssignedClient/${id}`, reqOption);
       let data = await response.json();
       setAssignedUsers(data);
   };
@@ -131,7 +131,7 @@ useEffect(()=>{
       let reqOption = {
           method: "GET"
       };
-      const response = await fetch(`https://hrbackend-e58m.onrender.com/userDetailstoAssignClient/${id}`, reqOption);
+      const response = await fetch(`https://hrbackend-1.onrender.com/userDetailstoAssignClient/${id}`, reqOption);
       let data = await response.json();
       setUsersData(data);
       setFilteredData(data);
@@ -169,7 +169,7 @@ useEffect(()=>{
     // If the user confirms, proceed with the assignment
     if (isConfirmed) {
         try {
-            const response = await axios.post(`https://hrbackend-e58m.onrender.com/assignClient/${userId}/${clientId}`, 
+            const response = await axios.post(`https://hrbackend-1.onrender.com/assignClient/${userId}/${clientId}`, 
             {
                 headers: {
                     'Content-Type': 'application/json'
