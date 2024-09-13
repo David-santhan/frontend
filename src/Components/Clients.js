@@ -97,7 +97,7 @@ useEffect(()=>{
                     method: "DELETE",
                      headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`  // Add token if applicable
+    'Authorization': `Bearer `  // Add token if applicable
   },
                 };
                 let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/deleteClient/${id}`, reqOption);
