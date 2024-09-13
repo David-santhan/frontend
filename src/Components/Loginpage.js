@@ -68,7 +68,7 @@ function Loginpage() {
       
     };
 
-    let JSONData = await fetch("https://hrbackend-e58m.onrender.com/login", reqOption);
+    let JSONData = await fetch("https://hrbackend-1.onrender.com/login", reqOption);
     let JSOData = await JSONData.json();
     
     if (JSOData.status === "Success") { 
