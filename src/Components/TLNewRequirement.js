@@ -73,7 +73,7 @@ function TLNewRequirement() {
 
     const getClientDetails = async(userId)=>{
         try {
-            let response = await axios.get(`https://hrbackend-e58m.onrender.com/TlClients/${userId}`);
+            let response = await axios.get(`https://hrbackend-1.onrender.com/TlClients/${userId}`);
             let data = response.data;  
             setClient(data.Client);
             console.log(data)
@@ -130,7 +130,7 @@ let sendUserDataToDataBase = async () => {
     body: JSON.stringify(dataToSend),
   };
 
-  let JSONData = await fetch("https://hrbackend-e58m.onrender.com/newRequirment", reqOption);
+  let JSONData = await fetch("https://hrbackend-1.onrender.com/newRequirment", reqOption);
   let JSOData = await JSONData.json();
   if (JSOData.status === "Success") {
     alert(JSOData.msg);
