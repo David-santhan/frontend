@@ -89,7 +89,7 @@ function CreateClient() {
 //         headers:myheader,
 //     };
 
-//     let JSONData=await fetch("https://hrbackend-e58m.onrender.com/addClient",reqOption);
+//     let JSONData=await fetch("https://hrbackend-1.onrender.com/addClient",reqOption);
 //     let JSOData= await JSONData.json();
 //     if (JSOData.status==="Success") {
 //       alert(JSOData.msg);
@@ -124,7 +124,7 @@ function CreateClient() {
       method:"Post",
       body:dataToSend,
     };
-    let JSONData= await fetch("https://hrbackend-e58m.onrender.com/addClient",reqOption);
+    let JSONData= await fetch("https://hrbackend-1.onrender.com/addClient",reqOption);
     let JSOData = await JSONData.json();
     if (JSOData.status == "Success") {
       alert(JSOData.msg);
