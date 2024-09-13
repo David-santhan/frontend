@@ -63,11 +63,9 @@ function Loginpage() {
 
     let reqOption = {
       method: "POST",
-      mode: 'no-cors',
+      
       body: dataToSend,
-       headers: {
-    'Content-Type': 'application/json'
-  },
+      
     };
 
     let JSONData = await fetch("https://hrbackend-e58m.onrender.com/login", reqOption);
