@@ -39,7 +39,7 @@ function UserTopNav() {
         let reqOption = {
             method: "GET",
         };
-        let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/loggedinuserdata/${email}`, reqOption);
+        let JSONData = await fetch(`https://hrbackend-1.onrender.com/loggedinuserdata/${email}`, reqOption);
         let JSOData = await JSONData.json();
         setLoginUserData(JSOData);
     };
@@ -104,7 +104,7 @@ function UserTopNav() {
                                 </Nav>
                                 <Nav>
                                     <Navbar.Brand href="/Profile">
-                                        <Img src={localStoreProfile ? `https://hrbackend-e58m.onrender.com/${localStoreProfile}` : '/Images/defaultProfilePic.png'} style={{ width: "70px", borderRadius: "50px", margin: '10px' }} />
+                                        <Img src={localStoreProfile ? `https://hrbackend-1.onrender.com/${localStoreProfile}` : '/Images/defaultProfilePic.png'} style={{ width: "70px", borderRadius: "50px", margin: '10px' }} />
                                     </Navbar.Brand>
                                     <Navbar.Text style={{ margin: "5px" }}>
                                         <b style={{ color: "black", textDecoration: "underline", fontFamily: "initial" }}>Welcome:</b>
