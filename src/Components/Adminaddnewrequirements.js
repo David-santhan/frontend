@@ -72,7 +72,7 @@ function Adminaddnewrequirements() {
       let reqOption={
         method:"Get",
       }
-      let JSONData=await fetch("https://hrbackend-e58m.onrender.com/clientDetails",reqOption);
+      let JSONData=await fetch("https://hrbackend-1.onrender.com/clientDetails",reqOption);
         let JSOData=await JSONData.json();
         setClient(JSOData);
         console.log(JSOData)
@@ -175,7 +175,7 @@ let sendUserDataToDataBase = async () => {
     body: JSON.stringify(dataToSend),
   };
 
-  let JSONData = await fetch("https://hrbackend-e58m.onrender.com/newRequirment", reqOption);
+  let JSONData = await fetch("https://hrbackend-1.onrender.com/newRequirment", reqOption);
   let JSOData = await JSONData.json();
   if (JSOData.status === "Success") {
     alert(JSOData.msg);
