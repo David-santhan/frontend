@@ -24,7 +24,7 @@ function TeamLeadTopNav() {
         let reqOption = {
             method: "GET",
         };
-        let JSONData = await fetch(`https://hrbackend-e58m.onrender.com/loggedinuserdata/${email}`, reqOption);
+        let JSONData = await fetch(`https://hrbackend-1.onrender.com/loggedinuserdata/${email}`, reqOption);
         let JSOData = await JSONData.json();
         setLoginUserData(JSOData);
     };
@@ -109,7 +109,7 @@ const decryptData = (ciphertext, secret) => {
                                 </Nav>
                                 <Nav>
                                     <Navbar.Brand href="/Profile">
-                                        <Img src={`https://hrbackend-e58m.onrender.com/${item.ProfilePic}`} style={{ width: "70px", borderRadius: "50px", margin: '10px' }} />
+                                        <Img src={`https://hrbackend-1.onrender.com/${item.ProfilePic}`} style={{ width: "70px", borderRadius: "50px", margin: '10px' }} />
                                     </Navbar.Brand>
                                     <Navbar.Text style={{ margin: "5px" }}>
                                         <b style={{ color: "black", textDecoration: "underline", fontFamily: "initial" }}>Welcome:</b>
