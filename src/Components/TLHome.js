@@ -30,6 +30,7 @@ function TLHome() {
   const [showtotalCandidates,setshowtotalCandidates] = useState(false);
   const [currentRecruiter,setCurrentRecruiter] = useState([]);
   const [recruiterStats, setRecruiterStats] = useState([]);
+  const [assignReqdetails,setAssignReqdetails]=useState([]);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const JWT_SECRET = "ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar";
@@ -57,7 +58,7 @@ function TLHome() {
   // Fetch user and team data
   const fetchUserData = async (userId) => {
     try {
-      let response = await axios.get(`https://hrbackend-1.onrender.com/TlHome/${userId}`);
+      let response = await axios.get(`http://localhost:7993/TlHome/${userId}`);
       let data = response.data;
       setUserData(data.user);
       setTeamData(data.Team);
@@ -79,7 +80,7 @@ function TLHome() {
 
     try {
         // Fetch user data and team details from the server
-        let JSONData = await fetch(`https://hrbackend-1.onrender.com/getUserData/${id}`, reqOption);
+        let JSONData = await fetch(`http://localhost:7993/getUserData/${id}`, reqOption);
         let JSOData = await JSONData.json();
 
         // Extract user details and team details from the response
@@ -102,7 +103,7 @@ function TLHome() {
   };
 
   try {
-    let JSONData = await fetch(`https://hrbackend-1.onrender.com/getTeamrequirements/${userId}`, reqOption);
+    let JSONData = await fetch(`http://localhost:7993/getTeamrequirements/${userId}`, reqOption);
     let JSOData = await JSONData.json();
     console.log(JSOData);
 
@@ -147,7 +148,7 @@ const viewRequirement = async (id) => {
       method: 'GET',
     };
     try {
-      let JSONData = await fetch(`https://hrbackend-1.onrender.com/getrequirements/${id}`, reqOption);
+      let JSONData = await fetch(`http://localhost:7993/getrequirements/${id}`, reqOption);
       let JSOData = await JSONData.json();
       console.log(JSOData);
       setViewReq([JSOData]); // Wrap in an array to iterate properly in the table
@@ -160,7 +161,7 @@ const viewRequirement = async (id) => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`https://hrbackend-1.onrender.com/userDetailsofAssignedRequirement/${id}`, reqOption);
+    const response = await fetch(`http://localhost:7993/userDetailsofAssignedRequirement/${id}`, reqOption);
     let data = await response.json();
     setAssignedUsersData(data);
     
@@ -169,12 +170,21 @@ const viewRequirement = async (id) => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`https://hrbackend-1.onrender.com/userDetailstoAssignRequirement/${id}/${userId}`, reqOption);
+    const response = await fetch(`http://localhost:7993/userDetailstoAssignRequirement/${id}/${userId}`, reqOption);
     let data = await response.json();
-    setUserData(data);
-    setSelectedReqId(id);
+    
+    setUserData(data.teamMembers);
+    if (Array.isArray(data.requirementDetails)) {
+      setAssignReqdetails(data.requirementDetails); // Set if it's an array
+    } else if (data.requirementDetails && typeof data.requirementDetails === "object") {
+      setAssignReqdetails([data.requirementDetails]); // Convert object to array
+    } else {
+      setAssignReqdetails([]); // Handle cases where it's not valid data
+    }  
+     setSelectedReqId(id);
     userDetailsofAssignedClient(id);
     setShowAssign(true)
+
     
 };
 
@@ -187,7 +197,7 @@ const assignReqToUser = async (userId) => {
   // If the user confirms, proceed with the assignment
   if (isConfirmed) {
       try {
-          const response = await axios.post(`https://hrbackend-1.onrender.com/assignReq/${userId}/${ReqId}`, 
+          const response = await axios.post(`http://localhost:7993/assignReq/${userId}/${ReqId}`, 
           {
               headers: {
                   'Content-Type': 'application/json'
@@ -219,7 +229,7 @@ const Reqcounts = async () => {
   };
 
   try {
-    const response = await fetch(`https://hrbackend-1.onrender.com/getTeamRequirementsCount/${userId}`, reqOption);
+    const response = await fetch(`http://localhost:7993/getTeamRequirementsCount/${userId}`, reqOption);
     let data = await response.json();
 
     // Log the complete data for debugging
@@ -318,7 +328,7 @@ style={{backgroundColor:"lightgray"}}
       {/* Displaying Team Information */}
       {teamData.length > 0 && (
         <div>
-          <Table responsive style={{textAlign:"center"}} >
+          <Table style={{textAlign:"center"}} >
             <thead>
               <tr>
               <th>Employee Code</th>
@@ -363,7 +373,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`https://hrbackend-1.onrender.com/${showUserData.userDetails.ProfilePic}`}
+              src={`http://localhost:7993/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
@@ -706,7 +716,7 @@ style={{backgroundColor:"lightgray"}}
           <tr>
             <td>
               {item.assessments.length > 0 ? (
-                <Table bordered responsive>
+                <Table responsive bordered>
                   <thead >
                     <tr>
                       <th>Assessment</th>
@@ -743,9 +753,6 @@ style={{backgroundColor:"lightgray"}}
 ) : (
   <p>No requirements to display.</p>
 )}
-
-
-
         </Modal.Body>
       </Modal>
 
@@ -758,14 +765,24 @@ style={{backgroundColor:"lightgray"}}
       >
         <Modal.Header closeButton>
           <Modal.Title id="example-modal-sizes-title-lg">
-          <h3>
-          <img
-            style={{ width: "30px", margin: "10px" }}
-            src='/Images/icon.png'
-            alt="icon"
-          />
-          <b style={{ fontFamily: "monospace" }}>Assign Requirement</b>
-        </h3>
+          {Array.isArray(assignReqdetails) && assignReqdetails.length > 0 ? (
+  assignReqdetails.map((item, index) => (
+    <h3 key={index}>
+      <img
+        style={{ width: "30px", margin: "10px" }}
+        src='/Images/icon.png'
+        alt="icon"
+      />
+      <b style={{ fontFamily: "monospace" }}> 
+        Assign {item.client || 'No client'} 
+      </b>
+    </h3>
+  ))
+) : (
+  <p>No data available</p>
+)}
+
+
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -820,7 +837,7 @@ style={{backgroundColor:"lightgray"}}
 
   {assignedUsersData && assignedUsersData.length > 0 ? (
     <div>
-      <Table responsive style={{ textAlign: "center" }}>
+      <Table  responsive style={{ textAlign: "center" }}>
         <thead>
           <tr>
             <th>Employee Code</th>
@@ -878,7 +895,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`https://hrbackend-1.onrender.com/${showUserData.userDetails.ProfilePic}`}
+              src={`http://localhost:7993/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
