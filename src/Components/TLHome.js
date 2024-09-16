@@ -318,7 +318,7 @@ style={{backgroundColor:"lightgray"}}
       {/* Displaying Team Information */}
       {teamData.length > 0 && (
         <div>
-          <Table style={{textAlign:"center"}} >
+          <Table responsive style={{textAlign:"center"}} >
             <thead>
               <tr>
               <th>Employee Code</th>
@@ -466,7 +466,7 @@ style={{backgroundColor:"lightgray"}}
 
       {/* Render table only if showfl is true */}
       {showfl && (
-        <Table>
+        <Table responsive>
           <thead>
             <tr>
               <th>Sno</th>
@@ -624,7 +624,7 @@ style={{backgroundColor:"lightgray"}}
         </Modal.Header>
         <Modal.Body>
         {showReq && viewReq.length > 0 ? (
-  <Table striped bordered hover>
+  <Table striped bordered hover responsive>
     <tbody>
       {viewReq.map((item, index) => (
         <React.Fragment key={index}>
@@ -706,7 +706,7 @@ style={{backgroundColor:"lightgray"}}
           <tr>
             <td>
               {item.assessments.length > 0 ? (
-                <Table bordered>
+                <Table bordered responsive>
                   <thead >
                     <tr>
                       <th>Assessment</th>
@@ -774,7 +774,7 @@ style={{backgroundColor:"lightgray"}}
   {/* Displaying Team Information */}
   {userData && userData.length > 0 ? ( // Ensure userData is not null or undefined
     <div>
-      <Table style={{textAlign: "center"}}>
+      <Table responsive style={{textAlign: "center"}}>
         <thead>
           <tr>
             <th>Employee Code</th>
@@ -820,7 +820,7 @@ style={{backgroundColor:"lightgray"}}
 
   {assignedUsersData && assignedUsersData.length > 0 ? (
     <div>
-      <Table style={{ textAlign: "center" }}>
+      <Table responsive style={{ textAlign: "center" }}>
         <thead>
           <tr>
             <th>Employee Code</th>
