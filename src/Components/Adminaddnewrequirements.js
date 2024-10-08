@@ -22,6 +22,7 @@ function Adminaddnewrequirements() {
   const [relevantExperience,setRelevantExperience]=useState("");
   const [skill,setSkill]=useState("");
   const [requirmentType,setRequirmentType]=useState("");
+  const [role,setRole]= useState("");
   const [val,setVal]=useState([{
     Assessment:"",
     Yoe:""
@@ -133,7 +134,7 @@ const handleDelete = (index) => {
 //     method:"Post",
 //     body:dataToSend,
 //   };
-//   let JSONData= await fetch("http://localhost:7993/newRequirment",reqOption);
+//   let JSONData= await fetch("https://hrbackend-1.onrender.com/newRequirment",reqOption);
 //   let JSOData = await JSONData.json();
 //   if (JSOData.status=="Success") {
 //     alert(JSOData.msg);
@@ -157,6 +158,7 @@ let sendUserDataToDataBase = async () => {
     yearsExperience,
     relevantExperience,
     skill,
+    role,
     requirmentType,
     uploadedBy:userId,
     clientId:selectedClient.ClientId,
@@ -268,8 +270,12 @@ const handleSubmit=(event)=>{
         </Form.Group>
         <Form.Group as={Col} >
           <Form.Label><b>Skill</b></Form.Label>
-          <Form.Control value={skill} onChange={(e)=> setSkill(e.target.value)} style={{width:"300px",textAlign:"center",margin:"10px",border:"1px solid gray",borderRadius:"15px"}} placeholder="Enter Skills" />
+          <textarea value={skill} onChange={(e)=> setSkill(e.target.value)} style={{width:"300px",textAlign:"center",margin:"10px",border:"1px solid gray",borderRadius:"15px"}} placeholder="Enter Skills" ></textarea>
         </Form.Group> 
+        <Form.Group as={Col} >
+          <Form.Label><b>Role</b></Form.Label>
+          <Form.Control value={role} onChange={(e)=> setRole(e.target.value)} type='text' style={{width:"300px",textAlign:"center",margin:"10px",border:"1px solid gray",borderRadius:"15px"}} placeholder="Enter Role" />
+        </Form.Group>
         <Form.Group as={Col} >
           <Form.Label><b>Requirement Type</b></Form.Label>
           <Form.Select value={requirmentType} onChange={(e)=> setRequirmentType(e.target.value)} style={{width:"300px",textAlign:"center",margin:"10px",border:"1px solid gray",borderRadius:"15px"}} >
@@ -281,7 +287,6 @@ const handleSubmit=(event)=>{
             <option value="Closed">Closed</option>
           </Form.Select>        </Form.Group> <hr></hr>
         <Form.Group as={Col} >
-          <Button onClick={()=> handleAdd()}>ADD Assessment</Button> <hr></hr>
           {
             val.map((data,index)=>{
               return(
@@ -295,7 +300,9 @@ const handleSubmit=(event)=>{
                 
               )
             })
-          }
+          } <hr></hr>
+                    <Button onClick={()=> handleAdd()}>ADD Assessment</Button> <hr></hr>
+
         </Form.Group>
 </Row>
 
