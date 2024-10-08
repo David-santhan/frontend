@@ -15,9 +15,6 @@ import CryptoJS from 'crypto-js';
 import {  Form, InputGroup, FormControl } from 'react-bootstrap';
 
 
-
-
-
 function Clients() {
 
 const [clientsList,setClientsList]= useState([]);
@@ -71,8 +68,6 @@ const readClientList = async (id) => {
   handleShow();
 };
 
-
-
 useEffect(()=>{
     getClientList();
 })
@@ -117,7 +112,6 @@ useEffect(()=>{
         }
     };
     
-
     const userDetailsofAssignedClient = async (id) => {
       let reqOption = {
           method: "GET"
@@ -194,9 +188,6 @@ useEffect(()=>{
         alert('Client assignment was canceled ❌');
     }
 };
-  
-
-
    
   return (
     <div>
