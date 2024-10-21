@@ -179,7 +179,7 @@ const handleTotalSearch = () => {
   // Fetch user and team data
   const fetchUserData = async (userId) => {
     try {
-      let response = await axios.get(`http://localhost:7993/TlHome/${userId}`);
+      let response = await axios.get(`https://hrbackend-1.onrender.com/TlHome/${userId}`);
       let data = response.data;
       setUserData(data.user);
       setTeamData(data.Team);
@@ -201,7 +201,7 @@ const handleTotalSearch = () => {
 
     try {
         // Fetch user data and team details from the server
-        let JSONData = await fetch(`http://localhost:7993/getUserData/${id}`, reqOption);
+        let JSONData = await fetch(`https://hrbackend-1.onrender.com/getUserData/${id}`, reqOption);
         let JSOData = await JSONData.json();
 
         // Extract user details and team details from the response
@@ -224,7 +224,7 @@ const handleTotalSearch = () => {
   };
 
   try {
-    let JSONData = await fetch(`http://localhost:7993/getTeamrequirements/${userId}`, reqOption);
+    let JSONData = await fetch(`https://hrbackend-1.onrender.com/getTeamrequirements/${userId}`, reqOption);
     let JSOData = await JSONData.json();
     console.log(JSOData);
 
@@ -266,7 +266,7 @@ const viewRequirement = async (id) => {
       method: 'GET',
     };
     try {
-      let JSONData = await fetch(`http://localhost:7993/getrequirements/${id}`, reqOption);
+      let JSONData = await fetch(`https://hrbackend-1.onrender.com/getrequirements/${id}`, reqOption);
       let JSOData = await JSONData.json();
       
       setViewReq([JSOData]); // Wrap in an array to iterate properly in the table
@@ -280,7 +280,7 @@ const viewRequirement = async (id) => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`http://localhost:7993/userDetailsofAssignedRequirement/${id}/${userId}`, reqOption);
+    const response = await fetch(`https://hrbackend-1.onrender.com/userDetailsofAssignedRequirement/${id}/${userId}`, reqOption);
     let data = await response.json();
     setAssignedUsersData(data);
     console.log(data)    
@@ -289,7 +289,7 @@ const viewRequirement = async (id) => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`http://localhost:7993/userDetailstoAssignRequirement/${id}/${userId}`, reqOption);
+    const response = await fetch(`https://hrbackend-1.onrender.com/userDetailstoAssignRequirement/${id}/${userId}`, reqOption);
     let data = await response.json();
     console.log(data)
     setUserData(data.teamMembers);
@@ -316,7 +316,7 @@ const assignReqToUser = async (userId) => {
   // If the user confirms, proceed with the assignment
   if (isConfirmed) {
       try {
-          const response = await axios.post(`http://localhost:7993/assignReq/${userId}/${ReqId}`, 
+          const response = await axios.post(`https://hrbackend-1.onrender.com/assignReq/${userId}/${ReqId}`, 
           {
               headers: {
                   'Content-Type': 'application/json'
@@ -349,7 +349,7 @@ const Reqcounts = async () => {
   };
 
   try {
-    const response = await fetch(`http://localhost:7993/getTeamRequirementsCount/${userId}`, reqOption);
+    const response = await fetch(`https://hrbackend-1.onrender.com/getTeamRequirementsCount/${userId}`, reqOption);
     let data = await response.json();
 
     // Log the complete data for debugging
@@ -373,7 +373,7 @@ const RequirmentCandidates = async (id)=>{
   let reqOption = {
     method:"GET"
   }
-  let response = await fetch(`http://localhost:7993/getRequirementsCandidatesCount/${id}`,reqOption)
+  let response = await fetch(`https://hrbackend-1.onrender.com/getRequirementsCandidatesCount/${id}`,reqOption)
   // let data = response.json();
   // console.log('Response data:', data);
   if (!response.ok) {
@@ -396,7 +396,7 @@ const fetchCandidates = async (id) => {
   setError(""); // Reset error state
 
   try {
-    const response = await fetch(`http://localhost:7993/viewactions/${id}/${selectedRecruiterId}`);
+    const response = await fetch(`https://hrbackend-1.onrender.com/viewactions/${id}/${selectedRecruiterId}`);
     const data = await response.json();
    
 
@@ -419,7 +419,7 @@ const fetchCandidates = async (id) => {
 
 const CandidateData = async(id)=>{
   try {
-      const response = await axios.get(`http://localhost:7993/candidate/${id}`);
+      const response = await axios.get(`https://hrbackend-1.onrender.com/candidate/${id}`);
      
       // console.log(response.data)
           setCandidateDetails(response.data); 
@@ -434,7 +434,7 @@ const requirementDetailsWithAssignedUsers = async () => {
   let reqOption = {
       method: "GET"
   };
-  const response = await fetch(`http://localhost:7993/requirementDetailsWithAssignedUsers/${userId}`, reqOption);
+  const response = await fetch(`https://hrbackend-1.onrender.com/requirementDetailsWithAssignedUsers/${userId}`, reqOption);
   let data = await response.json();
   setShowCandidateDetailsHome(data);
   // console.log(data)    
@@ -516,7 +516,7 @@ const postStatus = async (id) => {
   }
 
   try {
-      const response = await fetch(`http://localhost:7993/updatestatus/${id}`, {
+      const response = await fetch(`https://hrbackend-1.onrender.com/updatestatus/${id}`, {
           method: 'PUT',
           headers: {
               'Content-Type': 'application/json',
@@ -1021,7 +1021,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`http://localhost:7993/${showUserData.userDetails.ProfilePic}`}
+              src={`https://hrbackend-1.onrender.com/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
@@ -1529,7 +1529,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`http://localhost:7993/${showUserData.userDetails.ProfilePic}`}
+              src={`https://hrbackend-1.onrender.com/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
@@ -1884,7 +1884,7 @@ style={{backgroundColor:"lightgray"}}
         <tr>
             <td>
               <Image
-                src={`http://localhost:7993/${candidateDetails.candidateImage}`}
+                src={`https://hrbackend-1.onrender.com/${candidateDetails.candidateImage}`}
                 style={{ width: "100px", borderRadius: "100px" }}
                 alt="Candidate Image"
               ></Image>
@@ -2074,7 +2074,7 @@ style={{backgroundColor:"lightgray"}}
     <td>
   {typeof candidateDetails.updatedResume === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`http://localhost:7993/${candidateDetails.updatedResume}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://hrbackend-1.onrender.com/${candidateDetails.updatedResume}`} target="_blank" rel="noopener noreferrer">
         View Resume
       </a>
     </div>
@@ -2089,7 +2089,7 @@ style={{backgroundColor:"lightgray"}}
     <td>
   {typeof candidateDetails.ornnovaProfile === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`http://localhost:7993/${candidateDetails.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://hrbackend-1.onrender.com/${candidateDetails.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
         View Ornnova Profile
       </a>
     </div>
