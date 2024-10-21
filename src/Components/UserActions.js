@@ -109,7 +109,7 @@ function UserActions() {
         const fetchRequirement = async () => {
             try {
               console.log(id)
-                const response = await axios.get(`http://localhost:7993/actions/${id}/${userId}`);
+                const response = await axios.get(`https://hrbackend-1.onrender.com/actions/${id}/${userId}`);
                 // console.log('Fetched requirement:', response.data); // Check the data structure
                 setRequirValues(prevValues => ({
                     ...prevValues,
@@ -134,7 +134,7 @@ function UserActions() {
         };     
         const fetchUserData = async (email) => {
             try {
-                const response = await fetch(`http://localhost:7993/loggedinuserdata/${email}`);
+                const response = await fetch(`https://hrbackend-1.onrender.com/loggedinuserdata/${email}`);
                 const data = await response.json();
                 setLoginUserData(data);
             } catch (err) {
@@ -197,7 +197,7 @@ function UserActions() {
 //             }
 //         };
 
-//         const response = await fetch('http://localhost:7993/candidates', {
+//         const response = await fetch('https://hrbackend-1.onrender.com/candidates', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json' // Send data as JSON
@@ -264,7 +264,7 @@ function UserActions() {
 //       formData.append('candidate[ornnovaProfile]', ornnovaProfileRef.current.files[0]); // Assuming this is a File object
 //       formData.append('candidate[candidateImage]', candidateimageRef.current.files[0]); // Assuming this is a File object
 
-//       const response = await fetch('http://localhost:7993/candidates', {
+//       const response = await fetch('https://hrbackend-1.onrender.com/candidates', {
 //           method: 'POST',
 //           body: formData // Send as FormData
 //       });
@@ -331,7 +331,7 @@ const sendCandidateDataToDatabase = async () => {
   if (candidateimageRef.current?.files[0]) formData.append('candidateImage', candidateimageRef.current.files[0]);
 
   try {
-      const response = await fetch('http://localhost:7993/Candidates', {
+      const response = await fetch('https://hrbackend-1.onrender.com/Candidates', {
           method: 'POST',
           body: formData // Send FormData object
       });
