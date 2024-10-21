@@ -59,7 +59,7 @@ const userType = getDecryptedData("User Type")
 
 const readClientList = async (id) => {
   let reqOption = { method: "GET" };
-  let JSONData = await fetch(`http://localhost:7993/ClientsList/${id}`, reqOption);
+  let JSONData = await fetch(`https://hrbackend-1.onrender.com/ClientsList/${id}`, reqOption);
   let JSOData = await JSONData.json();
   setClientList(JSOData);
   // setSelectedClientId(id);
@@ -78,7 +78,7 @@ let getClientList = async () => {
     };
 
     try {
-        let JSONData = await fetch("http://localhost:7993/ClientsList", reqOption);
+        let JSONData = await fetch("https://hrbackend-1.onrender.com/ClientsList", reqOption);
         let JSOData = await JSONData.json();
         // console.log(JSOData); // Log the response to inspect its structure
         // Assuming JSOData is supposed to be an array of clients
@@ -110,7 +110,7 @@ let getClientList = async () => {
                 let reqOption = {
                     method: "DELETE",
                 };
-                let JSONData = await fetch(`http://localhost:7993/deleteClient/${id}`, reqOption);
+                let JSONData = await fetch(`https://hrbackend-1.onrender.com/deleteClient/${id}`, reqOption);
                 let JSOData = await JSONData.json();
     
                 if (JSOData.status === "success") {
@@ -134,7 +134,7 @@ let getClientList = async () => {
       let reqOption = {
           method: "GET"
       };
-      const response = await fetch(`http://localhost:7993/userDetailsofAssignedClient/${id}`, reqOption);
+      const response = await fetch(`https://hrbackend-1.onrender.com/userDetailsofAssignedClient/${id}`, reqOption);
       let data = await response.json();
       setAssignedUsers(data.userDetails);
      
@@ -145,7 +145,7 @@ let getClientList = async () => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`http://localhost:7993/userDetailsofAssignedClient/${id}`, reqOption);
+    const response = await fetch(`https://hrbackend-1.onrender.com/userDetailsofAssignedClient/${id}`, reqOption);
     let data = await response.json();
     setAssignedCount(data.count);
     // console.log(data.count)
@@ -156,7 +156,7 @@ let getClientList = async () => {
       let reqOption = {
           method: "GET"
       };
-      const response = await fetch(`http://localhost:7993/userDetailstoAssignClient/${id}`, reqOption);
+      const response = await fetch(`https://hrbackend-1.onrender.com/userDetailstoAssignClient/${id}`, reqOption);
       let data = await response.json();
       console.log( data)
       setUsersData(data);
@@ -211,7 +211,7 @@ const filtereData = filteredData
     // If the user confirms, proceed with the assignment
     if (isConfirmed) {
         try {
-            const response = await axios.post(`http://localhost:7993/assignClient/${userId}/${clientId}`, 
+            const response = await axios.post(`https://hrbackend-1.onrender.com/assignClient/${userId}/${clientId}`, 
             {
                 headers: {
                     'Content-Type': 'application/json'
