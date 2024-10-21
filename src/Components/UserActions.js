@@ -11,6 +11,7 @@ import FormLabel from 'react-bootstrap/esm/FormLabel';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import CryptoJS from 'crypto-js';
+import TeamLeadTopNav from './TeamLeadTopNav';
 
 
 
@@ -72,6 +73,7 @@ function UserActions() {
  
     const userId = getDecryptedData('Id'); // Retrieve the user ID from local storage
     const userEmail = getDecryptedData('Email');
+    const userType = getDecryptedData("User Type");
 
     const navigate = useNavigate();
     const [requirValues, setRequirValues] = useState({
@@ -106,7 +108,8 @@ function UserActions() {
     useEffect(() => {
         const fetchRequirement = async () => {
             try {
-                const response = await axios.get(`https://hrbackend-1.onrender.com/actions/${id}/${userId}`);
+              console.log(id)
+                const response = await axios.get(`http://localhost:7993/actions/${id}/${userId}`);
                 // console.log('Fetched requirement:', response.data); // Check the data structure
                 setRequirValues(prevValues => ({
                     ...prevValues,
@@ -131,7 +134,7 @@ function UserActions() {
         };     
         const fetchUserData = async (email) => {
             try {
-                const response = await fetch(`https://hrbackend-1.onrender.com/loggedinuserdata/${email}`);
+                const response = await fetch(`http://localhost:7993/loggedinuserdata/${email}`);
                 const data = await response.json();
                 setLoginUserData(data);
             } catch (err) {
@@ -194,7 +197,7 @@ function UserActions() {
 //             }
 //         };
 
-//         const response = await fetch('https://hrbackend-1.onrender.com/candidates', {
+//         const response = await fetch('http://localhost:7993/candidates', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json' // Send data as JSON
@@ -261,7 +264,7 @@ function UserActions() {
 //       formData.append('candidate[ornnovaProfile]', ornnovaProfileRef.current.files[0]); // Assuming this is a File object
 //       formData.append('candidate[candidateImage]', candidateimageRef.current.files[0]); // Assuming this is a File object
 
-//       const response = await fetch('https://hrbackend-1.onrender.com/candidates', {
+//       const response = await fetch('http://localhost:7993/candidates', {
 //           method: 'POST',
 //           body: formData // Send as FormData
 //       });
@@ -328,7 +331,7 @@ const sendCandidateDataToDatabase = async () => {
   if (candidateimageRef.current?.files[0]) formData.append('candidateImage', candidateimageRef.current.files[0]);
 
   try {
-      const response = await fetch('https://hrbackend-1.onrender.com/Candidates', {
+      const response = await fetch('http://localhost:7993/Candidates', {
           method: 'POST',
           body: formData // Send FormData object
       });
@@ -357,7 +360,8 @@ const submitAssessment=()=>{
 
     return (
         <div>
-            <UserTopNav />
+            {/* <UserTopNav /> */}
+            {userType === "TeamLead" ? <TeamLeadTopNav/> : <UserTopNav/>}
             <center>
                 <h4 style={{fontFamily:"monospace", backgroundColor:"lightgray", borderRadius:"20px", padding:"5px", margin:"10px"}}><b>Requirement Details</b></h4>
                 <Form style={{margin:"10px", backgroundColor:"linen", padding:"10px", borderRadius:"20px"}}>
