@@ -13,10 +13,6 @@ import Image from 'react-bootstrap/Image';
 import CryptoJS from 'crypto-js';
 
 
-
-
-
-
 function Requirements() {
     let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
 
@@ -58,6 +54,31 @@ function Requirements() {
     const [showModal, setShowModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [assignedUserDetails,setAssignedUserDetails] = useState([]);
+    const [usersCount, setUsersCount] = useState(0);
+    const [remainingUsers, setRemainingUsers] = useState([]);
+    const [selectedReqId,setSelectedReqId]= useState('');
+    // State for filters
+    const [selectedCandidateStatus, setSelectedCandidateStatus] = useState('');
+    const [candidateName, setCandidateName] = useState('');
+
+    // Function to filter candidates
+    const filteredRecruitersData = recruitersData.map(item => ({
+        ...item,
+        candidates: item.candidates.filter(candidate => {
+            const recentStatus = candidate.Status && candidate.Status.length > 0
+                ? candidate.Status[candidate.Status.length - 1].Status
+                : "No Action Taken";
+
+            const matchesStatus = selectedCandidateStatus ? recentStatus === selectedCandidateStatus : true;
+            const matchesName = candidateName 
+                ? `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(candidateName.toLowerCase())
+                : true;
+
+            return matchesStatus && matchesName;
+        })
+    })).filter(item => item.candidates.length > 0); // Keep only items with candidates
+
+
     
 const [formData, setFormData] = useState({
   id:'',
@@ -87,12 +108,19 @@ const [tempSearchRole, setTempSearchRole] = useState('');
 const [tempSearchStatus, setTempSearchStatus] = useState('All');
 const [selectedStatus, setSelectedStatus] = useState('');
 const [searchReq, setSearchReq] = useState("");
+const [expandedRecruiter, setExpandedRecruiter] = useState(null);
+
+    const toggleRecruiter = (recruiterId) => {
+        // Toggle the visibility of candidates for the selected recruiter
+        setExpandedRecruiter(expandedRecruiter === recruiterId ? null : recruiterId);
+    };
+
 
     const handleSearchChange = (event) => {
         setSearchReq(event.target.value);
     };
 
-
+ 
 // Status options for the search dropdown
 const statusSearchOptions = [ 'Ornnova Screen Selected', 'Shared with Client', 'Client Rejected', 'L1 Pending', 
     'L1 Selected', 'L1 Rejected', 'L2 Pending', 'L2 Selected', 'L2 Rejected', 
@@ -216,23 +244,6 @@ const filteredCandidates = filterCandidates();
         }
     };
    
-    const fetchCandidates = async (recruiterId, reqId) => {
-        try {
-            const response = await axios.get('https://hrbackend-1.onrender.com/api/candidates', {
-                params: {
-                    recruiterId,
-                    reqId
-                }
-            });
-            const candidatesData = response.data;
-                  
-            console.log( candidatesData); // Print the candidate details to the console
-            setCandidates(candidatesData); // Store candidates in state if you need to display them
-            setShowCandidate(true);
-        } catch (error) {
-            console.error('Error fetching candidates:', error);
-        }
-    }
     const requirementDetails = async (id) => {
         try {
             const response = await axios.get(`https://hrbackend-1.onrender.com/getrequirements/${id}`);
@@ -384,7 +395,6 @@ const filteredCandidates = filterCandidates();
         }
       };
       // Edit Requirement
-
       const fetchRequirement = async (id) => {
         try {
             const response = await fetch(`https://hrbackend-1.onrender.com/getrequirements/${id}`);
@@ -406,8 +416,7 @@ const filteredCandidates = filterCandidates();
             ...prevData,
             [name]: value,
         }));
-    };
-    
+    };  
     const handleAssessmentChange = (index, e) => {
       const { name, value } = e.target;
       const updatedAssessments = [...formData.assessments];
@@ -417,15 +426,12 @@ const filteredCandidates = filterCandidates();
           assessments: updatedAssessments,
       }));
     };
-    
     const addAssessment = () => {
       setFormData((prevData) => ({
           ...prevData,
           assessments: [...prevData.assessments, { assessment: '', yoe: '' }],
       }));
     };
-    
-    
     const deleteAssessment = (index) => {
       const newAssessments = formData.assessments.filter((_, i) => i !== index);
       setFormData({
@@ -445,25 +451,25 @@ const filteredCandidates = filterCandidates();
           console.error(err);
           alert("Error updating requirement.");
       }
-    };
-    
+    }; 
 // Function to fetch requirement details without Axios
 const fetchRequirementDetails = async (reqId) => {
   try {
       // Send GET request using the Fetch API
       const response = await fetch(`https://hrbackend-1.onrender.com/admingetrequirements/${reqId}`);
-
       // Check if the response is okay (status 200)
       if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
       }
-
       // Check if the response is JSON
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
+          console.log(data)
           setAssignedUserDetails(data.userDetails);
-          setShowAssigns(true); 
+          fetchRemainingUsers(reqId);
+          setShowAssigns(true);
+          setSelectedReqId(reqId);
       } else {
           throw new Error("Received non-JSON response from server");
       }
@@ -473,6 +479,68 @@ const fetchRequirementDetails = async (reqId) => {
   }
 };
 
+const fetchRemainingUsers = async (reqId) => {
+  try {
+      // Make a GET request to the /remainingusers/:id API
+      const response = await axios.get(`https://hrbackend-1.onrender.com/remainingusers/${reqId}`);
+      
+      // Set the remaining users in state
+      setRemainingUsers(response.data);
+  } catch (err) {
+      console.error('Error fetching remaining users:', err.message);
+      // setError('Failed to load remaining users.');
+  } 
+};
+// Fetch user count from the API
+const fetchUsersCount = async () => {
+  try {
+    const response = await axios.get("https://hrbackend-1.onrender.com/allUsersCount"); // API call to get count
+    setUsersCount(response.data); // update state with the count
+  } catch (error) {
+    console.error("Error fetching user count:", error);
+  }
+};
+
+// Call the function when component mounts
+useEffect(() => {
+  fetchUsersCount();
+}, []); // empty dependency array to run it once on mount
+  
+const assignReqToUser = async (userId) => {
+  const ReqId = selectedReqId; // Ensure you have a way to store the selected client ID
+
+  // Show a confirmation dialog to the user
+  const isConfirmed = window.confirm(`Are you sure you want to assign this Requirement ?`);
+
+  // If the user confirms, proceed with the assignment
+  if (isConfirmed) {
+      try {
+          const response = await axios.post(`https://hrbackend-1.onrender.com/assignReq/${userId}/${ReqId}`, 
+          {
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          });
+
+          const result = response.data;
+
+          if (result.status === 'success') {
+              alert('Requirement assigned successfully ✅');
+              setShowAssigns(false)
+              window.location.reload();
+              // Optionally refresh the user list or perform any other updates
+          } else {
+              alert(result.msg);
+          }
+      } catch (error) {
+          console.error('Error assigning client:', error.response ? error.response.data : error.message);
+          alert('An error occurred while assigning the client. Please try again later.');
+      }
+  } else {
+      // User canceled the assignment, so no action is taken
+      alert('Requirement assignment was canceled ❌');
+  }
+};
 
     return (
         <div>
@@ -588,7 +656,7 @@ const fetchRequirementDetails = async (reqId) => {
                                 <td>{item.requirementtype}</td>
                                 <td>{new Date(item.startDate).toLocaleDateString()}</td>
                                 <td>{new Date(item.uploadedDate).toLocaleDateString()}</td>
-                                <td><Link style={{textDecoration:"none"}} onClick={()=>{fetchRequirementDetails(item._id)}}><strong style={{ backgroundColor:"dimgrey", borderRadius: "8px", padding: "9px", color: "white" }}>{item.userCount}</strong></Link></td>
+                                <td><Link style={{textDecoration:"none"}} onClick={()=>{fetchRequirementDetails(item._id)}}><strong style={{ backgroundColor:"dimgrey", borderRadius: "8px", padding: "9px", color: "white" }}>{item.userCount}/{usersCount}</strong></Link></td>
                                 <td>
                                     <Link style={{ textDecoration: "none" }} onClick={() => fetchRecruiterDetails(item._id)}>
                                         <b style={{ backgroundColor: "lightsteelblue", borderRadius: "8px", padding: "9px", color: "black" }}>
@@ -650,7 +718,7 @@ const fetchRequirementDetails = async (reqId) => {
                     </Modal.Body>
                 </Modal>
 
-                <Modal show={showA} size="lg"onHide={() => setShowA(false)}dialogClassName="modal-90w"aria-labelledby="example-custom-modal-styling-title" >
+                <Modal show={showA} size="fullscreen"onHide={() => setShowA(false)}dialogClassName="modal-90w"aria-labelledby="example-custom-modal-styling-title" >
             <Modal.Header closeButton>
                 <Modal.Title id="example-custom-modal-styling-title">
                 <h5> <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img><b style={{fontFamily:"monospace"}} >Recruiters Actions</b></h5> {/* Displaying single requirement detail */}
@@ -658,34 +726,110 @@ const fetchRequirementDetails = async (reqId) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            <div className="table-responsive">
-            <Table style={{textAlign:"center"}} striped bordered hover responsive className="table-sm">
-                    <thead>
-                        <tr>
-                            <th>Employee Code</th>
-                            <th>Employee Name</th>
-                            {/* <th>Email</th> */}
-                            <th>Uploads</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            recruitersData.map((item, i) => (
+            {/* Filters */}
+            <div style={{ marginBottom: '10px' }}>
+                 
+                
+                <input
+                    type="search"
+                    placeholder="Search by Candidate Name"
+                    value={candidateName}
+                    onChange={(e) => setCandidateName(e.target.value)}
+                    style={{ padding:"10px",width:"300px",margin:"10px",border:"2px solid black",borderRadius:"20px" }}
+                /> <br></br>
+                <select style={{padding:"10px",width:"300px",margin:"10px",border:"2px solid black",borderRadius:"20px"}} onChange={(e) => setSelectedCandidateStatus(e.target.value)} value={selectedCandidateStatus}>
+                    <option value="">All</option>
+                    {statusSearchOptions.map((status, index) => (
+                        <option key={index} value={status}>{status}</option>
+                    ))}
+                </select>
+            </div>
+
+            <Table striped bordered hover responsive className="table-sm" style={{ textAlign: "center" }}>
+                <thead>
+                    <tr>
+                        <th>Employee Name</th>
+                        <th>Candidate Name</th>
+                        <th>Role</th>
+                        <th>ECTC</th>
+                        <th>LWD</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredRecruitersData.map((item, i) => (
+                        <React.Fragment key={i}>
+                            {item.candidates.length > 0 ? (
+                                item.candidates.filter(candidate => {
+                                    const recentStatus = candidate.Status && candidate.Status.length > 0
+                                        ? candidate.Status[candidate.Status.length - 1].Status
+                                        : "No Action Taken";
+
+                                    const matchesStatus = selectedCandidateStatus ? recentStatus === selectedCandidateStatus : true;
+                                    const matchesName = candidateName 
+                                        ? `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(candidateName.toLowerCase())
+                                        : true;
+
+                                    return matchesStatus && matchesName;
+                                }).map((candidate, index) => {
+                                    const recentStatus = candidate.Status && candidate.Status.length > 0
+                                        ? candidate.Status[candidate.Status.length - 1].Status
+                                        : "No Action Taken";
+
+                                    let textColor;
+                                    if (recentStatus === "No Action Taken") {
+                                        textColor = "blue";
+                                    } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+                                        textColor = "red";
+                                    } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+                                        textColor = "orange";
+                                    } else {
+                                        textColor = "green";
+                                    }
+
+                                    return (
+                                        <tr key={index}>
+                                            {index === 0 && (
+                                                <td rowSpan={item.candidates.length}>{item.recruiter.EmployeeName}</td>
+                                            )}
+                                            <td>{candidate.firstName} {candidate.lastName}</td>
+                                            <td>{candidate.role}</td>
+                                            <td>{candidate.ectc}</td>
+                                            <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
+                                            <td style={{ color: textColor }}>
+                                                <b>{recentStatus}</b>
+                                            </td>
+                                            <td
+                                                style={{ cursor: "pointer", color: "blue" }}
+                                                onClick={() => CandidateData(candidate._id)}>
+                                                <b>
+                                                    <img
+                                                        style={{
+                                                            backgroundColor: "lightblue",
+                                                            margin: "5px",
+                                                            padding: "10px",
+                                                            borderRadius: "10px",
+                                                        }}
+                                                        src='./Images/view.svg'
+                                                        alt="View"
+                                                    />
+                                                </b>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            ) : (
                                 <tr key={i}>
                                     <td>{item.recruiter.EmpCode}</td>
                                     <td>{item.recruiter.EmployeeName}</td>
-                                    {/* <td>{item.recruiter.Email}</td> */}
-                                    <td
-                                        style={{ cursor: "pointer", color: "blue" }}
-                                        onClick={() => fetchCandidates(item.recruiter._id,item.regId)}>
-                                        <b>{item.candidateCount}</b>
-                                    </td>
+                                    <td colSpan={6}>No Candidates</td>
                                 </tr>
-                            ))
-                        }
-                    </tbody>
-                </Table>
-                </div>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </tbody>
+            </Table>
             </Modal.Body>
             </Modal>
 
@@ -769,133 +913,12 @@ const fetchRequirementDetails = async (reqId) => {
                                          <td colSpan="2">No assessments available</td>
                                     </tr>
                             )}
-
                     </tbody>
                 </Table>
                 </div>
     </Modal.Body>
                </Modal>
-            <Modal show={showCandidate} onHide={() => setShowCandidate(false)} fullscreen={true} dialogClassName="modal-90w" aria-labelledby="candidates-modal-title">
-                <Modal.Header closeButton>
-                    <Modal.Title id="candidates-modal-title">
-                        <strong className="me-auto">
-                        <h5> <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img><b style={{fontFamily:"monospace"}} >Candidates Details</b></h5>
-                        </strong>
-                    </Modal.Title>
-                </Modal.Header>
-                {/* Search Inputs */}
-      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <FormControl
-          type="text"
-          placeholder="Search by Name"
-          value={tempSearchName}
-          onChange={(e) => setTempSearchName(e.target.value)}
-          style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-        />
-        <FormControl
-          type="text"
-          placeholder="Search by Role"
-          value={tempSearchRole}
-          onChange={(e) => setTempSearchRole(e.target.value)}
-          style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-        />
-        <FormControl
-          as="select"
-          value={tempSearchStatus}
-          onChange={(e) => setTempSearchStatus(e.target.value)}
-          style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-        >
-          <option value="All">All</option>
-          {statusSearchOptions.map((option, idx) => (
-            <option key={idx} value={option}>
-              {option}
-            </option>
-          ))}
-        </FormControl>
-        <Button onClick={handleSearchClick}>Search</Button>
-      </div>
-
-      {/* Candidate Table */}
-      <Modal.Body>
-        <Table responsive striped bordered hover>
-          <thead style={{ textAlign: "center" }}>
-            <tr>
-              <th>Sno</th>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Total YOE</th>
-              <th>LWD</th>
-              <th>ECTC</th>
-              <th>Status</th>
-              <th>Uploaded Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody style={{ textAlign: "center" }}>
-            {filteredCandidates.length > 0 ? filteredCandidates.map((candidate, index) => {
-              const recentStatus = candidate.Status && candidate.Status.length
-                ? candidate.Status[candidate.Status.length - 1].Status
-                : "No status available";
-
-              let statusColor;
-              if (recentStatus === "No status available") {
-                statusColor = "blue";
-              } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-                statusColor = "red";
-              } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-                statusColor = "orange";
-              } else {
-                statusColor = "green";
-              }
-
-              return (
-                <tr key={candidate.id}>
-                  <td>{index + 1}</td>
-                  <td>{candidate.firstName} {candidate.lastName}</td>
-                  <td>{candidate.role}</td>
-                  <td>{candidate.totalYoe}</td>
-                  <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
-                  <td>{candidate.ectc}</td>
-                  <td style={{ color: statusColor }}>
-                    <b>{recentStatus}</b>
-                  </td>
-                  <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
-                  <td>
-                    <Link onClick={() => CandidateData(candidate._id)} >
-                      <Image
-                        style={{
-                          backgroundColor: "lightblue",
-                          margin: "10px",
-                          padding: "10px",
-                          borderRadius: "10px",
-                        }}
-                        src='/Images/view.svg'
-                      />
-                    </Link>
-                    <Link onClick={() => handleDeleteClick(candidate._id)} >
-                      <Image
-                        style={{
-                          backgroundColor: "IndianRed",
-                          margin: "10px",
-                          padding: "10px",
-                          borderRadius: "10px",
-                        }}
-                        src='/Images/trash.svg'
-                      />
-                    </Link>
-                  </td>
-                </tr>
-              );
-            }) : (
-              <tr>
-                <td colSpan="9">No candidates available.</td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </Modal.Body>
-
-            </Modal>
+           
             <Modal size="lg" show={lagShow} onHide={() => setLagShow(false)} aria-labelledby="example-modal-sizes-title-lg" style={{ backgroundColor: "lightgrey",opacity:"99%" }}>
             <Modal.Header closeButton>
                 <Modal.Title id="example-modal-sizes-title-lg">
@@ -1055,10 +1078,10 @@ const fetchRequirementDetails = async (reqId) => {
                 <td><b>LWD:</b></td>
                 <td>{new Date(candidateDetails.lwd).toLocaleDateString()}</td>
             </tr>
-            <tr>
+            {/* <tr>
                 <td><b>Internal Screening:</b></td>
                 <td>{candidateDetails.internalScreening}</td>
-            </tr>
+            </tr> */}
             <tr>
                 <td><b>Offer In Hand:</b></td>
                 <td>{candidateDetails.offerInHand}</td>
@@ -1079,10 +1102,10 @@ const fetchRequirementDetails = async (reqId) => {
                 <td><b>Remark:</b></td>
                 <td>{candidateDetails.remark}</td>
             </tr>
-            <tr>
+            {/* <tr>
                 <td><b>Shared With Client:</b></td>
                 <td>{candidateDetails.sharedWithClient}</td>
-            </tr>
+            </tr> */}
             <tr>
       <td><strong>Candidate Resume:</strong></td>
     <td>
@@ -1503,20 +1526,59 @@ const fetchRequirementDetails = async (reqId) => {
                     <Table responsive style={{textAlign:"center"}}>
                         <thead>
                             <tr>
+                              <th>Sno</th>
                                 <th>Name</th>
                                 <th>User Type</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {assignedUserDetails.map((item)=>{
+                            {assignedUserDetails.map((item,index)=>{
                               return(
-                                <tr> <td>{item.name}</td>
+                                <tr> 
+                                   <th scope="row">{index + 1}</th>
+                                  <td>{item.name}</td>
                                       <td>{item.userType}</td>
-                                      <td><Button variant='success'><b>Assigned</b></Button></td>
+                                      <td><Button style={{borderRadius:"20px"}} variant='success'><b>Assigned</b></Button></td>
                                 </tr>)})}
                         </tbody>
-                    </Table>   
+                    </Table>   <hr></hr>
+                    <h4 style={{textAlign:"center"}}>
+            <img
+              style={{ width: "30px", margin: "10px" }}
+              src='/Images/icon.png'
+              alt="icon"
+            />
+            <b style={{ fontFamily: "monospace" }}>Assign Users</b>
+          </h4> <hr></hr>
+                    <Table responsive style={{textAlign:"center"}} >
+                <thead>
+                    <tr>
+                        <th >Sno</th>
+                        <th >Name</th>
+                        <th >User Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {remainingUsers.length > 0 ? (
+                        remainingUsers.map((user, index) => (
+                            <tr key={user._id}>
+                                <th scope="row">{index + 1}</th>
+                                <td>{user.name || 'N/A'}</td>
+                                <td>{user.userType || 'N/A'}</td>
+                                <td><Button onClick={()=>{ assignReqToUser(user._id)}} style={{backgroundColor:"lightcoral",border:"0px",borderRadius:"20px"}}><strong style={{color:"white"}}>Assign</strong></Button></td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="4" style={{ textAlign: 'center' }}>
+                                No remaining users found
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </Table>
         </Modal.Body>
         <Modal.Footer>
           
