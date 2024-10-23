@@ -27,10 +27,12 @@ function Home() {
   const [requirementData, SetRequirementData] = useState({}); // Changed to object
   const [lgShow, setLgShow] = useState(false);
   const [show, setShow] = useState(false);
+  const [viewCandidate,setViewCandidate] = useState(false);
   const [updateshow, setUpdateshow] = useState(false);
   const [candidateData,setCandidateData] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [selectedTypes, setSelectedTypes] = useState(['hot', 'warm']);
+  const [candidatesData,setCandidatesData] = useState([]);
   let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
    // State to hold the search terms
    const [nameSearchTerm, setNameSearchTerm] = useState("");
@@ -105,7 +107,7 @@ const UserType = getDecryptedData("User Type")
 
   // Function to handle the view button click
   const handleViewClick = (candidate) => {
-    setSelectedCandidate(candidate);
+    
   };
  
 
@@ -286,6 +288,17 @@ const getDropdownTitle = () => {
     return selectedTypes.join(', ').replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+const ViewCandidateData = async(id)=>{
+  try {
+      const response = await axios.get(`https://hrbackend-1.onrender.com/candidate/${id}`);
+     
+      setSelectedCandidate(response.data);
+      console.log(selectedCandidate)
+          setViewCandidate(true)
+  } catch (error) {
+      console.error('Error fetching candidates:', error);
+  } 
+}
 
   const handleDeleteClick = async (candidateId) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this candidate?');
@@ -629,7 +642,7 @@ const getDropdownTitle = () => {
                                 </td>
                                 <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>
                                 <td>
-                                    <Link onClick={() => handleViewClick(item)}>
+                                    <Link onClick={() => ViewCandidateData(item._id)}>
                                         <Image style={{ backgroundColor: "lightblue", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
                                     </Link>
                                     <Link onClick={() => handleDeleteClick(item._id)}>
@@ -1059,6 +1072,242 @@ const getDropdownTitle = () => {
                 </div>
     </Modal.Body>
                </Modal>
+
+
+               <Modal
+        size="lg"
+        show={viewCandidate}
+        onHide={() => setViewCandidate(false)}
+        aria-labelledby="example-modal-sizes-title-lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="example-modal-sizes-title-lg">
+          <h5>
+            <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img>
+            <b style={{ fontFamily: "monospace" }}>Candidate Details</b>
+          </h5>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        {viewCandidate && selectedCandidate && (
+        <div>
+          {/* Your existing code to display the selected candidate's details goes here */}
+          <Table striped bordered hover className="table-sm">
+            <tbody>
+              <tr>
+                <td>
+                  <Image
+                    src={`https://hrbackend-1.onrender.com/${selectedCandidate.candidateImage}`}
+                    style={{ width: "100px", borderRadius: "100px" }}
+                    alt="Candidate Image"
+                  />
+                </td>
+                <td>
+                  <center>
+                    <strong>Update Status</strong> <hr></hr>
+                    {selectedCandidate.Status && Array.isArray(selectedCandidate.Status) && selectedCandidate.Status.length > 0 ? (
+    selectedCandidate.Status.map((item, index) => (
+      <React.Fragment key={index}>
+        <tr>
+          <td>
+            <b>Status :</b>
+          </td>
+          <td style={{ fontFamily: "monospace" }}>
+            {item.Status}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>Updated Date :</b>
+          </td>
+          <td>{new Date(item.Date).toLocaleDateString()}</td>
+        </tr>
+        <hr />
+      </React.Fragment>
+    ))
+  ) : (
+    <tr>
+      <td colSpan={2}>No Action Taken</td>
+    </tr>
+  )}
+                  </center>
+                </td>
+              </tr>
+              {/* Rest of your candidate details as in your provided code */}
+              <tr>
+                <td><b>Candidate Name</b></td>
+                <td>{selectedCandidate.firstName} {selectedCandidate.lastName}</td>
+              </tr>
+<tr>
+    <td><b>Email:</b></td>
+    <td>{selectedCandidate.email}</td>
+</tr>
+<tr>
+    <td><b>Date of Birth:</b></td>
+    <td>{new Date(selectedCandidate.dob).toLocaleDateString()}</td>
+</tr>
+<tr>
+    <td><b>Mobile Number:</b></td>
+    <td>{selectedCandidate.mobileNumber}</td>
+</tr>
+{/* Uncomment the following if client information is needed
+<tr>
+    <td><b>Client:</b></td>
+    <td>{candidateDetails.client}</td>
+</tr>
+*/}
+<tr>
+    <td><b>Skills:</b></td>
+    <td>{selectedCandidate.candidateSkills}</td>
+</tr>
+<tr>
+    <td><b>CTC:</b></td>
+    <td>{selectedCandidate.ctc}</td>
+</tr>
+<tr>
+    <td><b>Expected CTC:</b></td>
+    <td>{selectedCandidate.ectc}</td>
+</tr>
+<tr>
+    <td><b>Educational Qualification:</b></td>
+    <td>{selectedCandidate.educationalQualification}</td>
+</tr>
+<tr>
+    <td><b>Total YOE:</b></td>
+    <td>{selectedCandidate.totalYoe}</td>
+</tr>
+<tr>
+    <td><b>Relevant YOE:</b></td>
+    <td>{selectedCandidate.relevantYoe}</td>
+</tr>
+<tr>
+    <td><b>Current Location:</b></td>
+    <td>{selectedCandidate.currentLocation}</td>
+</tr>
+<tr>
+    <td><b>Preferred Location:</b></td>
+    <td>{selectedCandidate.prefLocation}</td>
+</tr>
+<tr>
+    <td><b>Current Organization:</b></td>
+    <td>{selectedCandidate.currentOrg}</td>
+</tr>
+<tr>
+    <td><b>Role:</b></td>
+    <td>{selectedCandidate.role}</td>
+</tr>
+<tr>
+    <td><b>Resignation Served:</b></td>
+    <td>{selectedCandidate.resignationServed}</td>
+</tr>
+<tr>
+    <td><b>Last Working Date:</b></td>
+    <td>{new Date(selectedCandidate.lwd).toLocaleDateString()}</td>
+</tr>
+{/* Uncomment the following if status information is needed
+<tr>
+    <td><b>Status:</b></td>
+    <td>{candidateDetails.Status}</td>
+</tr>
+*/}
+<tr>
+    <td><b>Offer In Hand:</b></td>
+    <td>{selectedCandidate.offerInHand}</td>
+</tr>
+<tr>
+    <td><b>Interview Date:</b></td>
+    <td>{new Date(selectedCandidate.interviewDate).toLocaleDateString()}</td>
+</tr>
+<tr>
+    <td><b>Details:</b></td>
+    <td>{selectedCandidate.details}</td>
+</tr>
+<tr>
+    <td><b>Feedback:</b></td>
+    <td>{selectedCandidate.feedback}</td>
+</tr>
+<tr>
+    <td><b>Remark:</b></td>
+    <td>{selectedCandidate.remark}</td>
+</tr>
+{/* Uncomment the following if shared with client information is needed
+<tr>
+    <td><b>Shared With Client:</b></td>
+    <td>{candidateDetails.sharedWithClient}</td>
+</tr>
+*/}
+<tr>
+    <td><strong>Candidate Resume:</strong></td>
+    <td>
+        {typeof selectedCandidate.updatedResume === 'string' ? (
+            <div style={{ marginBottom: '5px' }}>
+                <a href={`https://hrbackend-1.onrender.com/${selectedCandidate.updatedResume}`} target="_blank" rel="noopener noreferrer">
+                    View Resume
+                </a>
+            </div>
+        ) : (
+            'No PDFs available.'
+        )}
+    </td>
+</tr>
+<tr>
+    <td><strong>Ornnova Profile:</strong></td>
+    <td>
+        {typeof selectedCandidate.ornnovaProfile === 'string' ? (
+            <div style={{ marginBottom: '5px' }}>
+                <a href={`https://hrbackend-1.onrender.com/${selectedCandidate.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
+                    View Ornnova Profile
+                </a>
+            </div>
+        ) : (
+            'No PDFs available.'
+        )}
+    </td>
+</tr>
+<tr>
+    <td colSpan="2">
+        <center>
+            <h5>
+                <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
+                <b style={{ fontFamily: "monospace" }}>Assessment</b>
+            </h5>
+        </center>
+    </td>
+</tr>
+{
+    selectedCandidate.assessments && Array.isArray(selectedCandidate.assessments) && selectedCandidate.assessments.length > 0 ? (
+        selectedCandidate.assessments.map((item, index) => (
+            <React.Fragment key={index}>
+                <tr>
+                    <td><b>Assessment:</b></td>
+                    <td>{item.assessment}</td>
+                </tr>
+                <tr>
+                    <td><b>YOE:</b></td>
+                    <td>{item.yoe}</td>
+                </tr>
+                <tr>
+                    <td><b>Score:</b></td>
+                    <td>{item.score}</td>
+                </tr>
+                <tr>
+                    <td colSpan={2}><hr /></td>
+                </tr>
+            </React.Fragment>
+        ))
+    ) : (
+        <tr>
+            <td colSpan={2}>No assessments available.</td>
+        </tr>
+    )
+}            </tbody>
+          </Table>
+        </div>
+      )}
+
+        </Modal.Body>
+      </Modal>
+
     </center>
     </div>
   );
