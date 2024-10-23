@@ -32,6 +32,30 @@ function Home() {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [selectedTypes, setSelectedTypes] = useState(['hot', 'warm']);
   let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
+   // State to hold the search terms
+   const [nameSearchTerm, setNameSearchTerm] = useState("");
+   const [statusSearchTerm, setStatusSearchTerm] = useState("");
+
+   // Status options
+   const statusOptions = [
+       'Ornnova Screen Selected', 'Shared with Client', 'Client Rejected', 
+       'L1 Pending', 'L1 Selected', 'L1 Rejected', 'L2 Pending', 
+       'L2 Selected', 'L2 Rejected', 'Onboard Confirmation', 
+       'On Boarded', 'Rejected', 'Declined'
+   ];
+
+   // Filtered candidates based on the search terms
+   const filteredCandidates = candidateData.filter(item => {
+       const fullName = `${item.firstName} ${item.lastName}`.toLowerCase();
+       const recentStatus = item.Status && item.Status.length > 0
+           ? item.Status[item.Status.length - 1].Status.toLowerCase() // Get the most recent status
+           : "no status"; // Default if no status
+
+       return (
+           fullName.includes(nameSearchTerm.toLowerCase()) &&
+           (statusSearchTerm ? recentStatus === statusSearchTerm.toLowerCase() : true)
+       );
+   });
 
   // Function to decrypt data
   const decryptData = (ciphertext, secret) => {
@@ -513,14 +537,7 @@ const getDropdownTitle = () => {
                                     </td>
                                     <td>
                                         <Link to={`/UserAction/${req._id}/${userId}`}>
-                                            <Button
-                                                style={{
-                                                    border: '1px solid gray',
-                                                    backgroundColor: buttonColor,
-                                                    borderRadius: '20px',
-                                                    color: textColor,
-                                                }}
-                                            >
+                                            <Button style={{ border: '1px solid gray',backgroundColor: buttonColor,borderRadius: '20px',color: textColor,}}>
                                                 <b>Take Action</b>
                                             </Button>
                                         </Link>
@@ -547,261 +564,86 @@ const getDropdownTitle = () => {
       </Modal.Header>
 
       <Modal.Body>
-        <center>
-          <Table striped bordered hover style={{ textAlign: "center" }}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Skills</th>
-                <th>Total YOE</th>
-                <th>LWD</th>
-                <th>ECTC</th>
-                <th>Status</th>
-                <th>Uploaded Date</th>
-              </tr>
-            </thead>
-            <tbody>
-  {
-    candidateData.map((item, index) => {
-      // Get the most recent status
-      const recentStatus = item.Status && item.Status.length > 0
-        ? item.Status[item.Status.length - 1].Status
-        : "No Status";
+       {/* Name Search Input Field */}
+       <input
+                type="text"
+                placeholder="Search by name..."
+                value={nameSearchTerm}
+                onChange={(e) => setNameSearchTerm(e.target.value)}
+                style={{ marginBottom: "10px", padding: "10px", width: "300px",border:"2px solid black",borderRadius:"20px" }}
+            /> <br></br>
 
-      // Determine the text color based on the status
-      let textColor;
-      if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected/Declined"].includes(recentStatus)) {
-        textColor = "red"; // Rejected statuses
-      } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-        textColor = "orange"; // Pending statuses
-      } else if (recentStatus === "No Status") {
-        textColor = "blue"; // No status
-      } else {
-        textColor = "green"; // Other statuses
-      }
-
-      return (
-        <tr key={index}>
-          <td>{item.firstName} {item.lastName}</td>
-          <td>{item.candidateSkills}</td>
-          <td>{item.totalYoe}</td>
-          <td>{new Date(item.lwd).toLocaleDateString()}</td>
-          <td>{item.ectc}</td>
-          <td style={{ color: textColor }}>
-            <b>{recentStatus}</b> {/* Display the most recent status */}
-          </td>
-          <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>
-          <td>
-            <Link onClick={() => handleViewClick(item)}>
-              <Image style={{ backgroundColor: "lightblue", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
-            </Link>
-            <Link onClick={() => handleDeleteClick(item._id)}>
-              <Image style={{ backgroundColor: "IndianRed", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/trash.svg' />
-            </Link>
-            <Link onClick={() => updateCandidate(item._id)}>
-              <Image style={{ backgroundColor: "lightgreen", padding: "10px", margin: "10px", borderRadius: "10px" }} src='/Images/edit.svg' />
-            </Link>
-          </td>
-        </tr>
-      );
-    })
-  }
-</tbody>
-
-          </Table>
-
-          {/* Conditionally render a modal with the selected candidate's details */}
-          {selectedCandidate && (
-            <Modal
-            style={{backgroundColor:"lightgray",opacity:"98%"}}
-            size="lg"
-              show={true}
-              onHide={() => setSelectedCandidate(null)}
-              aria-labelledby="candidate-details-modal-title"
+            {/* Status Selection Dropdown */}
+            <select
+                value={statusSearchTerm}
+                onChange={(e) => setStatusSearchTerm(e.target.value)}
+                style={{ marginBottom: "20px", padding: "10px", width: "300px",border:"2px solid black",borderRadius:"20px" }}
             >
-              <Modal.Header closeButton>
-                <Modal.Title id="candidate-details-modal-title">
-                <h5> <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img><b style={{fontFamily:"monospace"}} >Candidate Information</b></h5> {/* Displaying single requirement detail */}
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <div className="table-responsive">
-              <Table striped bordered hover className="table table-sm">
-              <tbody>
-  <tr>
-    <td>
-      <Image src={`https://hrbackend-1.onrender.com/${selectedCandidate.candidateImage}`} style={{ width: "100px", borderRadius: "100px" }} alt="Candidate Image" />
-      <td>
-       
-      </td>
-    </td>
-  </tr>
-  
-  {/* Add the Candidate Status here */}
-  <tr>
-    <td><strong>Candidate Status:</strong></td>
-    <td>
-      {/* Get the most recent status */}
-      {selectedCandidate.Status && selectedCandidate.Status.length > 0 ? 
-        selectedCandidate.Status[selectedCandidate.Status.length - 1].Status : 
-        "No Status"
-      }
-    </td>
-  </tr>
+                <option value="">All</option> {/* Default option */}
+                {statusOptions.map((status, index) => (
+                    <option key={index} value={status.toLowerCase()}>{status}</option>
+                ))}
+            </select>
 
-  <tr>
-    <td><strong>Name:</strong></td>
-    <td>{selectedCandidate.firstName} {selectedCandidate.lastName}</td>
-  </tr>
-  <tr>
-    <td><strong>Email:</strong></td>
-    <td>{selectedCandidate.email}</td>
-  </tr>
-  <tr>
-    <td><strong>Mobile Number:</strong></td>
-    <td>{selectedCandidate.mobileNumber}</td>
-  </tr>
-  <tr>
-    <td><strong>Date of Birth:</strong></td>
-    <td>{new Date(selectedCandidate.dob).toLocaleDateString()}</td>
-  </tr>
-  <tr>
-    <td><strong>CTC:</strong></td>
-    <td>{selectedCandidate.ctc}</td>
-  </tr>
-  <tr>
-    <td><strong>ECTC:</strong></td>
-    <td>{selectedCandidate.ectc}</td>
-  </tr>
-  <tr>
-    <td><strong>Educational Qualification:</strong></td>
-    <td>{selectedCandidate.educationalQualification}</td>
-  </tr>
-  <tr>
-    <td><strong>Total YOE:</strong></td>
-    <td>{selectedCandidate.totalYoe}</td>
-  </tr>
-  <tr>
-    <td><strong>Relevant YOE:</strong></td>
-    <td>{selectedCandidate.relevantYoe}</td>
-  </tr>
-  <tr>
-    <td><strong>LWD:</strong></td>
-    <td>{new Date(selectedCandidate.lwd).toLocaleDateString()}</td>
-  </tr>
-  <tr>
-    <td><strong>Current Location:</strong></td>
-    <td>{selectedCandidate.currentLocation}</td>
-  </tr>
-  <tr>
-    <td><strong>Preferred Location:</strong></td>
-    <td>{selectedCandidate.prefLocation}</td>
-  </tr>
-  <tr>
-    <td><strong>Resignation Served:</strong></td>
-    <td>{selectedCandidate.resignationServed}</td>
-  </tr>
-  <tr>
-    <td><strong>Current Organization:</strong></td>
-    <td>{selectedCandidate.currentOrg}</td>
-  </tr>
-  <tr>
-    <td><strong>Candidate Skills:</strong></td>
-    <td>{selectedCandidate.candidateSkills}</td>
-  </tr>
-  <tr>
-    <td><strong>Role:</strong></td>
-    <td>{selectedCandidate.role}</td>
-  </tr>
-  <tr>
-    <td><strong>Feedback:</strong></td>
-    <td>{selectedCandidate.feedback}</td>
-  </tr>
-  <tr>
-    <td><strong>Details:</strong></td>
-    <td>{selectedCandidate.details}</td>
-  </tr>
-  <tr>
-    <td><strong>Interview Date:</strong></td>
-    <td>{new Date(selectedCandidate.interviewDate).toLocaleDateString()}</td>
-  </tr>
-  <tr>
-    <td><strong>Offer in Hand:</strong></td>
-    <td>{selectedCandidate.offerInHand}</td>
-  </tr>
-  <tr>
-    <td><strong>Remark:</strong></td>
-    <td>{selectedCandidate.remark}</td>
-  </tr>
-  <tr>
-    <td><strong>Candidate Resume:</strong></td>
-    <td>
-      {typeof selectedCandidate.updatedResume === 'string' ? (
-        <div style={{ marginBottom: '5px' }}>
-          <a href={`https://hrbackend-1.onrender.com/${selectedCandidate.updatedResume}`} target="_blank" rel="noopener noreferrer">
-            View Resume
-          </a>
-        </div>
-      ) : 'No PDFs available.'}
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Ornnova Profile:</strong></td>
-    <td>
-      {typeof selectedCandidate.ornnovaProfile === 'string' ? (
-        <div style={{ marginBottom: '5px' }}>
-          <a href={`https://hrbackend-1.onrender.com/${selectedCandidate.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
-            View Ornnova Profile
-          </a>
-        </div>
-      ) : 'No PDFs available.'}
-    </td>
-  </tr>
-  
-  <tr>
-    <td colSpan={2}>
-      <h3 style={{ fontFamily: "monospace" }}><center>Assessment</center></h3>
-    </td>
-  </tr>
+            <Table responsive style={{textAlign:"center"}}>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Skills</th>
+                        <th>Total YOE</th>
+                        <th>LWD</th>
+                        <th>ECTC</th>
+                        <th>Status</th>
+                        <th>Uploaded On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredCandidates.map((item, index) => {
+                        // Get the most recent status
+                        const recentStatus = item.Status && item.Status.length > 0
+                            ? item.Status[item.Status.length - 1].Status
+                            : "No Status";
 
-  {
-    selectedCandidate.assessments && Array.isArray(selectedCandidate.assessments) && selectedCandidate.assessments.length > 0 ? (
-      selectedCandidate.assessments.map((item, index) => (
-        <React.Fragment key={index}>
-          <tr>
-            <td><b>Assessment:</b></td>
-            <td>{item.assessment}</td>
-          </tr>
-          <tr>
-            <td><b>YOE:</b></td>
-            <td>{item.yoe}</td>
-          </tr>
-          <tr>
-            <td><b>Score:</b></td>
-            <td>{item.score}</td>
-          </tr> 
-          <hr />
-        </React.Fragment>
-      ))
-    ) : (
-      <tr>
-        <td colSpan={2}>No assessments available.</td>
-      </tr>
-    )
-  }
-</tbody>
+                        // Determine the text color based on the status
+                        let textColor;
+                        if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+                            textColor = "red"; // Rejected statuses
+                        } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+                            textColor = "orange"; // Pending statuses
+                        } else if (recentStatus === "No Status") {
+                            textColor = "blue"; // No status
+                        } else {
+                            textColor = "green"; // Other statuses
+                        }
 
-</Table>
-</div>
-      </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={() => setSelectedCandidate(null)}>
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          )}
-        </center>
+                        return (
+                            <tr key={index}>
+                                <td>{item.firstName} {item.lastName}</td>
+                                <td>{item.candidateSkills}</td>
+                                <td>{item.totalYoe}</td>
+                                <td>{new Date(item.lwd).toLocaleDateString()}</td>
+                                <td>{item.ectc}</td>
+                                <td style={{ color: textColor }}>
+                                    <b>{recentStatus}</b> {/* Display the most recent status */}
+                                </td>
+                                <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>
+                                <td>
+                                    <Link onClick={() => handleViewClick(item)}>
+                                        <Image style={{ backgroundColor: "lightblue", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
+                                    </Link>
+                                    <Link onClick={() => handleDeleteClick(item._id)}>
+                                        <Image style={{ backgroundColor: "IndianRed", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/trash.svg' />
+                                    </Link>
+                                    <Link onClick={() => updateCandidate(item._id)}>
+                                        <Image style={{ backgroundColor: "lightgreen", padding: "10px", margin: "10px", borderRadius: "10px" }} src='/Images/edit.svg' />
+                                    </Link>
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </Table>
       </Modal.Body>
     </Modal>
     <center>
