@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Img from 'react-bootstrap/Image';
@@ -17,7 +17,6 @@ function Loginpage() {
   const [errors, setErrors] = useState({});
   const JWT_SECRET = "ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar";
 
-  const userTypeRef = useRef();
   const storeObj = useSelector((store) => store);
   console.log(storeObj);
 
@@ -59,22 +58,24 @@ function Loginpage() {
     let dataToSend = new FormData();
     dataToSend.append('Email', email);
     dataToSend.append('Password', password);
-    dataToSend.append('UserType', userTypeRef.current.value);
 
     let reqOption = {
       method: "POST",
-      
       body: dataToSend,
-      
     };
 
     let JSONData = await fetch("https://hrbackend-1.onrender.com/login", reqOption);
     let JSOData = await JSONData.json();
-    
-    if (JSOData.status === "Success") { 
-      alert(JSOData.msg); 
-      dispatch({ type: "login", data: JSOData.data });
+
+    if (JSOData.status === "Success") {
+      // Check if the user status is Inactive
+      if (JSOData.data.Status === "InActive") {
+        alert("Your account is InActive ❌");
+        return; // Stop the login process
+      }
       
+      dispatch({ type: "login", data: JSOData.data });
+
       // Store encrypted data in localStorage
       localStorage.setItem("isLogedin", true);
       localStorage.setItem("Name", encryptData(JSOData.data.EmployeeName, JWT_SECRET));
@@ -86,14 +87,9 @@ function Loginpage() {
       localStorage.setItem("Id", encryptData(JSOData.data.Id, JWT_SECRET));
       localStorage.setItem("claimedRequirements", encryptData(JSOData.data.ClaimedRequirements, JWT_SECRET));
 
-      // Navigate based on user type
-      navigate(
-        userTypeRef.current.value === "Admin" 
-          ? "/Adminhome" 
-          : userTypeRef.current.value === "TeamLead" 
-            ? "/TLHome" 
-            : "/home"
-      );
+      // Navigate based on user type directly from the response
+      const userType = JSOData.data.UserType; // Get user type from the API response
+      navigate(userType === "Admin" ? "/Adminhome" : userType === "TeamLead" ? "/TLHome" : "/home");
 
       window.location.reload();
     } else {
@@ -128,17 +124,6 @@ function Loginpage() {
             <Form.Control value={password} onChange={handlePasswordChange} style={{ borderRadius: "15px", textAlign: "center", borderColor: errors.password ? 'red' : 'black' }} type="password" placeholder="Enter Your Password" />
             {!passwordIsValid && <p style={{ color: 'red' }}>Password must be at least 6 characters long.</p>}
             {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
-          </Form.Group>
-
-          <Form.Group className="mb-3" controlId="formBasicUserType">
-            <Form.Label><b>User Type</b></Form.Label>
-            <Form.Select ref={userTypeRef} style={{ borderRadius: "15px", textAlign: "center", borderColor: errors.password ? 'red' : 'black' }}>
-              <option value="">Select User Type</option>
-              <option value="User">User</option>
-              <option value="TeamLead">Team Lead</option>
-              <option value="Admin">Admin</option>
-            </Form.Select>
-            {errors.userType && <p style={{ color: 'red' }}>{errors.userType}</p>}
           </Form.Group>
 
           <a href='/forgotpassword'>Forgot Password?</a>
