@@ -107,28 +107,39 @@ function Signup() {
 // };
 
   const sendLink = async (e) => {
-  // e.preventDefault();
+  e.preventDefault(); // Prevent default form submission behavior
 
- const token = getDecryptedData("Id"); // Assume token is stored in local storage
-  const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}` // Include token if the endpoint requires it
-    },
-    body: JSON.stringify({ email })
-  });
+  const email = "your_email@example.com"; // Replace with the state variable if needed
 
-  if (res.status === 201) {
-    const data = await res.json();
-    setEmail(""); // Clear the input field
-    setShow(true); // Show feedback
-  } else if (res.status === 401) {
-    alert("Unauthorized. Please provide correct credentials.");
-  } else {
-    alert("Invalid User. Please try again.");
+  if (!email) {
+    alert("Please enter an email address");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email })
+    });
+
+    if (res.status === 201) {
+      const data = await res.json();
+      setEmail(""); // Clear input on success
+      setShow(true); // Show success feedback
+    } else if (res.status === 401) {
+      alert("Unauthorized. Please provide correct credentials.");
+    } else {
+      alert("Invalid User. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error sending password link:", error);
+    alert("An error occurred while sending the password reset link. Please try again later.");
   }
 };
+
 
 
 
