@@ -602,7 +602,7 @@ const ViewCandidateData = async(id)=>{
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Skills</th>
+                        <th>Role</th>
                         <th>Total YOE</th>
                         <th>LWD</th>
                         <th>ECTC</th>
@@ -633,7 +633,7 @@ const ViewCandidateData = async(id)=>{
                         return (
                             <tr key={index}>
                                 <td>{item.firstName} {item.lastName}</td>
-                                <td>{item.candidateSkills}</td>
+                                <td>{item.role}</td>
                                 <td>{item.totalYoe}</td>
                                 <td>{new Date(item.lwd).toLocaleDateString()}</td>
                                 <td>{item.ectc}</td>
