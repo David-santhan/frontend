@@ -111,7 +111,7 @@ function Loginpage() {
     <div>
       <center>
         <Form onSubmit={handleSubmit} style={{ backgroundColor: "lightgray", padding: "50px", borderRadius: "20px", width: "370px", marginTop: "15px" }}>
-          <Img src='./Images/LOGO_ORNNOVA.avif' style={{ width: "200px", borderRadius: "50px" }}></Img><hr />
+          <Img src='./Images/LOGO_ORNNOVA.avif' style={{ width: "200px", }}></Img><hr />
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label><b>Email address</b></Form.Label>
             <Form.Control value={email} onChange={handleEmailChange} style={{ borderRadius: "15px", textAlign: "center", borderColor: errors.email ? 'red' : 'black' }} type="email" placeholder="Enter Your Email Address" />
