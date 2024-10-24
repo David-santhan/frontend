@@ -53,7 +53,7 @@ function Signup() {
 // }
 
   const sendLink = async (e) => {
-  e.preventDefault(); // To prevent page refresh on form submit, uncomment if necessary
+  // e.preventDefault(); // To prevent page refresh on form submit, uncomment if necessary
 
   const email = "example@example.com"; // Ensure email is obtained from the state or form
 
