@@ -33,24 +33,52 @@ function Signup() {
     setEmail(e.target.value)
 }
 
-const sendLink = async (e)=>{
-  // e.preventDefault();
+// const sendLink = async (e)=>{
+//   // e.preventDefault();
 
-  const res = await fetch ("https://hrbackend-1.onrender.com/sendpasswordlink",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },body:JSON.stringify({email})
-  });
-  const data = await res.json();
-   if (data.status === 201) {
-    setEmail("");
-    setShow(true)
-   }else{
-    // toast.error("Invalid User")
-    alert("Invalid User")
-   }
-}
+//   const res = await fetch ("https://hrbackend-1.onrender.com/sendpasswordlink",{
+//     method:"POST",
+//     headers:{
+//       "Content-Type":"application/json"
+//     },body:JSON.stringify({email})
+//   });
+//   const data = await res.json();
+//    if (data.status === 201) {
+//     setEmail("");
+//     setShow(true)
+//    }else{
+//     // toast.error("Invalid User")
+//     alert("Invalid User")
+//    }
+// }
+const sendLink = async (e) => {
+  e.preventDefault(); // Uncomment this if you're preventing default form submission behavior.
+
+  try {
+    const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email }) // Ensure 'email' is properly set in your component's state
+    });
+
+    const data = await res.json();
+
+    if (res.status === 201) { // Check the response status
+      setEmail(""); // Clear the input field
+      setShow(true); // Show success message
+    } else {
+      alert("Invalid User"); // Handle invalid user case
+    }
+  } catch (error) {
+    console.error("Error sending password link:", error);
+    alert("Something went wrong. Please try again.");
+  }
+};
+
+
+  
   // let sendUserData= async()=>{
   //   const res = await fetch("https://hrbackend-1.onrender.com/forgot-password",{
   //     method:"POST",
