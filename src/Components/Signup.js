@@ -33,24 +33,60 @@ function Signup() {
     setEmail(e.target.value)
 }
 
-const sendLink = async (e)=>{
-  // e.preventDefault();
+// const sendLink = async (e)=>{
+//   // e.preventDefault();
 
-  const res = await fetch ("https://hrbackend-1.onrender.com/sendpasswordlink",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },body:JSON.stringify({email})
-  });
-  const data = await res.json();
-   if (data.status === 201) {
-    setEmail("");
-    setShow(true)
-   }else{
-    // toast.error("Invalid User")
-    alert("Invalid User")
-   }
-}
+//   const res = await fetch ("https://hrbackend-1.onrender.com/sendpasswordlink",{
+//     method:"POST",
+//     headers:{
+//       "Content-Type":"application/json"
+//     },body:JSON.stringify({email})
+//   });
+//   const data = await res.json();
+//    if (data.status === 201) {
+//     setEmail("");
+//     setShow(true)
+//    }else{
+//     // toast.error("Invalid User")
+//     alert("Invalid User")
+//    }
+// }
+
+  const sendLink = async (e) => {
+  e.preventDefault(); // To prevent page refresh on form submit, uncomment if necessary
+
+  const email = "example@example.com"; // Ensure email is obtained from the state or form
+
+  // Check if email is defined
+  if (!email) {
+    alert("Please enter an email address");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email }) // Make sure the email is valid
+    });
+
+    // Check HTTP response status
+    if (res.status === 201) {
+      const data = await res.json();
+      setEmail(""); // Clear the input field after success
+      setShow(true); // Show success message or UI feedback
+    } else if (res.status === 401) {
+      alert("Unauthorized. Please check your email or credentials.");
+    } else {
+      alert("Invalid User. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error sending password link:", error);
+    alert("An error occurred while sending the password reset link. Please try again later.");
+  }
+};
 
 
 
