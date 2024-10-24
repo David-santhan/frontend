@@ -107,7 +107,7 @@ function Signup() {
 // };
 
   const sendLink = async (e) => {
-  e.preventDefault();
+  // e.preventDefault();
 
  const token = getDecryptedData("Id"); // Assume token is stored in local storage
   const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
