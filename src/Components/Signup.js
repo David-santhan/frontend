@@ -7,12 +7,30 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate,Link } from 'react-router-dom';
 import axios from 'axios';
 import {ToastContainer,toast} from 'react-toastify';
+import CryptoJS from 'crypto-js';
 
 function Signup() {
 
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
   const [show, setShow] = useState(false);
+    let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
+
+  // Function to decrypt data
+  const decryptData = (ciphertext, secret) => {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, secret);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  };
+
+  const getDecryptedData = (key) => {
+    const encryptedValue = localStorage.getItem(key);
+    if (encryptedValue) {
+      return decryptData(encryptedValue, JWT_SECRET);
+    }
+    return null;
+  };
+
+  const userId = getDecryptedData("Id");
 
  
 
@@ -52,39 +70,63 @@ function Signup() {
 //    }
 // }
 
+//   const sendLink = async (e) => {
+//   // e.preventDefault(); // To prevent page refresh on form submit, uncomment if necessary
+
+//   const email = "example@example.com"; // Ensure email is obtained from the state or form
+
+//   // Check if email is defined
+//   if (!email) {
+//     alert("Please enter an email address");
+//     return;
+//   }
+
+//   try {
+//     const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json"
+//       },
+//       body: JSON.stringify({ email }) // Make sure the email is valid
+//     });
+
+//     // Check HTTP response status
+//     if (res.status === 201) {
+//       const data = await res.json();
+//       setEmail(""); // Clear the input field after success
+//       setShow(true); // Show success message or UI feedback
+//     } else if (res.status === 401) {
+//       alert("Unauthorized. Please check your email or credentials.");
+//     } else {
+//       alert("Invalid User. Please try again.");
+//     }
+//   } catch (error) {
+//     console.error("Error sending password link:", error);
+//     alert("An error occurred while sending the password reset link. Please try again later.");
+//   }
+// };
+
   const sendLink = async (e) => {
-  // e.preventDefault(); // To prevent page refresh on form submit, uncomment if necessary
+  e.preventDefault();
 
-  const email = "example@example.com"; // Ensure email is obtained from the state or form
+ const token = getDecryptedData("Id"); // Assume token is stored in local storage
+  const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}` // Include token if the endpoint requires it
+    },
+    body: JSON.stringify({ email })
+  });
 
-  // Check if email is defined
-  if (!email) {
-    alert("Please enter an email address");
-    return;
-  }
-
-  try {
-    const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email }) // Make sure the email is valid
-    });
-
-    // Check HTTP response status
-    if (res.status === 201) {
-      const data = await res.json();
-      setEmail(""); // Clear the input field after success
-      setShow(true); // Show success message or UI feedback
-    } else if (res.status === 401) {
-      alert("Unauthorized. Please check your email or credentials.");
-    } else {
-      alert("Invalid User. Please try again.");
-    }
-  } catch (error) {
-    console.error("Error sending password link:", error);
-    alert("An error occurred while sending the password reset link. Please try again later.");
+  if (res.status === 201) {
+    const data = await res.json();
+    setEmail(""); // Clear the input field
+    setShow(true); // Show feedback
+  } else if (res.status === 401) {
+    alert("Unauthorized. Please provide correct credentials.");
+  } else {
+    alert("Invalid User. Please try again.");
   }
 };
 
