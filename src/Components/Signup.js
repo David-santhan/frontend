@@ -51,24 +51,24 @@ function Signup() {
     setEmail(e.target.value)
 }
 
-// const sendLink = async (e)=>{
-//   // e.preventDefault();
+const sendLink = async (e)=>{
+  // e.preventDefault();
 
-//   const res = await fetch ("https://hrbackend-1.onrender.com/sendpasswordlink",{
-//     method:"POST",
-//     headers:{
-//       "Content-Type":"application/json"
-//     },body:JSON.stringify({email})
-//   });
-//   const data = await res.json();
-//    if (data.status === 201) {
-//     setEmail("");
-//     setShow(true)
-//    }else{
-//     // toast.error("Invalid User")
-//     alert("Invalid User")
-//    }
-// }
+  const res = await fetch ("https://hrbackend-1.onrender.com/sendpasswordlink",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },body:JSON.stringify({email})
+  });
+  const data = await res.json();
+   if (data.status === 201) {
+    setEmail("");
+    setShow(true)
+   }else{
+    // toast.error("Invalid User")
+    alert("Invalid User")
+   }
+}
 
 //   const sendLink = async (e) => {
 //   // e.preventDefault(); // To prevent page refresh on form submit, uncomment if necessary
@@ -105,43 +105,6 @@ function Signup() {
 //     alert("An error occurred while sending the password reset link. Please try again later.");
 //   }
 // };
-
-  const sendLink = async (e) => {
-  // e.preventDefault(); // Prevent default form submission behavior
-
-  const email = "your_email@example.com"; // Replace with the state variable if needed
-
-  if (!email) {
-    alert("Please enter an email address");
-    return;
-  }
-
-  try {
-    const res = await fetch("https://hrbackend-1.onrender.com/sendpasswordlink", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email })
-    });
-
-    if (res.status === 201) {
-      const data = await res.json();
-      setEmail(""); // Clear input on success
-      setShow(true); // Show success feedback
-    } else if (res.status === 401) {
-      alert("Unauthorized. Please provide correct credentials.");
-    } else {
-      alert("Invalid User. Please try again.");
-    }
-  } catch (error) {
-    console.error("Error sending password link:", error);
-    alert("An error occurred while sending the password reset link. Please try again later.");
-  }
-};
-
-
-
 
   
   // let sendUserData= async()=>{
