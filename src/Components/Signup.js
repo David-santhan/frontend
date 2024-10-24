@@ -107,7 +107,7 @@ function Signup() {
 // };
 
   const sendLink = async (e) => {
-  e.preventDefault(); // Prevent default form submission behavior
+  // e.preventDefault(); // Prevent default form submission behavior
 
   const email = "your_email@example.com"; // Replace with the state variable if needed
 
