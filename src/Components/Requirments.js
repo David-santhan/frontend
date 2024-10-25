@@ -541,6 +541,41 @@ const assignReqToUser = async (userId) => {
       alert('Requirement assignment was canceled ❌');
   }
 };
+const unassignReqFromUser = async (userId) => {
+  const ReqId = selectedReqId; // Ensure you have a way to store the selected requirement ID
+
+  // Show a confirmation dialog to the user
+  const isConfirmed = window.confirm(`Are you sure you want to unassign this Requirement?`);
+
+  // If the user confirms, proceed with the unassignment
+  if (isConfirmed) {
+      try {
+          const response = await axios.post(`https://hrbackend-1.onrender.com/unassignReq/${userId}/${ReqId}`, 
+          {
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          });
+
+          const result = response.data;
+
+          if (result.status === 'success') {
+              alert('Requirement unassigned successfully ✅');
+              setShowAssigns(false);
+              window.location.reload();
+              // Optionally refresh the user list or perform any other updates
+          } else {
+              alert(result.msg);
+          }
+      } catch (error) {
+          console.error('Error unassigning requirement:', error.response ? error.response.data : error.message);
+          alert('An error occurred while unassigning the requirement. Please try again later.');
+      }
+  } else {
+      // User canceled the unassignment, so no action is taken
+      alert('Requirement unassignment was canceled ❌');
+  }
+};
 
     return (
         <div>
@@ -1529,7 +1564,7 @@ const assignReqToUser = async (userId) => {
                               <th>Sno</th>
                                 <th>Name</th>
                                 <th>User Type</th>
-                                <th>Action</th>
+                                <th colSpan={2}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1540,6 +1575,8 @@ const assignReqToUser = async (userId) => {
                                   <td>{item.name}</td>
                                       <td>{item.userType}</td>
                                       <td><Button style={{borderRadius:"20px"}} variant='success'><b>Assigned</b></Button></td>
+                                      <td><Button  onMouseEnter={(e) => e.target.style.backgroundColor = "lightcoral"}
+                                                   onMouseLeave={(e) => e.target.style.backgroundColor = "lightsteelblue"} style={{borderRadius:"20px",fontWeight:"bolder",color:"black",border:"0px",backgroundColor:"lightsteelblue"}}  onClick={()=> unassignReqFromUser(item._id)}>Un Assign</Button></td>
                                 </tr>)})}
                         </tbody>
                     </Table>   <hr></hr>
@@ -1567,7 +1604,22 @@ const assignReqToUser = async (userId) => {
                                 <th scope="row">{index + 1}</th>
                                 <td>{user.name || 'N/A'}</td>
                                 <td>{user.userType || 'N/A'}</td>
-                                <td><Button onClick={()=>{ assignReqToUser(user._id)}} style={{backgroundColor:"lightcoral",border:"0px",borderRadius:"20px"}}><strong style={{color:"white"}}>Assign</strong></Button></td>
+                                <td>
+  <Button 
+    onClick={() => { assignReqToUser(user._id) }} 
+    style={{
+      backgroundColor: "lightcoral", 
+      border: "0px", 
+      borderRadius: "20px", 
+      color: "black",
+      fontWeight:"bold"
+    }} 
+    onMouseEnter={(e) => e.target.style.backgroundColor = "lightgreen"}
+    onMouseLeave={(e) => e.target.style.backgroundColor = "lightcoral"}
+  >
+    Assign
+  </Button>
+</td>
                             </tr>
                         ))
                     ) : (
