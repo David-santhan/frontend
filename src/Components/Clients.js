@@ -38,8 +38,6 @@ const [filteredData, setFilteredData] = useState([]);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-
-
   let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
 
   // Function to decrypt data
@@ -236,7 +234,42 @@ const filtereData = filteredData
         alert('Client assignment was canceled ❌');
     }
 };
-    
+
+const unassignClientFromUser = async (userId) => {
+    const clientId = selectedClientId; // Ensure you have a way to store the selected client ID
+
+    // Show a confirmation dialog to the user
+    const isConfirmed = window.confirm(`Are you sure you want to unassign this client?`);
+
+    // If the user confirms, proceed with the unassignment
+    if (isConfirmed) {
+        try {
+            const response = await axios.post(`https://hrbackend-1.onrender.com/unassignClient/${userId}/${clientId}`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = response.data;
+
+            if (result.status === 'success') {
+                alert('Client unassigned successfully ✅');
+                setLgShow(false);
+                // Optionally refresh the user list or perform any other updates
+            } else {
+                alert(result.msg);
+            }
+        } catch (error) {
+            console.error('Error unassigning client:', error.response ? error.response.data : error.message);
+            alert('An error occurred while unassigning the client. Please try again later.');
+        }
+    } else {
+        // User canceled the unassignment, so no action is taken
+        alert('Client unassignment was canceled ❌');
+    }
+};
+
+
   return (
     <div>
         {/* <AdminTopNav/> */}
@@ -385,6 +418,9 @@ const filtereData = filteredData
                                         color: "black",
                                         borderRadius: "20px"
                                     }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = "lightgreen"}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = "lightsteelblue"}
+
                                 >
                                     Assign
                                 </Link>
@@ -432,7 +468,7 @@ const filtereData = filteredData
                     <th scope="col">Name</th>
                     <th scope="col">Email</th>
                     <th scope="col">User Type</th>
-                    <th scope="col">Status</th>
+                    <th colSpan={2} >Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -457,6 +493,15 @@ const filtereData = filteredData
                                     Assigned
                                 </Link>
                             </td>
+                            <td><Link style={{
+                                        textDecoration: "none",
+                                        fontWeight: "bold",
+                                        backgroundColor: "lightcoral",
+                                        padding: "6px",
+                                        color: "black",
+                                        borderRadius: "20px"
+                                    }} onClick={()=>{unassignClientFromUser(user._id)}} onMouseEnter={(e) => e.target.style.backgroundColor = "lightsteelblue"}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = "lightcoral"} >Un Assign</Link></td>
                         </tr>
                     ))
                 ) : (
