@@ -21,7 +21,9 @@ function UserActions() {
    let candidateimageRef = useRef();
     const [show, setShow] = useState(false);
     const [showAss, setShowAss] = useState(false);
-   
+  const [isModified, setIsModified] = useState(false); // Track if any changes were made
+  const [allFieldsFilled, setAllFieldsFilled] = useState(false); // Check if all fields are filled
+
     const [loginUserData, setLoginUserData] = useState([]);
     const { id } = useParams();
     const [firstName,setFirstName]=useState();
@@ -49,6 +51,9 @@ function UserActions() {
     const [offerInHand,setOfferInHand]=useState();
     const [remark,setRemark]=useState();
     const [candidateCount, setCandidateCount] = useState(null);
+    const [hover, setHover] = useState(false);
+    const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false); // Tracks submission status
+    const [candidateData,setCandidateData]= useState([]);
     
     // const [updatedResume,setUpdatedResume]=useState();
     // const [ornnovaProfile,setOrnnovaProfile]=useState();
@@ -56,6 +61,16 @@ function UserActions() {
 
 
     let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
+
+    const date = new Date('');
+if (!isNaN(date)) {
+  console.log(date.toISOString());
+} else {
+  // console.error("Invalid date");
+}
+
+
+
 
   // Function to decrypt data
   const decryptData = (ciphertext, secret) => {
@@ -105,6 +120,21 @@ function UserActions() {
      
     const todayDate = getTodayDate();
 
+    const viewCandidates = async()=>{
+      try {
+        const response = await axios.get(`https://hrbackend-1.onrender.com/viewactions/${id}/${userId}`)
+        setCandidateData(response.data.candidates);
+        // handleShow()
+        // console.log(response.data);
+      } catch (error) {
+        // alert("No Candidates")
+      }
+    }
+
+    useEffect(()=>{
+      viewCandidates();
+    })
+
     useEffect(() => {
         const fetchRequirement = async () => {
             try {
@@ -146,144 +176,28 @@ function UserActions() {
         fetchUserData(userEmail);
     }, [id, userId, userEmail]);
 
-    const [scores, setScores] = useState(requirValues.assessments.map(() => ''));
+    const [scores, setScores] = useState(requirValues.assessments.map(() => '')|| []);
 
-    const handleScoreChange = (index, value) => {
-      const updatedScores = [...scores];
-      updatedScores[index] = value;
-      setScores(updatedScores);
-    };
+    // Check if all fields are filled (called whenever scores change)
+useEffect(() => {
+  if (scores.length > 0) {
+    const allFilled = scores.every(score => score.trim() !== ''); // Check if all scores are non-empty
+    setAllFieldsFilled(allFilled);
+  }
+}, [scores]);
+
+    // Handle score change
+  const handleScoreChange = (index, value) => {
+    const updatedScores = [...scores];
+    updatedScores[index] = value;
+    setScores(updatedScores);
+  };
     
     const assessmentsWithScores = requirValues.assessments.map((assessment, index) => ({
       assessment: assessment.assessment,
       yoe: assessment.yoe,
       score: scores[index] // Ensure scores[index] exists
   }));
-
-  
-//   let sendCandidateDataToDatabase = async () => {
-//     try {
-//         // Prepare the data object to match the server expectations
-//         const data = {
-//             reqId: id, // ID of the requirement
-//             recruiterId: userId, // ID of the recruiter (not an array here)
-//             candidate: { // Single candidate data as an object
-//                 date: todayDate,
-//                 firstName: firstName,
-//                 lastName: lastName,
-//                 dob: new Date(dob).toISOString(), // Convert date to ISO string format
-//                 mobileNumber: mobileNumber,
-//                 email: email,
-//                 ctc: ctc,
-//                 ectc: ectc,
-//                 totalYoe: totalYoe,
-//                 relevantYoe: relevantYoe,
-//                 lwd: new Date(lwd).toISOString(), // Convert date to ISO string format
-//                 currentLocation: currentLocation,
-//                 prefLocation: prefLocation,
-//                 resignationServed: resignationServed,
-//                 currentOrg: currentOrg,
-//                 candidateSkills: candidateSkills, // Keep as an array
-//                 role: role,
-//                 internalScreening: internalScreening,
-//                 sharedWithClient: sharedWithClient,
-//                 feedback: feedback,
-//                 details: details,
-//                 interviewDate: new Date(interviewDate).toISOString(), // Convert date to ISO string format
-//                 educationalQualification: educationalQualification,
-//                 offerInHand: offerInHand,
-//                 remark: remark,
-//                 assessments: assessmentsWithScores // Keep as an array of objects
-//             }
-//         };
-
-//         const response = await fetch('https://hrbackend-1.onrender.com/candidates', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json' // Send data as JSON
-//             },
-//             body: JSON.stringify(data) // Convert data to JSON string
-//         });
-
-//         if (!response.ok) {
-//             const errorData = await response.json();
-//             throw new Error(`HTTP error! status: ${response.status}, details: ${errorData.message}`);
-//         }
-
-//         const result = await response.json();
-//         console.log(result);
-//         alert("Data saved successfully ✅");
-
-//     } catch (error) {
-//         console.error('Error:', error);
-//         alert("Failed to save data ❌");
-//     }
-// };
-
-
-
-// let sendCandidateDataToDatabase = async () => {
-//   try {
-//       // Create a FormData object
-//       const formData = new FormData();
-
-//       // Append basic fields
-//       formData.append('reqId', id);
-//       formData.append('recruiterId', userId); // Single recruiterId
-
-//       // Append candidate data
-//       formData.append('candidate[date]', todayDate);
-//       formData.append('candidate[firstName]', firstName);
-//       formData.append('candidate[lastName]', lastName);
-//       formData.append('candidate[dob]', new Date(dob).toISOString());
-//       formData.append('candidate[mobileNumber]', mobileNumber);
-//       formData.append('candidate[email]', email);
-//       formData.append('candidate[ctc]', ctc);
-//       formData.append('candidate[ectc]', ectc);
-//       formData.append('candidate[totalYoe]', totalYoe);
-//       formData.append('candidate[relevantYoe]', relevantYoe);
-//       formData.append('candidate[lwd]', new Date(lwd).toISOString());
-//       formData.append('candidate[currentLocation]', currentLocation);
-//       formData.append('candidate[prefLocation]', prefLocation);
-//       formData.append('candidate[resignationServed]', resignationServed);
-//       formData.append('candidate[currentOrg]', currentOrg);
-//       formData.append('candidate[candidateSkills]', JSON.stringify(candidateSkills));
-//       formData.append('candidate[role]', role);
-//       formData.append('candidate[internalScreening]', internalScreening);
-//       formData.append('candidate[sharedWithClient]', sharedWithClient);
-//       formData.append('candidate[feedback]', feedback);
-//       formData.append('candidate[details]', details);
-//       formData.append('candidate[interviewDate]', new Date(interviewDate).toISOString());
-//       formData.append('candidate[educationalQualification]', educationalQualification);
-//       formData.append('candidate[offerInHand]', offerInHand);
-//       formData.append('candidate[remark]', remark);
-//       formData.append('candidate[assessments]', JSON.stringify(assessmentsWithScores));
-
-//       // Append files
-//       formData.append('candidate[updatedResume]', updatedResumeRef.current.files[0]); // Assuming this is a File object
-//       formData.append('candidate[ornnovaProfile]', ornnovaProfileRef.current.files[0]); // Assuming this is a File object
-//       formData.append('candidate[candidateImage]', candidateimageRef.current.files[0]); // Assuming this is a File object
-
-//       const response = await fetch('https://hrbackend-1.onrender.com/candidates', {
-//           method: 'POST',
-//           body: formData // Send as FormData
-//       });
-
-//       if (!response.ok) {
-//           const errorData = await response.json();
-//           throw new Error(`HTTP error! status: ${response.status}, details: ${errorData.message}`);
-//       }
-
-//       const result = await response.json();
-//       console.log(result);
-//       alert("Data saved successfully ✅");
-
-//   } catch (error) {
-//       console.error('Error:', error);
-//       alert("Failed to save data ❌");
-//   }
-// };
-
 const sendCandidateDataToDatabase = async () => {
   // Create a FormData object
   const formData = new FormData();
@@ -354,8 +268,13 @@ const sendCandidateDataToDatabase = async () => {
 
 
 const submitAssessment=()=>{
-  alert(" Assessment Submitted ✅");
-  setShowAss(false);
+  if (allFieldsFilled) {
+    alert(" Assessment Submitted ✅");
+    setShowAss(false);
+    setIsAssessmentSubmitted(true); // Set to true after submission
+ 
+  }
+ 
 }
 
     return (
@@ -440,25 +359,85 @@ const submitAssessment=()=>{
           <hr />
         </Form.Group>
       </Row> <hr></hr>
-      <h3> <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img><b style={{fontFamily:"monospace"}} >Assessment</b></h3> {/* Displaying single requirement detail */}
-     <center>
-     <Row className='mb-3'>
-                <center>
-                <Form.Group as={Row} md={3} controlId="formAssessments">
-                    <div style={{border:"1px solid gray", padding: "10px", borderRadius: "5px"}}>
-                        {requirValues.assessments.map((assessment, index) => (
-                            <div key={index}>
-                              <FormLabel><b>Assessment</b></FormLabel>
-                              <Form.Control style={{width:"300px"}} type='text' readOnly value={assessment.assessment}></Form.Control>
-                              <FormLabel><b>Years Of Experience</b></FormLabel>
-                              <Form.Control style={{width:"300px"}} type='text' readOnly value={assessment.yoe}></Form.Control> <hr></hr>
-                            </div>
-                        ))}
-                    </div>
-                </Form.Group>
-                </center>
-            </Row>
-     </center>
+      {/* Displaying single requirement detail */}
+      <h3 style={{ textAlign: "left", display: "flex", alignItems: "center" }}>
+  <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
+  <b style={{ fontFamily: "monospace" }}>Assessment</b>
+</h3>
+<div className="container">
+      <Row className="mb-3">
+        {/* Assessment Details Section */}
+        <Col md={6}>
+          <div style={{ border: "1px solid gray", padding: "10px", borderRadius: "5px" }}>
+            <Form.Group controlId="formAssessments">
+              {requirValues.assessments.map((assessment, index) => (
+                <div key={index}>
+                  <FormLabel><b>Assessment</b></FormLabel>
+                  <Form.Control style={{ width: "100%" }} type='text' readOnly value={assessment.assessment}></Form.Control>
+                  <FormLabel><b>Years Of Experience</b></FormLabel>
+                  <Form.Control style={{ width: "100%" }} type='text' readOnly value={assessment.yoe}></Form.Control>
+                  <hr />
+                </div>
+              ))}
+            </Form.Group>
+          </div>
+        </Col>
+
+        {/* Candidate Table Section */}
+        <Col md={6}>
+        <h3 style={{ textAlign: "left", display: "flex", alignItems: "center" }}>
+  <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
+  <b style={{ fontFamily: "monospace" }}>Candidates Uploaded</b>
+</h3>
+        <Table style={{textAlign:"center",}}  responsive>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>ECTC</th>
+            <th>Status</th>
+            <th>Uploaded On</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+    {candidateData.map((item, index) => {
+        // Get the most recent status
+        const recentStatus = item.Status && item.Status.length > 0
+            ? item.Status[item.Status.length - 1].Status
+            : "No Action Taken";
+
+        // Determine the text color based on the status
+        let textColor;
+
+        if (recentStatus === "No Action Taken") {
+            textColor = "blue"; // No Action Taken
+        } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+            textColor = "red"; // Rejected statuses
+        } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+            textColor = "orange"; // Pending statuses
+        } else {
+            textColor = "green"; // Other statuses
+        }
+
+        return (
+            <tr key={index}>
+                <td>{item.firstName} {item.lastName}</td>
+                <td>{item.ectc}</td>
+                <td style={{ color: textColor }}>
+                    <b>{recentStatus}</b> {/* Display the most recent status */}
+                </td>
+                <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>               
+               
+               
+            </tr>
+        );
+    })}
+</tbody>
+
+      </Table>
+        </Col>
+      </Row>
+    </div>
                     <Row>
                         <center>
                         <Button variant="primary" style={{borderRadius:"20px"}} onClick={() => setShow(true)}>
@@ -481,10 +460,6 @@ const submitAssessment=()=>{
       <Modal.Body>
         <Form style={{ backgroundColor: "aliceblue", padding: "30px", borderRadius: "20px" }}>
           <Row className="g-3">
-            {/* <Col md={6} lg={4}>
-              <FormLabel><b>Type Of Lead</b></FormLabel>
-              <Form.Control style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Type Of Lead" />
-            </Col> */}
             <Col md={6} lg={4}>
               <FormLabel><b>Date</b></FormLabel>
               <Form.Control type="date" style={{ borderRadius: "15px", border: "1px solid black", fontWeight: "bold" }} defaultValue={todayDate} readOnly />
@@ -568,22 +543,6 @@ const submitAssessment=()=>{
               <FormLabel><b>Role</b></FormLabel>
               <Form.Control value={role} onChange={(e)=> setRole(e.target.value)} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Role" />
             <hr></hr> </Col>
-            {/* <Col md={6} lg={4}>
-              <FormLabel><b>Internal Screening</b></FormLabel>
-              <Form.Select value={internalScreening} onChange={(e)=> setInternalScreening(e.target.value)} style={{ borderRadius: "15px", border: "1px solid black" }}>
-                <option>Choose...</option>
-                <option>Selected</option>
-                <option>Rejected</option>
-              </Form.Select>
-            <hr></hr> </Col>
-            <Col md={6} lg={4}>
-              <FormLabel><b>Shared with Client</b></FormLabel>
-              <Form.Select value={sharedWithClient} onChange={(e)=> setSharedWithClient(e.target.value)} style={{ borderRadius: "15px", border: "1px solid black" }}>
-                <option>Choose...</option>
-                <option>Yes</option>
-                <option>No</option>
-              </Form.Select>
-             <hr></hr></Col> */}
             <Col md={6} lg={4}>
               <FormLabel><b>Feedback</b></FormLabel>
               <Form.Control value={feedback} onChange={(e)=> setFeedback(e.target.value)} as="textarea" rows={5} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Feedback" />
@@ -623,10 +582,20 @@ const submitAssessment=()=>{
             <hr></hr> </Col>
           </Row>   
         
-          <Button variant="primary" style={{borderRadius:"20px",backgroundColor:"tomato",border:"1.5px solid black"}} onClick={() => setShowAss(true)}>
-            <b>Take Assessment</b>
-          </Button>
-<hr/>
+          <Button
+  variant="primary"
+  style={{
+    borderRadius: "20px",
+    backgroundColor: isAssessmentSubmitted ? "lightpink" : "tomato", // Conditionally set background color
+    color:"black",
+    border: "1.5px solid black"
+  }}
+  onClick={() => setShowAss(true)}
+>
+  <b>{isAssessmentSubmitted ? "Update Assessment" : "Take Assessment"}</b>
+</Button>
+
+    <hr/>
        
 
           <Modal
@@ -641,7 +610,7 @@ const submitAssessment=()=>{
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            {requirValues.assessments.map((assessment, index) => (
+      {requirValues.assessments.map((assessment, index) => (
         <Row key={index} className="mb-3">
           <Col md={6} lg={8}>
             <Form.Control
@@ -661,19 +630,33 @@ const submitAssessment=()=>{
           </Col>
           <Col md={3} lg={2}>
             <Form.Control
-              value={scores[index]}
+              value={scores[index] || ''} // Ensure we do not access an undefined score
               onChange={(e) => handleScoreChange(index, e.target.value)}
               style={{ textAlign: "center", borderRadius: "15px", border: "1px solid black" }}
             />
           </Col>
         </Row>
       ))}
-                <Row>
-                    <center>
-                        <Button onClick={()=> submitAssessment()} style={{ width: "200px", borderRadius: "20px", backgroundColor: "gray", color: "white", border: "1.5px solid lightgray" }} > <b>Submit Assessment</b> </Button>
-                    </center>
-                </Row>
-            </Modal.Body>
+      <Row>
+        <center>
+          <Button
+            onClick={() => submitAssessment()}
+            disabled={!allFieldsFilled} // Disable the button if not all fields are filled
+            style={{
+              width: "200px",
+              borderRadius: "20px",
+              backgroundColor: hover ? "green" : "gray",
+              color: "white",
+              border: "1.5px solid lightgray"
+            }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+          >
+            <b>Submit Assessment</b>
+          </Button>
+        </center>
+      </Row>
+    </Modal.Body>
         </Modal>
 
 <center>
