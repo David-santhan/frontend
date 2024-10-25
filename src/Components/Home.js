@@ -398,7 +398,10 @@ const ViewCandidateData = async(id)=>{
             <tr>
               <th>Reg Id</th>
               <th>Client</th>
+              
               <th>Requirement Type</th>
+              <th>Role</th>
+              <th>Skills</th>
               <th>
                 <button style={{ borderRadius: "20px" }} onClick={handleSort}>
                   <b>Start Date</b> {sortOrder === 'asc' ? '⬆️' : '⬇️'}
@@ -418,6 +421,8 @@ const ViewCandidateData = async(id)=>{
                 <td>{req.regId}</td>
                 <td>{req.client}</td>
                 <td>{req.requirementtype}</td>
+                <td>{req.role}</td>
+                <td>{req.skill}</td>
                 <td>{new Date(req.startDate).toLocaleDateString()}</td>
                 <td>{new Date(req.uploadedDate).toLocaleDateString()}</td>
                 <td>
@@ -494,6 +499,8 @@ const ViewCandidateData = async(id)=>{
                         <th>Reg Id</th>
                         <th>Client</th>
                         <th>Requirement Type</th>
+                        <th>Role</th>
+                        <th>Skills</th>
                         <th>
                             <button style={{ border: "1.5px solid black", borderRadius: "20px" }} onClick={handleSortClaimedDate}>
                                 <b>Claimed On</b> {sortClaimedDateOrder === 'asc' ? '⬆️' : '⬇️'}
@@ -528,6 +535,8 @@ const ViewCandidateData = async(id)=>{
                                     <td><Link style={{ textDecoration: "none" }} onClick={() => requirementDetails(req._id)}><b>{req.regId}</b></Link></td>
                                     <td>{req.client}</td>
                                     <td>{req.requirementtype}</td>
+                                    <td>{req.role}</td>
+                                    <td>{req.skill}</td>
                                     <td>{userClaim ? new Date(userClaim.claimedDate).toLocaleDateString() : 'N/A'}</td>
                                     <td>
                                         <Link onClick={() => viewCandidates(req._id)} style={{ textDecoration: 'none' }}>
@@ -612,50 +621,65 @@ const ViewCandidateData = async(id)=>{
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredCandidates.map((item, index) => {
-                        // Get the most recent status
-                        const recentStatus = item.Status && item.Status.length > 0
-                            ? item.Status[item.Status.length - 1].Status
-                            : "No Status";
+  {filteredCandidates.map((item, index) => {
+    // Get the most recent status
+    const recentStatus = item.Status && item.Status.length > 0
+      ? item.Status[item.Status.length - 1].Status
+      : "No Status";
 
-                        // Determine the text color based on the status
-                        let textColor;
-                        if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-                            textColor = "red"; // Rejected statuses
-                        } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-                            textColor = "orange"; // Pending statuses
-                        } else if (recentStatus === "No Status") {
-                            textColor = "blue"; // No status
-                        } else {
-                            textColor = "green"; // Other statuses
-                        }
+    // Determine the text color based on the status
+    let textColor;
+    if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+      textColor = "red"; // Rejected statuses
+    } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+      textColor = "orange"; // Pending statuses
+    } else if (recentStatus === "No Status") {
+      textColor = "blue"; // No status
+    } else {
+      textColor = "green"; // Other statuses
+    }
 
-                        return (
-                            <tr key={index}>
-                                <td>{item.firstName} {item.lastName}</td>
-                                <td>{item.role}</td>
-                                <td>{item.totalYoe}</td>
-                                <td>{new Date(item.lwd).toLocaleDateString()}</td>
-                                <td>{item.ectc}</td>
-                                <td style={{ color: textColor }}>
-                                    <b>{recentStatus}</b> {/* Display the most recent status */}
-                                </td>
-                                <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>
-                                <td>
-                                    <Link onClick={() => ViewCandidateData(item._id)}>
-                                        <Image style={{ backgroundColor: "lightblue", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
-                                    </Link>
-                                    <Link onClick={() => handleDeleteClick(item._id)}>
-                                        <Image style={{ backgroundColor: "IndianRed", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/trash.svg' />
-                                    </Link>
-                                    <Link onClick={() => updateCandidate(item._id)}>
-                                        <Image style={{ backgroundColor: "lightgreen", padding: "10px", margin: "10px", borderRadius: "10px" }} src='/Images/edit.svg' />
-                                    </Link>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
+    const isDeleteEnabled = recentStatus === "No Status"; // Enable delete button if recent status is "No Status"
+
+    return (
+      <tr key={index}>
+        <td>{item.firstName} {item.lastName}</td>
+        <td>{item.role}</td>
+        <td>{item.totalYoe}</td>
+        <td>{new Date(item.lwd).toLocaleDateString()}</td>
+        <td>{item.ectc}</td>
+        <td style={{ color: textColor }}>
+          <b>{recentStatus}</b> {/* Display the most recent status */}
+        </td>
+        <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>
+        <td>
+          <Link onClick={() => ViewCandidateData(item._id)}>
+            <Image style={{ backgroundColor: "lightblue", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
+          </Link>
+          <Link
+            onClick={isDeleteEnabled ? () => handleDeleteClick(item._id) : undefined} // Enable delete only if recent status is "No Status"
+          >
+            <Image
+              style={{
+                backgroundColor: isDeleteEnabled ? "IndianRed" : "lightgray", // Change color if disabled
+                margin: "10px",
+                padding: "10px",
+                borderRadius: "10px",
+                cursor: isDeleteEnabled ? "pointer" : "not-allowed" // Change cursor style if disabled
+              }}
+              src='/Images/trash.svg'
+              alt="Delete"
+            />
+          </Link>
+          <Link onClick={() => updateCandidate(item._id)}>
+            <Image style={{ backgroundColor: "lightgreen", padding: "10px", margin: "10px", borderRadius: "10px" }} src='/Images/edit.svg' />
+          </Link>
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
+
             </Table>
       </Modal.Body>
     </Modal>
@@ -980,7 +1004,7 @@ const ViewCandidateData = async(id)=>{
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button style={{borderRadius:"20px",backgroundColor:"lightsteelblue",color:"green",border:"1.5px solid black"}} onClick={handleSaveChanges}>
+        <Button style={{borderRadius:"20px",backgroundColor:"lightgray",color:"green",border:"1.5px solid black"}} onClick={handleSaveChanges}>
           <b>Save Changes</b>
         </Button>
       </Modal.Footer>
@@ -1072,9 +1096,7 @@ const ViewCandidateData = async(id)=>{
                 </div>
     </Modal.Body>
                </Modal>
-
-
-               <Modal
+               <Modal style={{backgroundColor:"lightgray",opacity:"97%"}}
         size="lg"
         show={viewCandidate}
         onHide={() => setViewCandidate(false)}
@@ -1104,7 +1126,7 @@ const ViewCandidateData = async(id)=>{
                 </td>
                 <td>
                   <center>
-                    <strong>Update Status</strong> <hr></hr>
+                    <strong>Updated Status</strong> <hr></hr>
                     {selectedCandidate.Status && Array.isArray(selectedCandidate.Status) && selectedCandidate.Status.length > 0 ? (
     selectedCandidate.Status.map((item, index) => (
       <React.Fragment key={index}>
