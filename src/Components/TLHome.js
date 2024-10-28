@@ -68,6 +68,28 @@ const [totalfilteredCandidates, setTotalfilteredCandidates] = useState([]);
 const [displayedCandidates, setDisplayedCandidates] = useState([]);
 // State for displaying filtered user candidates
 const [displayedUserCandidates, setDisplayedUserCandidates] = useState([]);
+// const [candidates, setCandidates] = useState(displayedCandidates);
+
+// Function to delete a candidate
+const deleteCandidate = async (candidateId) => {
+  const isConfirmed = window.confirm("Are you sure you want to delete this candidate?");
+  if (!isConfirmed) {
+    return; // Exit the function if the user cancels
+  }
+
+  try {
+    const response = await axios.delete(`https://hrbackend-1.onrender.com/api/candidates/${candidateId}`);
+    if (response.status === 200) {
+      // Update the local state to remove the deleted candidate from the list
+      setCandidates(candidates.filter(candidate => candidate._id !== candidateId));
+      alert(response.data.message); // Optional: Show success message
+    }
+  } catch (error) {
+    console.error("Error deleting candidate:", error);
+    alert('Failed to delete candidate');
+  }
+};
+
 
   // Status options array
   const statusSearchOptions = [
@@ -2377,55 +2399,70 @@ style={{backgroundColor:"lightgray"}}
 
       {/* User Candidate Table */}
       {displayedCandidates && displayedCandidates.length > 0 ? (
-        <Table striped bordered hover responsive style={{textAlign:"center"}}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Total YOE</th>
-              <th>LWD</th>
-              <th>ECTC</th>
-              <th>Status</th>
-              <th>Uploaded Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayedCandidates.map((candidate, idx) => {
-              const recentStatus = candidate.Status && candidate.Status.length
-                ? candidate.Status[candidate.Status.length - 1].Status
-                : "No Action Taken";
+  <Table striped bordered hover responsive style={{ textAlign: "center" }}>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Total YOE</th>
+        <th>LWD</th>
+        <th>ECTC</th>
+        <th>Status</th>
+        <th>Uploaded Date</th>
+        <th colSpan={2}>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {displayedCandidates.map((candidate, idx) => {
+        const recentStatus = candidate.Status && candidate.Status.length
+          ? candidate.Status[candidate.Status.length - 1].Status
+          : "No Action Taken";
 
-              let textColor;
-              if (recentStatus === "No Action Taken") {
-                textColor = "blue";
-              } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-                textColor = "red";
-              } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-                textColor = "orange";
-              } else {
-                textColor = "green";
-              }
+        let textColor;
+        if (recentStatus === "No Action Taken") {
+          textColor = "blue";
+        } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+          textColor = "red";
+        } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+          textColor = "orange";
+        } else {
+          textColor = "green";
+        }
 
-              return (
-                <tr key={idx}>
-                  <td>{candidate.firstName} {candidate.lastName}</td>
-                  <td>{candidate.role}</td>
-                  <td>{candidate.totalYoe}</td>
-                  <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
-                  <td>{candidate.ectc}</td>
-                  <td style={{ color: textColor }}><b>{recentStatus}</b></td>
-                  <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
-                  <td> <Link onClick={()=> CandidateData(candidate._id)}><Image  style={{backgroundColor:"lightblue",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image></Link> </td>
+        return (
+          <tr key={idx}>
+            <td>{candidate.firstName} {candidate.lastName}</td>
+            <td>{candidate.role}</td>
+            <td>{candidate.totalYoe}</td>
+            <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
+            <td>{candidate.ectc}</td>
+            <td style={{ color: textColor }}><b>{recentStatus}</b></td>
+            <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
+            <td>
+              <Link onClick={() => CandidateData(candidate._id)}>
+                <Image 
+                  style={{ backgroundColor: "lightblue", margin: "5px", padding: "10px", borderRadius: "10px" }} 
+                  src='./Images/view.svg' 
+                />
+              </Link>
+            </td>
+            <td>
+              <Link onClick={ () => deleteCandidate(candidate._id)}  style={{ pointerEvents: recentStatus === "No Action Taken" ? "auto" : "none" }}>
+                <Image 
+                  style={{ backgroundColor: recentStatus === "No Action Taken" ? "indianred" : "lightgray", margin: "5px", padding: "10px", borderRadius: "10px", opacity: recentStatus === "No Action Taken" ? 1 : 0.5 }} 
+                  src='./Images/trash.svg' 
+                />
+              </Link>
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </Table>
+) : (
+  <p>No user candidates match your search criteria.</p>
+)}
 
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      ) : (
-        <p>No user candidates match your search criteria.</p>
-      )}
     </Modal.Body>
 
     <Modal.Footer>
