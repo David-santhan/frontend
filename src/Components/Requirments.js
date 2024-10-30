@@ -237,6 +237,7 @@ const filteredCandidates = filterCandidates();
         try {
             const response = await axios.get(`https://hrbackend-1.onrender.com/api/recruiters/${reqId}`);
             setRecruitersData(response.data.recruiters);
+            console.log(response.data.recruiters)
             setShowA(true);
             console.log(response.data)
         } catch (err) {
