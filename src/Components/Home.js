@@ -33,6 +33,11 @@ function Home() {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [selectedTypes, setSelectedTypes] = useState(['hot', 'warm']);
   const [candidatesData,setCandidatesData] = useState([]);
+  const [savedCounts,setSavedCount]=useState(0);
+  const [uploadedCounts,setUploadedCount]= useState(0);
+  const [candidateType, setCandidateType] = useState(); // Default to 'uploaded'
+  const [savedStatusSearchTerm, setSavedStatusSearchTerm] = useState('');
+
   let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
    // State to hold the search terms
    const [nameSearchTerm, setNameSearchTerm] = useState("");
@@ -48,16 +53,24 @@ function Home() {
 
    // Filtered candidates based on the search terms
    const filteredCandidates = candidateData.filter(item => {
-       const fullName = `${item.firstName} ${item.lastName}`.toLowerCase();
-       const recentStatus = item.Status && item.Status.length > 0
-           ? item.Status[item.Status.length - 1].Status.toLowerCase() // Get the most recent status
-           : "no status"; // Default if no status
+    const fullName = `${item.firstName} ${item.lastName}`.toLowerCase();
+    const recentStatus = item.Status && item.Status.length > 0
+        ? item.Status[item.Status.length - 1].Status.toLowerCase() // Get the most recent status
+        : "no status"; // Default if no status
 
-       return (
-           fullName.includes(nameSearchTerm.toLowerCase()) &&
-           (statusSearchTerm ? recentStatus === statusSearchTerm.toLowerCase() : true)
-       );
-   });
+    // Check for saved status
+    const matchesSavedStatus = savedStatusSearchTerm 
+        ? (savedStatusSearchTerm === 'saved' && item.savedStatus === 'Saved') ||
+          (savedStatusSearchTerm === 'uploaded' && item.savedStatus === 'Uploaded') 
+        : true;
+
+    return (
+        fullName.includes(nameSearchTerm.toLowerCase()) &&
+        (statusSearchTerm ? recentStatus === statusSearchTerm.toLowerCase() : true) &&
+        matchesSavedStatus // Add the saved status filter
+    );
+});
+
 
   // Function to decrypt data
   const decryptData = (ciphertext, secret) => {
@@ -138,33 +151,72 @@ const UserType = getDecryptedData("User Type")
     sortClaimedRequirements();
   }, [claimedData, sortClaimOrder]);
 
-  const fetchRequirements = async (userId) => {
-    try {
-      const response = await axios.get(`https://hrbackend-1.onrender.com/getHomeReqData/${userId}`);
-      // const data = await response.json();
-      const data = response.data;
-      const newData = data.filter(req => req.update === 'New' && !req.claimedBy.some(claim => claim.userId === userId));
-      const claimedData = data.filter(req => req.update === 'Old' || req.claimedBy.some(claim => claim.userId === userId));
-      setRequirements(newData);
-      setClaimedData(claimedData);
-    
-      // Fetch candidate counts
-      const counts = {};
-      for (let req of claimedData) {
-        try {
-          const res = await axios.get(`https://hrbackend-1.onrender.com/viewactions/${req._id}/${userId}`);
-          counts[req._id] = res.data.candidates.length || 0;
-        } catch (err) {
-          // console.error(`Error fetching candidates for ${req._id}:`, err);
-          counts[req._id] = 0;
-        }
-      }
-      setCandidateCounts(counts);
-    } catch (err) {
-      console.error('Error fetching requirements:', err);
-    }
-  };
+//   const fetchRequirements = async (userId) => {
+//     try {
+//         const response = await axios.get(`https://hrbackend-1.onrender.com/getHomeReqData/${userId}`);
+//         const data = response.data;
 
+//         const newData = data.filter(req => req.update === 'New' && !req.claimedBy.some(claim => claim.userId === userId));
+//         const claimedData = data.filter(req => req.update === 'Old' || req.claimedBy.some(claim => claim.userId === userId));
+
+//         setRequirements(newData);
+//         setClaimedData(claimedData);
+
+//         // Initialize counts objects for saved and uploaded counts
+//         const savedCounts = {};
+//         const uploadedCounts = {};
+
+//         // Fetch candidate counts for each claimed requirement
+//         for (let req of claimedData) {
+//             try {
+//                 const res = await axios.get(`https://hrbackend-1.onrender.com/viewactions/${req._id}/${userId}`);
+//                 setCandidateCounts(res.data.candidateCount)
+                
+//                 console.log(res)
+//                 // Assuming the response contains both savedCount and uploadedCount
+//                 savedCounts[req._id] = res.data.savedCount || 0;
+//                 uploadedCounts[req._id] = res.data.uploadedCount || 0;
+                
+//             } catch (err) {
+//                 console.error(`Error fetching candidates for ${req._id}:`, err);
+//                 savedCounts[req._id] = 0;
+//                 uploadedCounts[req._id] = 0;
+//             }
+//         }
+
+//         setUploadedCount(uploadedCounts);
+//         setSavedCount(savedCounts);
+//     } catch (err) {
+//         console.error('Error fetching requirements:', err);
+//     }
+// };
+
+const fetchRequirements = async (userId) => {
+  try {
+    const response = await axios.get(`https://hrbackend-1.onrender.com/getHomeReqData/${userId}`);
+    // const data = await response.json();
+    const data = response.data;
+    const newData = data.filter(req => req.update === 'New' && !req.claimedBy.some(claim => claim.userId === userId));
+    const claimedData = data.filter(req => req.update === 'Old' || req.claimedBy.some(claim => claim.userId === userId));
+    setRequirements(newData);
+    setClaimedData(claimedData);
+  
+    // Fetch candidate counts
+    const counts = {};
+    for (let req of claimedData) {
+      try {
+        const res = await axios.get(`https://hrbackend-1.onrender.com/viewactions/${req._id}/${userId}`);
+        counts[req._id] = res.data.candidates.length || 0;
+      } catch (err) {
+        // console.error(`Error fetching candidates for ${req._id}:`, err);
+        counts[req._id] = 0;
+      }
+    }
+    setCandidateCounts(counts);
+  } catch (err) {
+    console.error('Error fetching requirements:', err);
+  }
+}; 
   const requirementTypeOrder = {
     'Hot': 1,
     'Warm': 2,
@@ -254,11 +306,34 @@ const UserType = getDecryptedData("User Type")
     try {
       const response = await axios.get(`https://hrbackend-1.onrender.com/viewactions/${id}/${userId}`)
       setCandidateData(response.data.candidates);
+      console.log(response.data)
       handleShow()
     } catch (error) {
       alert("No Candidates")
     }
   }
+
+//   const viewCandidates = async (id) => {
+//     try {
+//         const response = await axios.get(`https://hrbackend-1.onrender.com/viewactions/${id}/${userId}`);
+        
+//         // Destructure the response data to get counts and candidates details
+//         const { savedCount, uploadedCount, savedCandidates, uploadedCandidates,candidates,candidateCount} = response.data;
+        
+//       //   if (candidateType === 'Uploaded') {
+//       //     setCandidateData(uploadedCandidates);
+//       // } else if (candidateType === 'Saved') {
+//       //     setCandidateData(savedCandidates);
+//       // } 
+//       setCandidateData(candidates);
+//       setCandidateCounts(candidateCount)
+
+//         console.log(response.data);
+//         handleShow();
+//     } catch (error) {
+//         alert("No Candidates");
+//     }
+// };
 
   const handleCheckboxChange = (type) => {
     if (type === 'all') {
@@ -311,10 +386,10 @@ const ViewCandidateData = async(id)=>{
   
         if (response.ok) {
           setCandidateData(candidateData.filter(candidate => candidate._id !== candidateId));
-          alert('Candidate deleted successfully');
+          alert('Candidate deleted successfully ✅');
           window.location.reload();
         } else {
-          alert('Failed to delete candidate');
+          alert('Failed to delete candidate ☹️');
         }
       } catch (error) {
         console.error('Error deleting candidate:', error);
@@ -322,7 +397,7 @@ const ViewCandidateData = async(id)=>{
       }
     } else {
       // User chose not to delete
-      alert('Candidate deletion canceled');
+      alert('Candidate deletion canceled ❌');
     }
   };
 
@@ -356,24 +431,37 @@ const ViewCandidateData = async(id)=>{
     }));
   };
 
-  const handleSaveChanges = async () => {
-    const candidateId = updateCandidateDetails._id; // Assuming _id is the identifier for the candidate
+ // Function that saves changes, with conditional logic for "Upload"
+const handleSaveChanges = async (status) => {
+  const candidateId = updateCandidateDetails._id;
 
-    try {
-      const response = await axios.put(`https://hrbackend-1.onrender.com/candidates/${candidateId}`, updateCandidateDetails);
+  try {
+    // Prepare updated details based on whether it's a save or upload action
+    const updatedDetails = {
+      ...updateCandidateDetails,
+      ...(status === "Uploaded" ? { savedStatus: "Uploaded", uploadedDate: new Date().toISOString() } : {})
+    };
 
-      if (response.status === 200) {
-        alert('Candidate details updated successfully ✅');
-        setUpdateshow(false) // Close the modal after successful update
-        window.location.reload();
-      } else {
-        alert('Failed to update candidate details.');
-      }
-    } catch (error) {
-      console.error('Error updating candidate:', error);
-      alert('An error occurred while updating candidate details.');
+    const response = await axios.put(`https://hrbackend-1.onrender.com/candidates/${candidateId}`, updatedDetails);
+
+    if (response.status === 200) {
+      alert('Candidate details updated successfully ✅');
+      setUpdateshow(false); // Close the modal after successful update
+      window.location.reload();
+    } else {
+      alert('Failed to update candidate details.');
     }
-  };
+  } catch (error) {
+    console.error('Error updating candidate:', error);
+    alert('An error occurred while updating candidate details.');
+  }
+};
+
+// Separate functions for Save and Upload buttons
+const saveChanges = () => handleSaveChanges("Saved");
+const uploadChanges = () => handleSaveChanges("Uploaded");
+
+
   const requirementDetails = async (id) => {
     try {
         const response = await axios.get(`https://hrbackend-1.onrender.com/getrequirements/${id}`);
@@ -506,7 +594,7 @@ const ViewCandidateData = async(id)=>{
                                 <b>Claimed On</b> {sortClaimedDateOrder === 'asc' ? '⬆️' : '⬇️'}
                             </button>
                         </th>
-                        <th>Uploads</th>
+                        <th>Your Profiles</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -568,121 +656,144 @@ const ViewCandidateData = async(id)=>{
                             );
                         })}
                 </tbody>
-            </Table>
+            </Table> 
+
         </center>
-      <Modal
-      show={show}
-      onHide={() => {
+        <Modal
+    show={show}
+    onHide={() => {
         setSelectedCandidate(null); // Reset selected candidate on modal close
         onHide();
-      }}
-      fullscreen={true}
-      aria-labelledby="example-custom-modal-styling-title"
-    >
-      <Modal.Header closeButton>
+    }}
+    fullscreen={true}
+    aria-labelledby="example-custom-modal-styling-title"
+>
+    <Modal.Header closeButton>
         <Modal.Title>
-          <h5> <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img><b style={{fontFamily:"monospace"}} >Candidates Details</b></h5> {/* Displaying single requirement detail */}
-          </Modal.Title>
-      </Modal.Header>
+            <h5>
+                <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
+                <b style={{ fontFamily: "monospace" }}>Candidates Details</b>
+            </h5>
+        </Modal.Title>
+    </Modal.Header>
 
-      <Modal.Body>
-       {/* Name Search Input Field */}
-       <input
-                type="text"
-                placeholder="Search by name..."
-                value={nameSearchTerm}
-                onChange={(e) => setNameSearchTerm(e.target.value)}
-                style={{ marginBottom: "10px", padding: "10px", width: "300px",border:"2px solid black",borderRadius:"20px" }}
-            /> <br></br>
+    <Modal.Body>
+    {/* Name Search Input Field */}
+   <center>
+   <input
+        type="text"
+        placeholder="Search by name..."
+        value={nameSearchTerm}
+        onChange={(e) => setNameSearchTerm(e.target.value)}
+        style={{ marginBottom: "10px", padding: "10px", width: "300px", border: "2px solid black", borderRadius: "20px",margin:"5px" }}
+    />
+    
 
-            {/* Status Selection Dropdown */}
-            <select
-                value={statusSearchTerm}
-                onChange={(e) => setStatusSearchTerm(e.target.value)}
-                style={{ marginBottom: "20px", padding: "10px", width: "300px",border:"2px solid black",borderRadius:"20px" }}
-            >
-                <option value="">All</option> {/* Default option */}
-                {statusOptions.map((status, index) => (
-                    <option key={index} value={status.toLowerCase()}>{status}</option>
-                ))}
-            </select>
+    {/* Status Selection Dropdown */}
+    <select
+        value={statusSearchTerm}
+        onChange={(e) => setStatusSearchTerm(e.target.value)}
+        style={{ marginBottom: "20px", padding: "10px", width: "300px", border: "2px solid black", borderRadius: "20px",margin:"5px" }}
+    >
+        <option value="">All</option> {/* Default option */}
+        {statusOptions.map((status, index) => (
+            <option key={index} value={status.toLowerCase()}>{status}</option>
+        ))}
+    </select>
 
-            <Table responsive style={{textAlign:"center"}}>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Total YOE</th>
-                        <th>LWD</th>
-                        <th>ECTC</th>
-                        <th>Status</th>
-                        <th>Uploaded On</th>
-                        <th>Actions</th>
+    {/* Saved Status Selection Dropdown */}
+    <select
+        value={savedStatusSearchTerm}
+        onChange={(e) => setSavedStatusSearchTerm(e.target.value)}
+        style={{ marginBottom: "20px", padding: "10px", width: "300px", border: "2px solid black", borderRadius: "20px",margin:"5px" }}
+    >        <option value="">Select Saved Status</option>
+        <option value="">All</option>
+        <option value="saved">Saved</option>
+        <option value="uploaded">Uploaded</option>
+    </select></center> <hr></hr>
+
+    <Table responsive style={{ textAlign: "center" }}>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Total YOE</th>
+                <th>LWD</th>
+                <th>ECTC</th>
+                <th>Status</th>
+                <th>Uploaded On</th>
+                <th>Actions</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {filteredCandidates.map((item, index) => {
+                // Get the most recent status
+                const recentStatus = item.Status && item.Status.length > 0
+                    ? item.Status[item.Status.length - 1].Status
+                    : "No Action Taken";
+
+                // Determine the text color based on the status
+                let textColor;
+                if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+                    textColor = "red"; // Rejected statuses
+                } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+                    textColor = "orange"; // Pending statuses
+                } else if (recentStatus === "No Action Taken") {
+                    textColor = "blue"; // No status
+                } else {
+                    textColor = "green"; // Other statuses
+                }
+
+                const isDeleteEnabled = recentStatus === "No Action Taken"; // Enable delete button if recent status is "No Action Taken"
+
+                return (
+                    <tr key={index}>
+                        <td>{item.firstName} {item.lastName}</td>
+                        <td>{item.role}</td>
+                        <td>{item.totalYoe}</td>
+                        <td>{new Date(item.lwd).toLocaleDateString()}</td>
+                        <td>{item.ectc}</td>
+                        <td style={{ color: textColor }}>
+                            <b>{recentStatus}</b> {/* Display the most recent status */}
+                        </td>
+                        <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>
+                        <td>
+                            <Link onClick={() => ViewCandidateData(item._id)}>
+                                <Image style={{ backgroundColor: "lightblue", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
+                            </Link>
+                            <Link onClick={isDeleteEnabled ? () => handleDeleteClick(item._id) : undefined}>
+                                <Image
+                                    style={{
+                                        backgroundColor: isDeleteEnabled ? "IndianRed" : "lightgray", // Change color if disabled
+                                        margin: "10px",
+                                        padding: "10px",
+                                        borderRadius: "10px",
+                                        cursor: isDeleteEnabled ? "pointer" : "not-allowed" // Change cursor style if disabled
+                                    }}
+                                    src='/Images/trash.svg'
+                                    alt="Delete"
+                                />
+                            </Link>
+                            <Link onClick={() => updateCandidate(item._id)}>
+                                <Image style={{ backgroundColor: "lightgreen", padding: "10px", margin: "10px", borderRadius: "10px" }} src='/Images/edit.svg' />
+                            </Link>
+                           
+                        </td>
+                        <td>
+                        {item.savedStatus === 'Saved' && ( // Only show Upload button if savedStatus is 'Saved'
+                                <Button onClick={() => updateCandidate(item._id)} style={{fontWeight:"bold",backgroundColor:"green",border:"0px",padding:"5px",borderRadius:"20px"}} onMouseMove={(e)=>{{e.target.style.backgroundColor = "gray";e.target.style.padding = "10px"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor = "green";e.target.style.padding = "5px"}}}>Upload</Button>
+                            )}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-  {filteredCandidates.map((item, index) => {
-    // Get the most recent status
-    const recentStatus = item.Status && item.Status.length > 0
-      ? item.Status[item.Status.length - 1].Status
-      : "No Status";
+                );
+            })}
+        </tbody>
+    </Table>
+</Modal.Body>
 
-    // Determine the text color based on the status
-    let textColor;
-    if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-      textColor = "red"; // Rejected statuses
-    } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-      textColor = "orange"; // Pending statuses
-    } else if (recentStatus === "No Status") {
-      textColor = "blue"; // No status
-    } else {
-      textColor = "green"; // Other statuses
-    }
+</Modal>
 
-    const isDeleteEnabled = recentStatus === "No Status"; // Enable delete button if recent status is "No Status"
-
-    return (
-      <tr key={index}>
-        <td>{item.firstName} {item.lastName}</td>
-        <td>{item.role}</td>
-        <td>{item.totalYoe}</td>
-        <td>{new Date(item.lwd).toLocaleDateString()}</td>
-        <td>{item.ectc}</td>
-        <td style={{ color: textColor }}>
-          <b>{recentStatus}</b> {/* Display the most recent status */}
-        </td>
-        <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>
-        <td>
-          <Link onClick={() => ViewCandidateData(item._id)}>
-            <Image style={{ backgroundColor: "lightblue", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
-          </Link>
-          <Link
-            onClick={isDeleteEnabled ? () => handleDeleteClick(item._id) : undefined} // Enable delete only if recent status is "No Status"
-          >
-            <Image
-              style={{
-                backgroundColor: isDeleteEnabled ? "IndianRed" : "lightgray", // Change color if disabled
-                margin: "10px",
-                padding: "10px",
-                borderRadius: "10px",
-                cursor: isDeleteEnabled ? "pointer" : "not-allowed" // Change cursor style if disabled
-              }}
-              src='/Images/trash.svg'
-              alt="Delete"
-            />
-          </Link>
-          <Link onClick={() => updateCandidate(item._id)}>
-            <Image style={{ backgroundColor: "lightgreen", padding: "10px", margin: "10px", borderRadius: "10px" }} src='/Images/edit.svg' />
-          </Link>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
-            </Table>
-      </Modal.Body>
-    </Modal>
     <center>
     <Modal
       style={{ backgroundColor: "lightgray", opacity: "98%" }}
@@ -969,43 +1080,59 @@ const ViewCandidateData = async(id)=>{
                     </div>
                 </div> <hr></hr>
                 <div className="row">
-                    <div className="col-md-12 form-group">
-                    <h3> <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img><b style={{fontFamily:"monospace"}} >Assessment Details</b></h3> {/* Displaying single requirement detail */}
-                    {updateCandidateDetails.assessments.map((assessment, index) => (
-                            <div key={index} className="form-group">
-                                <label><strong>Assessment {index + 1}:</strong></label>
-                                <input
-                                readOnly
-                                    type="text"
-                                    className="form-control"
-                                    value={assessment.assessment}
-                                    onChange={(e) => handleAssessmentChange(index, 'assessment', e.target.value)}
-                                />
-                                <label><strong>Years of Experience:</strong></label>
-                                <input
-                                readOnly
-                                    type="text"
-                                    className="form-control"
-                                    value={assessment.yoe}
-                                    onChange={(e) => handleAssessmentChange(index, 'yoe', e.target.value)}
-                                />
-                                <label><strong>Score:</strong></label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={assessment.score}
-                                    onChange={(e) => handleAssessmentChange(index, 'score', e.target.value)}
-                                /> <hr></hr>
-                            </div>
-                        ))}
+            <div className="col-md-12 form-group">
+                <h3>
+                    <img style={{width: "30px", margin: "10px"}} src='/Images/icon.png' alt="icon" />
+                    <b style={{fontFamily: "monospace"}}>Assessment Details</b>
+                </h3>
+                {updateCandidateDetails.assessments.map((assessment, index) => (
+                    <div key={index} className="form-group">
+                        <label><strong>Assessment {index + 1}:</strong></label>
+                        <input
+                            readOnly
+                            type="text"
+                            className="form-control"
+                            value={assessment.assessment}
+                        />
+                        <label><strong>Years of Experience:</strong></label>
+                        <input
+                            readOnly
+                            type="text"
+                            className="form-control"
+                            value={assessment.yoe}
+                        />
+                        <label><strong>Score:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={assessment.score}
+                            onChange={(e) => handleAssessmentChange(index, 'score', e.target.value)}
+                        />
+                        <hr />
                     </div>
-                </div>
+                ))}
+            </div>
+        </div>
             </div>
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button style={{borderRadius:"20px",backgroundColor:"lightgray",color:"green",border:"1.5px solid black"}} onClick={handleSaveChanges}>
-          <b>Save Changes</b>
+      {updateCandidateDetails.savedStatus === "Saved" && (
+                    <Button style={{borderRadius:"20px",backgroundColor:"mediumseagreen",color:"white",border:"1.5px solid black",fontWeight:"bold"}}
+                        type="button"
+                        className="btn btn-secondary ml-2"
+                        onMouseMove={(e)=>{{e.target.style.backgroundColor = "lightgray";e.target.style.color = "black";e.target.style.padding = "10px"}}}
+                        onMouseLeave={(e)=>{{e.target.style.backgroundColor = "mediumseagreen";e.target.style.color = "white";e.target.style.padding = "7px"}}}
+                        onClick={uploadChanges}
+                        // onClick={handleUploadStatus}
+                    >
+                        Upload
+                    </Button>
+                )}
+        <Button                         onMouseMove={(e)=>{{e.target.style.backgroundColor = "green";e.target.style.color = "white";e.target.style.padding = "10px"}}}
+                        onMouseLeave={(e)=>{{e.target.style.backgroundColor = "lightgray";e.target.style.color = "green";e.target.style.padding = "7px"}}}
+ style={{borderRadius:"20px",backgroundColor:"lightgray",color:"green",border:"1.5px solid black",fontWeight:"bold"}} onClick={saveChanges}>
+          Save Changes
         </Button>
       </Modal.Footer>
     </Modal>
