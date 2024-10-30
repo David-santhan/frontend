@@ -476,7 +476,7 @@ const fetchCandidates = async (id) => {
 
     if (response.ok) {
       if (data.candidates) {
-        setCandidates(data.candidates);
+        setCandidates(data.uploadedCandidates);
         setshowtotalCandidates(true)
       } else {
         setError(data.message);
@@ -793,8 +793,8 @@ const postStatus = async (id) => {
 
       <td>
         <Link to={`/UserAction/${req.requirementDetails?._id}/${userId}`}>
-          <Button style={{ border: '1px solid gray', backgroundColor: "MediumSeaGreen", borderRadius: '20px' }}>
-            <b>Upload</b>
+          <Button style={{ border: '0px ', backgroundColor: "MediumSeaGreen", borderRadius: '20px',fontWeight:"bold",padding:"5px" }} onMouseMove={(e)=>{{e.target.style.backgroundColor = "gray";e.target.style.padding = "7px"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor = "MediumSeaGreen";e.target.style.padding = "5px"}}}>
+            Upload
           </Button>
         </Link>
       </td>
@@ -1982,7 +1982,239 @@ style={{backgroundColor:"lightgray"}}
       )}
         </Modal.Body>
       </Modal>
-      <Modal style={{backgroundColor:"lightgray"}} size="fullscreen" show={lagShow} onHide={() => setLagShow(false)} aria-labelledby="example-modal-sizes-title-lg">
+      
+{/* Team Uloads Modal */}
+               <Modal show={showTeamModal} onHide={handleCloseTeamModal} size="fullscreen">
+      <Modal.Header closeButton>
+        <Modal.Title> <h3 style={{ textAlign: "center" }}>
+                            <img
+                                style={{ width: "30px", margin: "10px" }}
+                                src='/Images/icon.png'
+                                alt="icon"
+                            />
+                            <b style={{ fontFamily: "monospace" }}>Team Candidates</b>
+                        </h3></Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        {/* Search Inputs */}
+        <FormControl
+          type="search"
+          placeholder="Search by Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
+        />
+
+        {/* Role input */}
+        <FormControl
+          type="search"
+          placeholder="Search by Role"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
+        />
+
+        {/* Status dropdown */}
+        <FormControl as="select" value={status} onChange={(e) => setStatus(e.target.value)} style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}>
+          <option value="">All</option>
+          {statusSearchOptions.map((option, idx) => (
+            <option key={idx} value={option}>
+              {option}
+            </option>
+          ))}
+        </FormControl>
+
+        {/* Search Button */}
+        <center>
+          <Button variant="primary" onClick={handleTeamSearch} style={{ marginBottom: '20px' }}>
+            Search
+          </Button>
+        </center>
+
+        {/* Candidate Table */}
+        {displayedCandidates && displayedCandidates.length > 0 ? (
+          <Table striped bordered hover responsive style={{textAlign:"center"}}>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Total YOE</th>
+                <th>LWD</th>
+                <th>ECTC</th>
+                <th>Status</th>
+                <th>Uploaded Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayedCandidates.map((candidate, idx) => {
+                const recentStatus = candidate.Status && candidate.Status.length
+                  ? candidate.Status[candidate.Status.length - 1].Status
+                  : "No Action Taken";
+
+                let textColor;
+                if (recentStatus === "No Action Taken") {
+                  textColor = "blue";
+                } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+                  textColor = "red";
+                } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+                  textColor = "orange";
+                } else {
+                  textColor = "green";
+                }
+
+                return (
+                  <tr key={idx}>
+                    <td>{candidate.firstName} {candidate.lastName}</td>
+                    <td>{candidate.role}</td>
+                    <td>{candidate.totalYoe}</td>
+                    <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
+                    <td>{candidate.ectc}</td>
+                    <td style={{ color: textColor }}><b>{recentStatus}</b></td>
+                    <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
+                    <td> <Link onClick={()=> CandidateData(candidate._id)}><Image  style={{backgroundColor:"lightblue",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image></Link> </td>
+
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        ) : (
+          <p>No candidates match your search criteria.</p>
+        )}
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleCloseTeamModal}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+
+    {/* Your Uploads Modal */}
+    <Modal show={showUserModal} onHide={handleCloseUserModal} size="fullscreen">
+    <Modal.Header closeButton>
+      <Modal.Title> <h3 style={{ textAlign: "center" }}>
+                            <img
+                                style={{ width: "30px", margin: "10px" }}
+                                src='/Images/icon.png'
+                                alt="icon"
+                            />
+                            <b style={{ fontFamily: "monospace" }}>Your Uploads</b>
+                        </h3></Modal.Title>
+    </Modal.Header>
+
+    <Modal.Body>
+      {/* Search Inputs for User Candidates */}
+      <FormControl
+        type="search"
+        placeholder="Search by Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
+      />
+
+      <FormControl
+        type="search"
+        placeholder="Search by Role"
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
+      />
+
+      <FormControl as="select" value={status} onChange={(e) => setStatus(e.target.value)} style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}>
+        <option value="">All</option>
+        {statusSearchOptions.map((option, idx) => (
+          <option key={idx} value={option}>
+            {option}
+          </option>
+        ))}
+      </FormControl>
+
+      <center>
+        <Button variant="primary" onClick={handleUserCandidatesSearch} style={{ marginBottom: '20px' }}>
+          Search 
+        </Button>
+      </center>
+
+      {/* User Candidate Table */}
+      {displayedCandidates && displayedCandidates.length > 0 ? (
+  <Table striped bordered hover responsive style={{ textAlign: "center" }}>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Total YOE</th>
+        <th>LWD</th>
+        <th>ECTC</th>
+        <th>Status</th>
+        <th>Uploaded Date</th>
+        <th colSpan={2}>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {displayedCandidates.map((candidate, idx) => {
+        const recentStatus = candidate.Status && candidate.Status.length
+          ? candidate.Status[candidate.Status.length - 1].Status
+          : "No Action Taken";
+
+        let textColor;
+        if (recentStatus === "No Action Taken") {
+          textColor = "blue";
+        } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+          textColor = "red";
+        } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+          textColor = "orange";
+        } else {
+          textColor = "green";
+        }
+
+        return (
+          <tr key={idx}>
+            <td>{candidate.firstName} {candidate.lastName}</td>
+            <td>{candidate.role}</td>
+            <td>{candidate.totalYoe}</td>
+            <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
+            <td>{candidate.ectc}</td>
+            <td style={{ color: textColor }}><b>{recentStatus}</b></td>
+            <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
+            <td>
+              <Link onClick={() => CandidateData(candidate._id)}>
+                <Image 
+                  style={{ backgroundColor: "lightblue", margin: "5px", padding: "10px", borderRadius: "10px" }} 
+                  src='./Images/view.svg' 
+                />
+              </Link>
+            </td>
+            <td>
+              <Link onClick={ () => deleteCandidate(candidate._id)}  style={{ pointerEvents: recentStatus === "No Action Taken" ? "auto" : "none" }}>
+                <Image 
+                  style={{ backgroundColor: recentStatus === "No Action Taken" ? "indianred" : "lightgray", margin: "5px", padding: "10px", borderRadius: "10px", opacity: recentStatus === "No Action Taken" ? 1 : 0.5 }} 
+                  src='./Images/trash.svg' 
+                />
+              </Link>
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </Table>
+) : (
+  <p>No user candidates match your search criteria.</p>
+)}
+
+    </Modal.Body>
+
+    <Modal.Footer>
+      <Button variant="secondary" onClick={handleCloseUserModal}>
+        Close
+      </Button>
+    </Modal.Footer>
+  </Modal>
+
+  {/* Candidate Modal */}
+  <Modal style={{backgroundColor:"lightgray"}} size="fullscreen" show={lagShow} onHide={() => setLagShow(false)} aria-labelledby="example-modal-sizes-title-lg">
     <Modal.Header closeButton>
         <Modal.Title id="example-modal-sizes-title-lg">
             <h5> <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img><b style={{fontFamily:"monospace"}} >Candidate Details </b></h5> {/* Displaying single requirement detail */}
@@ -2244,233 +2476,6 @@ style={{backgroundColor:"lightgray"}}
 )}
     </Modal.Body>
                </Modal>
-
-               <Modal show={showTeamModal} onHide={handleCloseTeamModal} size="fullscreen">
-      <Modal.Header closeButton>
-        <Modal.Title> <h3 style={{ textAlign: "center" }}>
-                            <img
-                                style={{ width: "30px", margin: "10px" }}
-                                src='/Images/icon.png'
-                                alt="icon"
-                            />
-                            <b style={{ fontFamily: "monospace" }}>Team Candidates</b>
-                        </h3></Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body>
-        {/* Search Inputs */}
-        <FormControl
-          type="search"
-          placeholder="Search by Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-        />
-
-        {/* Role input */}
-        <FormControl
-          type="search"
-          placeholder="Search by Role"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-        />
-
-        {/* Status dropdown */}
-        <FormControl as="select" value={status} onChange={(e) => setStatus(e.target.value)} style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}>
-          <option value="">All</option>
-          {statusSearchOptions.map((option, idx) => (
-            <option key={idx} value={option}>
-              {option}
-            </option>
-          ))}
-        </FormControl>
-
-        {/* Search Button */}
-        <center>
-          <Button variant="primary" onClick={handleTeamSearch} style={{ marginBottom: '20px' }}>
-            Search
-          </Button>
-        </center>
-
-        {/* Candidate Table */}
-        {displayedCandidates && displayedCandidates.length > 0 ? (
-          <Table striped bordered hover responsive style={{textAlign:"center"}}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Total YOE</th>
-                <th>LWD</th>
-                <th>ECTC</th>
-                <th>Status</th>
-                <th>Uploaded Date</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedCandidates.map((candidate, idx) => {
-                const recentStatus = candidate.Status && candidate.Status.length
-                  ? candidate.Status[candidate.Status.length - 1].Status
-                  : "No Action Taken";
-
-                let textColor;
-                if (recentStatus === "No Action Taken") {
-                  textColor = "blue";
-                } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-                  textColor = "red";
-                } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-                  textColor = "orange";
-                } else {
-                  textColor = "green";
-                }
-
-                return (
-                  <tr key={idx}>
-                    <td>{candidate.firstName} {candidate.lastName}</td>
-                    <td>{candidate.role}</td>
-                    <td>{candidate.totalYoe}</td>
-                    <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
-                    <td>{candidate.ectc}</td>
-                    <td style={{ color: textColor }}><b>{recentStatus}</b></td>
-                    <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
-                    <td> <Link onClick={()=> CandidateData(candidate._id)}><Image  style={{backgroundColor:"lightblue",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image></Link> </td>
-
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
-        ) : (
-          <p>No candidates match your search criteria.</p>
-        )}
-      </Modal.Body>
-
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleCloseTeamModal}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
-    <Modal show={showUserModal} onHide={handleCloseUserModal} size="fullscreen">
-    <Modal.Header closeButton>
-      <Modal.Title> <h3 style={{ textAlign: "center" }}>
-                            <img
-                                style={{ width: "30px", margin: "10px" }}
-                                src='/Images/icon.png'
-                                alt="icon"
-                            />
-                            <b style={{ fontFamily: "monospace" }}>Your Uploads</b>
-                        </h3></Modal.Title>
-    </Modal.Header>
-
-    <Modal.Body>
-      {/* Search Inputs for User Candidates */}
-      <FormControl
-        type="search"
-        placeholder="Search by Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-      />
-
-      <FormControl
-        type="search"
-        placeholder="Search by Role"
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-      />
-
-      <FormControl as="select" value={status} onChange={(e) => setStatus(e.target.value)} style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}>
-        <option value="">All</option>
-        {statusSearchOptions.map((option, idx) => (
-          <option key={idx} value={option}>
-            {option}
-          </option>
-        ))}
-      </FormControl>
-
-      <center>
-        <Button variant="primary" onClick={handleUserCandidatesSearch} style={{ marginBottom: '20px' }}>
-          Search 
-        </Button>
-      </center>
-
-      {/* User Candidate Table */}
-      {displayedCandidates && displayedCandidates.length > 0 ? (
-  <Table striped bordered hover responsive style={{ textAlign: "center" }}>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Total YOE</th>
-        <th>LWD</th>
-        <th>ECTC</th>
-        <th>Status</th>
-        <th>Uploaded Date</th>
-        <th colSpan={2}>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {displayedCandidates.map((candidate, idx) => {
-        const recentStatus = candidate.Status && candidate.Status.length
-          ? candidate.Status[candidate.Status.length - 1].Status
-          : "No Action Taken";
-
-        let textColor;
-        if (recentStatus === "No Action Taken") {
-          textColor = "blue";
-        } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-          textColor = "red";
-        } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-          textColor = "orange";
-        } else {
-          textColor = "green";
-        }
-
-        return (
-          <tr key={idx}>
-            <td>{candidate.firstName} {candidate.lastName}</td>
-            <td>{candidate.role}</td>
-            <td>{candidate.totalYoe}</td>
-            <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
-            <td>{candidate.ectc}</td>
-            <td style={{ color: textColor }}><b>{recentStatus}</b></td>
-            <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
-            <td>
-              <Link onClick={() => CandidateData(candidate._id)}>
-                <Image 
-                  style={{ backgroundColor: "lightblue", margin: "5px", padding: "10px", borderRadius: "10px" }} 
-                  src='./Images/view.svg' 
-                />
-              </Link>
-            </td>
-            <td>
-              <Link onClick={ () => deleteCandidate(candidate._id)}  style={{ pointerEvents: recentStatus === "No Action Taken" ? "auto" : "none" }}>
-                <Image 
-                  style={{ backgroundColor: recentStatus === "No Action Taken" ? "indianred" : "lightgray", margin: "5px", padding: "10px", borderRadius: "10px", opacity: recentStatus === "No Action Taken" ? 1 : 0.5 }} 
-                  src='./Images/trash.svg' 
-                />
-              </Link>
-            </td>
-          </tr>
-        );
-      })}
-    </tbody>
-  </Table>
-) : (
-  <p>No user candidates match your search criteria.</p>
-)}
-
-    </Modal.Body>
-
-    <Modal.Footer>
-      <Button variant="secondary" onClick={handleCloseUserModal}>
-        Close
-      </Button>
-    </Modal.Footer>
-  </Modal>
  </div>
   );
 }
