@@ -64,7 +64,7 @@ function Loginpage() {
       body: dataToSend,
     };
 
-    let JSONData = await fetch("https://hrbackend-1.onrender.com/login", reqOption);
+    let JSONData = await fetch("https://hrbackend-2.onrender.com/login", reqOption);
     let JSOData = await JSONData.json();
 
     if (JSOData.status === "Success") {
