@@ -36,7 +36,7 @@ function AdminUpdateClient() {
 
 })
 useEffect(()=>{
-    axios.get('https://hrbackend-2.onrender.com/getClientdatatoUpdate/'+id)
+    axios.get('https://ornnovabackend.onrender.com/getClientdatatoUpdate/'+id)
 .then(res=>{
   setValues({...values,
     ClientName:res.data.ClientName,
@@ -76,7 +76,7 @@ let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
 const userType = getDecryptedData("User Type")
 const handleSubmit= async (e)=>{
     e.preventDefault();
-    axios.put('https://hrbackend-2.onrender.com/UpdateClient/'+id,values)
+    axios.put('https://ornnovabackend.onrender.com/UpdateClient/'+id,values)
     .then(res=>{
      console.log(res)
      alert(res.data.msg)
