@@ -116,7 +116,7 @@ function AdminCreateUser() {
             body: dataToSend,
         };
 
-        let JSONData = await fetch("https://hrbackend-1.onrender.com/newUser", reqOption);
+        let JSONData = await fetch("https://hrbackend-2.onrender.com/newUser", reqOption);
         let JSOData = await JSONData.json();
 
         if (JSOData.status === "Success") {
