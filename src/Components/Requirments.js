@@ -189,14 +189,14 @@ const filteredCandidates = filterCandidates();
 
     const fetchRequirements = async () => {
         try {
-            const response = await fetch('https://hrbackend-2.onrender.com/admingetrequirements');
+            const response = await fetch('https://ornnovabackend.onrender.com/admingetrequirements');
             const data = await response.json();
             SetRequirements(data);
              console.log(data)
             const counts = {};
             for (let req of data) {
                 try {
-                    const candidateRes = await axios.get(`https://hrbackend-2.onrender.com/adminviewactions/${req._id}`);
+                    const candidateRes = await axios.get(`https://ornnovabackend.onrender.com/adminviewactions/${req._id}`);
                     counts[req._id] = candidateRes.data.candidateCount || 0;
                    
                 } catch (err) {
@@ -214,7 +214,7 @@ const filteredCandidates = filterCandidates();
             try {
                 const counts = {};
                 for (let req of requirements) {
-                    const response = await axios.get(`https://hrbackend-2.onrender.com/api/requirements/${req._id}/claimedByCount`);
+                    const response = await axios.get(`https://ornnovabackend.onrender.com/api/requirements/${req._id}/claimedByCount`);
                     counts[req._id] = response.data.claimedByCount || 0;
                 }
                 setClaimedByCounts(counts);
@@ -228,7 +228,7 @@ const filteredCandidates = filterCandidates();
 
     const fetchClaimedUsersDetails = async (requirementId) => {
         try {
-            const response = await axios.get(`https://hrbackend-2.onrender.com/api/requirements/${requirementId}/claimedByDetails`);
+            const response = await axios.get(`https://ornnovabackend.onrender.com/api/requirements/${requirementId}/claimedByDetails`);
             setShowClaimedUsers(response.data.claimedUsers);
             setShow(true);
         } catch (error) {
@@ -238,7 +238,7 @@ const filteredCandidates = filterCandidates();
 
 const fetchRecruiterDetails = async (reqId) => {
     try {
-        const response = await axios.get(`https://hrbackend-2.onrender.com/api/recruiters/${reqId}`);
+        const response = await axios.get(`https://ornnovabackend.onrender.com/api/recruiters/${reqId}`);
         setRecruitersData(response.data.recruiters);
         console.log(response.data.recruiters);
         setShowA(true); // Show the recruiter data when fetched
@@ -252,14 +252,14 @@ const toggleAccordion = async (id) => {
         // If the accordion is being closed
         setExpandedId(null); // Reset expanded ID
     } else {
-      const response = await axios.get(`https://hrbackend-2.onrender.com/api/recruiters/${id}`);
+      const response = await axios.get(`https://ornnovabackend.onrender.com/api/recruiters/${id}`);
       setRecruitersData(response.data.recruiters);
         setExpandedId(id); // Set the current ID as expanded
     }
 };
     const requirementDetails = async (id) => {
         try {
-            const response = await axios.get(`https://hrbackend-2.onrender.com/getrequirements/${id}`);
+            const response = await axios.get(`https://ornnovabackend.onrender.com/getrequirements/${id}`);
             SetRequirementData(response.data); // Ensure this returns an object
             setLgShow(true);
         } catch (err) {
@@ -268,7 +268,7 @@ const toggleAccordion = async (id) => {
     };
     const CandidateData = async(id)=>{
         try {
-            const response = await axios.get(`https://hrbackend-2.onrender.com/candidate/${id}`);
+            const response = await axios.get(`https://ornnovabackend.onrender.com/candidate/${id}`);
            
             console.log(response.data)
                 setCandidateDetails(response.data); 
@@ -294,7 +294,7 @@ const toggleAccordion = async (id) => {
         
         if (confirmDelete) {
           try {
-            const response = await fetch(`https://hrbackend-2.onrender.com/api/candidates/${candidateId}`, {
+            const response = await fetch(`https://ornnovabackend.onrender.com/api/candidates/${candidateId}`, {
               method: 'DELETE',
             });
       
@@ -342,7 +342,7 @@ const toggleAccordion = async (id) => {
         }
       
         try {
-            const response = await fetch(`https://hrbackend-2.onrender.com/updatestatus/${id}`, {
+            const response = await fetch(`https://ornnovabackend.onrender.com/updatestatus/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -386,7 +386,7 @@ const toggleAccordion = async (id) => {
         }
     
         try {
-          const response = await fetch(`https://hrbackend-2.onrender.com/deleteRequirement/${id}`, {
+          const response = await fetch(`https://ornnovabackend.onrender.com/deleteRequirement/${id}`, {
             method: 'DELETE',
           });
     
@@ -410,7 +410,7 @@ const toggleAccordion = async (id) => {
       // Edit Requirement
       const fetchRequirement = async (id) => {
         try {
-            const response = await fetch(`https://hrbackend-2.onrender.com/getrequirements/${id}`);
+            const response = await fetch(`https://ornnovabackend.onrender.com/getrequirements/${id}`);
             if (response.ok) {
                 const data = await response.json();
                 setFormData({ ...data, id: data._id }); // Set ID for the PUT request
@@ -455,7 +455,7 @@ const toggleAccordion = async (id) => {
     const handleSubmit = async (e) => {
       e.preventDefault();
       try {
-          const response = await axios.put(`https://hrbackend-2.onrender.com/editRequirement/${formData.id}`, formData); // Use the correct ID and data
+          const response = await axios.put(`https://ornnovabackend.onrender.com/editRequirement/${formData.id}`, formData); // Use the correct ID and data
           alert("Updated Successfully ✅"); // Ensure your API returns a message
           setShowEditModal(false); // Close the modal after successful update
           window.location.reload();
@@ -469,7 +469,7 @@ const toggleAccordion = async (id) => {
 const fetchRequirementDetails = async (reqId) => {
   try {
       // Send GET request using the Fetch API
-      const response = await fetch(`https://hrbackend-2.onrender.com/admingetrequirements/${reqId}`);
+      const response = await fetch(`https://ornnovabackend.onrender.com/admingetrequirements/${reqId}`);
       // Check if the response is okay (status 200)
       if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
@@ -495,7 +495,7 @@ const fetchRequirementDetails = async (reqId) => {
 const fetchRemainingUsers = async (reqId) => {
   try {
       // Make a GET request to the /remainingusers/:id API
-      const response = await axios.get(`https://hrbackend-2.onrender.com/remainingusers/${reqId}`);
+      const response = await axios.get(`https://ornnovabackend.onrender.com/remainingusers/${reqId}`);
       
       // Set the remaining users in state
       setRemainingUsers(response.data);
@@ -507,7 +507,7 @@ const fetchRemainingUsers = async (reqId) => {
 // Fetch user count from the API
 const fetchUsersCount = async () => {
   try {
-    const response = await axios.get("https://hrbackend-2.onrender.com/allUsersCount"); // API call to get count
+    const response = await axios.get("https://ornnovabackend.onrender.com/allUsersCount"); // API call to get count
     setUsersCount(response.data); // update state with the count
   } catch (error) {
     console.error("Error fetching user count:", error);
@@ -528,7 +528,7 @@ const assignReqToUser = async (userId) => {
   // If the user confirms, proceed with the assignment
   if (isConfirmed) {
       try {
-          const response = await axios.post(`https://hrbackend-2.onrender.com/assignReq/${userId}/${ReqId}`, 
+          const response = await axios.post(`https://ornnovabackend.onrender.com/assignReq/${userId}/${ReqId}`, 
           {
               headers: {
                   'Content-Type': 'application/json'
@@ -563,7 +563,7 @@ const unassignReqFromUser = async (userId) => {
   // If the user confirms, proceed with the unassignment
   if (isConfirmed) {
       try {
-          const response = await axios.post(`https://hrbackend-2.onrender.com/unassignReq/${userId}/${ReqId}`, 
+          const response = await axios.post(`https://ornnovabackend.onrender.com/unassignReq/${userId}/${ReqId}`, 
           {
               headers: {
                   'Content-Type': 'application/json'
@@ -1094,7 +1094,7 @@ const unassignReqFromUser = async (userId) => {
     <Table  bordered hover className="table-sm">
         <tbody>
         <tr>
-      <td> <Image  src={`https://hrbackend-2.onrender.com/${candidateDetails.candidateImage}`} style={{width:"100px",borderRadius:"100px"}} alt='Candidate Image' ></Image>
+      <td> <Image  src={`https://ornnovabackend.onrender.com/${candidateDetails.candidateImage}`} style={{width:"100px",borderRadius:"100px"}} alt='Candidate Image' ></Image>
       </td>
       <center>
     <strong>Update Status</strong>
@@ -1274,7 +1274,7 @@ const unassignReqFromUser = async (userId) => {
     <td>
   {typeof candidateDetails.updatedResume === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`https://hrbackend-2.onrender.com/${candidateDetails.updatedResume}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://ornnovabackend.onrender.com/${candidateDetails.updatedResume}`} target="_blank" rel="noopener noreferrer">
         View Resume
       </a>
     </div>
@@ -1289,7 +1289,7 @@ const unassignReqFromUser = async (userId) => {
     <td>
   {typeof candidateDetails.ornnovaProfile === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`https://hrbackend-2.onrender.com/${candidateDetails.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://ornnovabackend.onrender.com/${candidateDetails.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
         View Ornnova Profile
       </a>
     </div>
