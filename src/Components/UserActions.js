@@ -122,7 +122,7 @@ if (!isNaN(date)) {
 
     const viewCandidates = async()=>{
       try {
-        const response = await axios.get(`https://hrbackend-2.onrender.com/viewactions/${id}/${userId}`)
+        const response = await axios.get(`https://ornnovabackend.onrender.com/viewactions/${id}/${userId}`)
         setCandidateData(response.data.candidates);
         // handleShow()
         // console.log(response.data);
@@ -139,7 +139,7 @@ if (!isNaN(date)) {
         const fetchRequirement = async () => {
             try {
               console.log(id)
-                const response = await axios.get(`https://hrbackend-2.onrender.com/actions/${id}/${userId}`);
+                const response = await axios.get(`https://ornnovabackend.onrender.com/actions/${id}/${userId}`);
                 // console.log('Fetched requirement:', response.data); // Check the data structure
                 setRequirValues(prevValues => ({
                     ...prevValues,
@@ -164,7 +164,7 @@ if (!isNaN(date)) {
         };     
         const fetchUserData = async (email) => {
             try {
-                const response = await fetch(`https://hrbackend-2.onrender.com/loggedinuserdata/${email}`);
+                const response = await fetch(`https://ornnovabackend.onrender.com/loggedinuserdata/${email}`);
                 const data = await response.json();
                 setLoginUserData(data);
             } catch (err) {
@@ -244,7 +244,7 @@ useEffect(() => {
 //   if (candidateimageRef.current?.files[0]) formData.append('candidateImage', candidateimageRef.current.files[0]);
 
 //   try {
-//       const response = await fetch('https://hrbackend-2.onrender.com/Candidates', {
+//       const response = await fetch('https://ornnovabackend.onrender.com/Candidates', {
 //           method: 'POST',
 //           body: formData // Send FormData object
 //       });
@@ -311,7 +311,7 @@ const sendCandidateDataToDatabase = async (status) => {
   if (candidateimageRef.current?.files[0]) formData.append('candidateImage', candidateimageRef.current.files[0]);
 
   try {
-      const response = await fetch('https://hrbackend-2.onrender.com/Candidates', {
+      const response = await fetch('https://ornnovabackend.onrender.com/Candidates', {
           method: 'POST',
           body: formData // Send FormData object
       });
