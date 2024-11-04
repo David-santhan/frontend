@@ -57,7 +57,7 @@ const userType = getDecryptedData("User Type")
 
 const readClientList = async (id) => {
   let reqOption = { method: "GET" };
-  let JSONData = await fetch(`https://hrbackend-2.onrender.com/ClientsList/${id}`, reqOption);
+  let JSONData = await fetch(`https://ornnovabackend.onrender.com/ClientsList/${id}`, reqOption);
   let JSOData = await JSONData.json();
   setClientList(JSOData);
   // setSelectedClientId(id);
@@ -76,7 +76,7 @@ let getClientList = async () => {
     };
 
     try {
-        let JSONData = await fetch("https://hrbackend-2.onrender.com/ClientsList", reqOption);
+        let JSONData = await fetch("https://ornnovabackend.onrender.com/ClientsList", reqOption);
         let JSOData = await JSONData.json();
         // console.log(JSOData); // Log the response to inspect its structure
         // Assuming JSOData is supposed to be an array of clients
@@ -108,7 +108,7 @@ let getClientList = async () => {
                 let reqOption = {
                     method: "DELETE",
                 };
-                let JSONData = await fetch(`https://hrbackend-2.onrender.com/deleteClient/${id}`, reqOption);
+                let JSONData = await fetch(`https://ornnovabackend.onrender.com/deleteClient/${id}`, reqOption);
                 let JSOData = await JSONData.json();
     
                 if (JSOData.status === "success") {
@@ -132,7 +132,7 @@ let getClientList = async () => {
       let reqOption = {
           method: "GET"
       };
-      const response = await fetch(`https://hrbackend-2.onrender.com/userDetailsofAssignedClient/${id}`, reqOption);
+      const response = await fetch(`https://ornnovabackend.onrender.com/userDetailsofAssignedClient/${id}`, reqOption);
       let data = await response.json();
       setAssignedUsers(data.userDetails);
      
@@ -143,7 +143,7 @@ let getClientList = async () => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`https://hrbackend-2.onrender.com/userDetailsofAssignedClient/${id}`, reqOption);
+    const response = await fetch(`https://ornnovabackend.onrender.com/userDetailsofAssignedClient/${id}`, reqOption);
     let data = await response.json();
     setAssignedCount(data.count);
     // console.log(data.count)
@@ -154,7 +154,7 @@ let getClientList = async () => {
       let reqOption = {
           method: "GET"
       };
-      const response = await fetch(`https://hrbackend-2.onrender.com/userDetailstoAssignClient/${id}`, reqOption);
+      const response = await fetch(`https://ornnovabackend.onrender.com/userDetailstoAssignClient/${id}`, reqOption);
       let data = await response.json();
       console.log( data)
       setUsersData(data);
@@ -209,7 +209,7 @@ const filtereData = filteredData
     // If the user confirms, proceed with the assignment
     if (isConfirmed) {
         try {
-            const response = await axios.post(`https://hrbackend-2.onrender.com/assignClient/${userId}/${clientId}`, 
+            const response = await axios.post(`https://ornnovabackend.onrender.com/assignClient/${userId}/${clientId}`, 
             {
                 headers: {
                     'Content-Type': 'application/json'
@@ -244,7 +244,7 @@ const unassignClientFromUser = async (userId) => {
     // If the user confirms, proceed with the unassignment
     if (isConfirmed) {
         try {
-            const response = await axios.post(`https://hrbackend-2.onrender.com/unassignClient/${userId}/${clientId}`, {
+            const response = await axios.post(`https://ornnovabackend.onrender.com/unassignClient/${userId}/${clientId}`, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
