@@ -15,7 +15,7 @@ function ResetPassword() {
     const navigate = useNavigate();
 
     const userValid = async()=>{
-        const res = await fetch(`https://hrbackend-2.onrender.com/ResetPasswordpage/${id}/${token}`,{
+        const res = await fetch(`https://ornnovabackend.onrender.com/ResetPasswordpage/${id}/${token}`,{
             method:"GET",
             headers :{ "Content-Type":"application/json"}
         });
@@ -37,7 +37,7 @@ function ResetPassword() {
 
  const sendPassword= async(e)=>{
     e.preventDefault();
-    const res = await fetch(`https://hrbackend-2.onrender.com/${id}/${token}`,{
+    const res = await fetch(`https://ornnovabackend.onrender.com/${id}/${token}`,{
         method:"POST",
         headers :{ "Content-Type":"application/json"},
         body:JSON.stringify({password})
