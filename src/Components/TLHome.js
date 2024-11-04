@@ -114,7 +114,7 @@ const deleteCandidate = async (candidateId) => {
   }
 
   try {
-    const response = await axios.delete(`https://hrbackend-2.onrender.com/api/candidates/${candidateId}`);
+    const response = await axios.delete(`https://ornnovabackend.onrender.com/api/candidates/${candidateId}`);
     if (response.status === 200) {
       // Update the local state to remove the deleted candidate from the list
       setCandidates(candidates.filter(candidate => candidate._id !== candidateId));
@@ -128,7 +128,7 @@ const deleteCandidate = async (candidateId) => {
 
 const updateCandidate = async(id)=>{
   try {
-    const response = await axios.get(`https://hrbackend-2.onrender.com/candidate/${id}`)
+    const response = await axios.get(`https://ornnovabackend.onrender.com/candidate/${id}`)
     console.log(response.data)
     setUpdateCandidateDetails(response.data);
     handleUpdateShow();
@@ -167,7 +167,7 @@ try {
     ...(status === "Uploaded" ? { savedStatus: "Uploaded", uploadedDate: new Date().toISOString() } : {})
   };
 
-  const response = await axios.put(`https://hrbackend-2.onrender.com/candidates/${candidateId}`, updatedDetails);
+  const response = await axios.put(`https://ornnovabackend.onrender.com/candidates/${candidateId}`, updatedDetails);
 
   if (response.status === 200) {
     alert('Candidate details updated successfully ✅');
@@ -354,7 +354,7 @@ const handleShowUserCandidates = (userCandidates)=>{
   // Fetch user and team data
   const fetchUserData = async (userId) => {
     try {
-      let response = await axios.get(`https://hrbackend-2.onrender.com/TlHome/${userId}`);
+      let response = await axios.get(`https://ornnovabackend.onrender.com/TlHome/${userId}`);
       let data = response.data;
 
       setUserData(data.user);
@@ -377,7 +377,7 @@ const handleShowUserCandidates = (userCandidates)=>{
 
     try {
         // Fetch user data and team details from the server
-        let JSONData = await fetch(`https://hrbackend-2.onrender.com/getUserData/${id}`, reqOption);
+        let JSONData = await fetch(`https://ornnovabackend.onrender.com/getUserData/${id}`, reqOption);
         let JSOData = await JSONData.json();
 
         // Extract user details and team details from the response
@@ -400,7 +400,7 @@ const handleShowUserCandidates = (userCandidates)=>{
   };
 
   try {
-    let JSONData = await fetch(`https://hrbackend-2.onrender.com/getTeamrequirements/${userId}`, reqOption);
+    let JSONData = await fetch(`https://ornnovabackend.onrender.com/getTeamrequirements/${userId}`, reqOption);
     let JSOData = await JSONData.json();
     console.log(JSOData);
 
@@ -442,7 +442,7 @@ const viewRequirement = async (id) => {
       method: 'GET',
     };
     try {
-      let JSONData = await fetch(`https://hrbackend-2.onrender.com/getrequirements/${id}`, reqOption);
+      let JSONData = await fetch(`https://ornnovabackend.onrender.com/getrequirements/${id}`, reqOption);
       let JSOData = await JSONData.json();
       
       setViewReq([JSOData]); // Wrap in an array to iterate properly in the table
@@ -456,7 +456,7 @@ const viewRequirement = async (id) => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`https://hrbackend-2.onrender.com/userDetailsofAssignedRequirement/${id}/${userId}`, reqOption);
+    const response = await fetch(`https://ornnovabackend.onrender.com/userDetailsofAssignedRequirement/${id}/${userId}`, reqOption);
     let data = await response.json();
     setAssignedUsersData(data);
     console.log(data)    
@@ -465,7 +465,7 @@ const viewRequirement = async (id) => {
     let reqOption = {
         method: "GET"
     };
-    const response = await fetch(`https://hrbackend-2.onrender.com/userDetailstoAssignRequirement/${id}/${userId}`, reqOption);
+    const response = await fetch(`https://ornnovabackend.onrender.com/userDetailstoAssignRequirement/${id}/${userId}`, reqOption);
     let data = await response.json();
     console.log(data)
     setUserData(data.teamMembers);
@@ -492,7 +492,7 @@ const assignReqToUser = async (userId) => {
   // If the user confirms, proceed with the assignment
   if (isConfirmed) {
       try {
-          const response = await axios.post(`https://hrbackend-2.onrender.com/assignReq/${userId}/${ReqId}`, 
+          const response = await axios.post(`https://ornnovabackend.onrender.com/assignReq/${userId}/${ReqId}`, 
           {
               headers: {
                   'Content-Type': 'application/json'
@@ -528,7 +528,7 @@ const unassignReqFromUser = async (userId) => {
   // If the user confirms, proceed with the unassignment
   if (isConfirmed) {
       try {
-          const response = await axios.post(`https://hrbackend-2.onrender.com/unassignReq/${userId}/${ReqId}`, 
+          const response = await axios.post(`https://ornnovabackend.onrender.com/unassignReq/${userId}/${ReqId}`, 
           {
               headers: {
                   'Content-Type': 'application/json'
@@ -561,7 +561,7 @@ const Reqcounts = async () => {
   };
 
   try {
-    const response = await fetch(`https://hrbackend-2.onrender.com/getTeamRequirementsCount/${userId}`, reqOption);
+    const response = await fetch(`https://ornnovabackend.onrender.com/getTeamRequirementsCount/${userId}`, reqOption);
     let data = await response.json();
 
     // Log the complete data for debugging
@@ -585,7 +585,7 @@ const RequirmentCandidates = async (id)=>{
   let reqOption = {
     method:"GET"
   }
-  let response = await fetch(`https://hrbackend-2.onrender.com/getRequirementsCandidatesCount/${id}`,reqOption)
+  let response = await fetch(`https://ornnovabackend.onrender.com/getRequirementsCandidatesCount/${id}`,reqOption)
   // let data = response.json();
   // console.log('Response data:', data);
   if (!response.ok) {
@@ -608,7 +608,7 @@ const fetchCandidates = async (id) => {
   setError(""); // Reset error state
 
   try {
-    const response = await fetch(`https://hrbackend-2.onrender.com/viewactions/${id}/${selectedRecruiterId}`);
+    const response = await fetch(`https://ornnovabackend.onrender.com/viewactions/${id}/${selectedRecruiterId}`);
     const data = await response.json();
    
 
@@ -631,7 +631,7 @@ const fetchCandidates = async (id) => {
 
 const CandidateData = async(id)=>{
   try {
-      const response = await axios.get(`https://hrbackend-2.onrender.com/candidate/${id}`);
+      const response = await axios.get(`https://ornnovabackend.onrender.com/candidate/${id}`);
      
       // console.log(response.data)
           setCandidateDetails(response.data); 
@@ -646,7 +646,7 @@ const requirementDetailsWithAssignedUsers = async () => {
   let reqOption = {
       method: "GET"
   };
-  const response = await fetch(`https://hrbackend-2.onrender.com/requirementDetailsWithAssignedUsers/${userId}`, reqOption);
+  const response = await fetch(`https://ornnovabackend.onrender.com/requirementDetailsWithAssignedUsers/${userId}`, reqOption);
   let data = await response.json();
   setShowCandidateDetailsHome(data);
   // console.log(data)    
@@ -729,7 +729,7 @@ const postStatus = async (id) => {
   }
 
   try {
-      const response = await fetch(`https://hrbackend-2.onrender.com/updatestatus/${id}`, {
+      const response = await fetch(`https://ornnovabackend.onrender.com/updatestatus/${id}`, {
           method: 'PUT',
           headers: {
               'Content-Type': 'application/json',
@@ -1271,7 +1271,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`https://hrbackend-2.onrender.com/${showUserData.userDetails.ProfilePic}`}
+              src={`https://ornnovabackend.onrender.com/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
@@ -1786,7 +1786,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`https://hrbackend-2.onrender.com/${showUserData.userDetails.ProfilePic}`}
+              src={`https://ornnovabackend.onrender.com/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
@@ -2425,7 +2425,7 @@ style={{backgroundColor:"lightgray"}}
         <tr>
             <td>
               <Image
-                src={`https://hrbackend-2.onrender.com/${candidateDetails.candidateImage}`}
+                src={`https://ornnovabackend.onrender.com/${candidateDetails.candidateImage}`}
                 style={{ width: "100px", borderRadius: "100px" }}
                 alt="Candidate Image"
               ></Image>
@@ -2615,7 +2615,7 @@ style={{backgroundColor:"lightgray"}}
     <td>
   {typeof candidateDetails.updatedResume === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`https://hrbackend-2.onrender.com/${candidateDetails.updatedResume}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://ornnovabackend.onrender.com/${candidateDetails.updatedResume}`} target="_blank" rel="noopener noreferrer">
         View Resume
       </a>
     </div>
@@ -2630,7 +2630,7 @@ style={{backgroundColor:"lightgray"}}
     <td>
   {typeof candidateDetails.ornnovaProfile === 'string' ? (
     <div style={{ marginBottom: '5px' }}>
-      <a href={`https://hrbackend-2.onrender.com/${candidateDetails.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
+      <a href={`https://ornnovabackend.onrender.com/${candidateDetails.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
         View Ornnova Profile
       </a>
     </div>
@@ -2698,7 +2698,7 @@ style={{backgroundColor:"lightgray"}}
                         <label><strong>Candidate Image:</strong></label>
                         <div>
                             <img
-                                src={`https://hrbackend-2.onrender.com/${updateCandidateDetails.candidateImage}`}
+                                src={`https://ornnovabackend.onrender.com/${updateCandidateDetails.candidateImage}`}
                                 style={{ width: "100px", borderRadius: "100px" }}
                                 alt='Candidate Image'
                             />
