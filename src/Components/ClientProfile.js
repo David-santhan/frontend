@@ -17,7 +17,7 @@ function ClientProfile() {
             let reqOption={
               method:"GET"
             }
-            let JSONData= await fetch(`https://hrbackend-1.onrender.com/ClientsList/${id}`,reqOption)
+            let JSONData= await fetch(`https://hrbackend-2.onrender.com/ClientsList/${id}`,reqOption)
             let JSOData= await JSONData.json();
             setClientsList(JSOData);
           }
