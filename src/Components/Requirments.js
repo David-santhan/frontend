@@ -11,11 +11,14 @@ import Row from 'react-bootstrap/Row';
 import Toast from 'react-bootstrap/Toast';
 import Image from 'react-bootstrap/Image';
 import CryptoJS from 'crypto-js';
+import Accordion from 'react-bootstrap/Accordion';
+import { useAccordionButton } from 'react-bootstrap/AccordionButton';
 
 
 function Requirements() {
     let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
 
+   
   // Function to decrypt data
   const decryptData = (ciphertext, secret) => {
     const bytes = CryptoJS.AES.decrypt(ciphertext, secret);
@@ -60,6 +63,9 @@ function Requirements() {
     // State for filters
     const [selectedCandidateStatus, setSelectedCandidateStatus] = useState('');
     const [candidateName, setCandidateName] = useState('');
+    const [expandedId, setExpandedId] = useState(null);
+
+   
 
     // Function to filter candidates
     const filteredRecruitersData = recruitersData.map(item => ({
@@ -110,10 +116,7 @@ const [selectedStatus, setSelectedStatus] = useState('');
 const [searchReq, setSearchReq] = useState("");
 const [expandedRecruiter, setExpandedRecruiter] = useState(null);
 
-    const toggleRecruiter = (recruiterId) => {
-        // Toggle the visibility of candidates for the selected recruiter
-        setExpandedRecruiter(expandedRecruiter === recruiterId ? null : recruiterId);
-    };
+   
 
 
     const handleSearchChange = (event) => {
@@ -233,18 +236,27 @@ const filteredCandidates = filterCandidates();
         }
     };
 
-    const fetchRecruiterDetails = async (reqId) => {
-        try {
-            const response = await axios.get(`https://hrbackend-1.onrender.com/api/recruiters/${reqId}`);
-            setRecruitersData(response.data.recruiters);
-            console.log(response.data.recruiters)
-            setShowA(true);
-            console.log(response.data)
-        } catch (err) {
-            toggleShowB();
-        }
-    };
-   
+const fetchRecruiterDetails = async (reqId) => {
+    try {
+        const response = await axios.get(`https://hrbackend-1.onrender.com/api/recruiters/${reqId}`);
+        setRecruitersData(response.data.recruiters);
+        console.log(response.data.recruiters);
+        setShowA(true); // Show the recruiter data when fetched
+    } catch (err) {
+        toggleShowB(); // Handle error
+    }
+};
+
+const toggleAccordion = async (id) => {
+    if (expandedId === id) {
+        // If the accordion is being closed
+        setExpandedId(null); // Reset expanded ID
+    } else {
+      const response = await axios.get(`https://hrbackend-1.onrender.com/api/recruiters/${id}`);
+      setRecruitersData(response.data.recruiters);
+        setExpandedId(id); // Set the current ID as expanded
+    }
+};
     const requirementDetails = async (id) => {
         try {
             const response = await axios.get(`https://hrbackend-1.onrender.com/getrequirements/${id}`);
@@ -655,7 +667,7 @@ const unassignReqFromUser = async (userId) => {
                 </Toast>
             </Col>
             {/* Table */}
-            <Table style={{ textAlign: "center" }} responsive="sm" striped hover>
+            <Table bordered style={{ textAlign: "center" }} responsive="sm"  hover>
                 <thead>
                     <tr>
                         <th>Reg Id</th>
@@ -668,58 +680,173 @@ const unassignReqFromUser = async (userId) => {
                         <th>Assigns</th>
                         <th>No of Profiles</th>
                         <th>No of Claims</th>
-                        <th colSpan={2}>Actions</th>
+                        <th colSpan={3}>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedRequirements
-                        .filter(item => 
-                            selectedTypes.length === requirementTypes.length || selectedTypes.includes(item.requirementtype)
-                        )
-                        .filter(item => 
-                            item.client.toLowerCase().includes(searchReq.toLowerCase()) // Filter by client name
-                        )
-                        .map((item) => (
-                            <tr key={item._id}>
-                                <td>
-                                    <Link style={{ textDecoration: "none" }} onClick={() => requirementDetails(item._id)}>
-                                        <b>{item.regId}</b>
-                                    </Link>
-                                </td>
-                                <td>{item.client}</td>
-                                <td>{item.role}</td>
-                                <td>{item.typeOfContract}</td>
-                                <td>{item.requirementtype}</td>
-                                <td>{new Date(item.startDate).toLocaleDateString()}</td>
-                                <td>{new Date(item.uploadedDate).toLocaleDateString()}</td>
-                                <td><Link style={{textDecoration:"none"}} onClick={()=>{fetchRequirementDetails(item._id)}}><strong style={{ backgroundColor:"dimgrey", borderRadius: "8px", padding: "9px", color: "white" }}>{item.userCount}/{usersCount}</strong></Link></td>
-                                <td>
-                                    <Link style={{ textDecoration: "none" }} onClick={() => fetchRecruiterDetails(item._id)}>
-                                        <b style={{ backgroundColor: "lightsteelblue", borderRadius: "8px", padding: "9px", color: "black" }}>
-                                            {candidateCounts[item._id] || 0}
-                                        </b>
-                                    </Link>
-                                </td>
-                                <td>
-                                    <Link style={{ textDecoration: "none" }} onClick={() => fetchClaimedUsersDetails(item._id)}>
-                                        <b style={{ backgroundColor: "lightgray", borderRadius: "8px", padding: "9px", color: "black" }}>
-                                            {claimedByCounts[item._id]}
-                                        </b>
-                                    </Link>
-                                </td>
-                                <td>
-                                    <Link onClick={() => handleDelete(item._id)}>
-                                        <Image style={{ backgroundColor: "IndianRed", padding: "10px", borderRadius: "10px" }} src='./Images/trash.svg' />
-                                    </Link>
-                                </td>
-                                <td>
-                                    <Link onClick={() => fetchRequirement(item._id)}>
-                                        <Image style={{ backgroundColor: "lightgreen", padding: "10px", borderRadius: "10px" }} src='./Images/edit.svg' />
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))}
+      {sortedRequirements
+        .filter(item =>
+          selectedTypes.length === requirementTypes.length || selectedTypes.includes(item.requirementtype)
+        )
+        .filter(item =>
+          item.client.toLowerCase().includes(searchReq.toLowerCase()) // Filter by client name
+        )
+        .map((item) => (
+          <React.Fragment key={item._id}>
+            {/* Main row */}
+            <tr>
+              <td>
+                <Link style={{ textDecoration: "none" }} onClick={() => requirementDetails(item._id)}>
+                  <b>{item.regId}</b>
+                </Link>
+              </td>
+              <td>{item.client}</td>
+              <td>{item.role}</td>
+              <td>{item.typeOfContract}</td>
+              <td>{item.requirementtype}</td>
+              <td>{new Date(item.startDate).toLocaleDateString()}</td>
+              <td>{new Date(item.uploadedDate).toLocaleDateString()}</td>
+              <td>
+                <Link style={{ textDecoration: "none" }} onClick={() => fetchRequirementDetails(item._id)}>
+                  <strong style={{ backgroundColor: "dimgrey", borderRadius: "8px", padding: "9px", color: "white" }}>
+                    {item.userCount}/{usersCount}
+                  </strong>
+                </Link>
+              </td>
+              <td>
+                <Link style={{ textDecoration: "none" }} onClick={() => fetchRecruiterDetails(item._id)}>
+                  <b style={{ backgroundColor: "lightsteelblue", borderRadius: "8px", padding: "9px", color: "black" }}>
+                    {candidateCounts[item._id] || 0}
+                  </b>
+                </Link>
+              </td>
+              <td>
+                <Link style={{ textDecoration: "none" }} onClick={() => fetchClaimedUsersDetails(item._id)}>
+                  <b style={{ backgroundColor: "lightgray", borderRadius: "8px", padding: "9px", color: "black" }}>
+                    {claimedByCounts[item._id]}
+                  </b>
+                </Link>
+              </td>
+              <td>
+                <Link onClick={() => handleDelete(item._id)}>
+                  <Image style={{ backgroundColor: "IndianRed", padding: "10px", borderRadius: "10px" }} src='./Images/trash.svg' />
+                </Link>
+              </td>
+              <td>
+                <Link onClick={() => fetchRequirement(item._id)}>
+                  <Image style={{ backgroundColor: "lightgreen", padding: "10px", borderRadius: "10px" }} src='./Images/edit.svg' />
+                </Link>
+              </td>
+              <td>
+                <Link onClick={() => toggleAccordion(item._id)}>
+                  <Image style={{  padding: "10px", borderRadius: "10px" }} src='./Images/expand.svg' />
+                </Link>
+              </td>
+            </tr>
+
+            {/* Conditionally render the accordion row below the main row */}
+            {expandedId === item._id && (
+              <tr>
+                <td colSpan="12">
+                  <Accordion activeKey="0">
+                    <Accordion.Item eventKey="0">
+                      {/* <Accordion.Header>More Details</Accordion.Header> */}
+                      <Accordion.Body>
+                      <Table  bordered hover responsive className="table-sm" style={{ textAlign: "center" }}>
+                <thead>
+                    <tr>
+                        <th>Employee Name</th>
+                        <th>Candidate Name</th>
+                        <th>Role</th>
+                        <th>ECTC</th>
+                        <th>LWD</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredRecruitersData.map((item, i) => (
+                        <React.Fragment key={i}>
+                            {item.candidates.length > 0 ? (
+                                item.candidates.filter(candidate => {
+                                    const recentStatus = candidate.Status && candidate.Status.length > 0
+                                        ? candidate.Status[candidate.Status.length - 1].Status
+                                        : "No Action Taken";
+
+                                    const matchesStatus = selectedCandidateStatus ? recentStatus === selectedCandidateStatus : true;
+                                    const matchesName = candidateName 
+                                        ? `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(candidateName.toLowerCase())
+                                        : true;
+
+                                    return matchesStatus && matchesName;
+                                }).map((candidate, index) => {
+                                    const recentStatus = candidate.Status && candidate.Status.length > 0
+                                        ? candidate.Status[candidate.Status.length - 1].Status
+                                        : "No Action Taken";
+
+                                    let textColor;
+                                    if (recentStatus === "No Action Taken") {
+                                        textColor = "blue";
+                                    } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+                                        textColor = "red";
+                                    } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+                                        textColor = "orange";
+                                    } else {
+                                        textColor = "green";
+                                    }
+
+                                    return (
+                                        <tr key={index}>
+                                            {index === 0 && (
+                                                <td rowSpan={item.candidates.length}>{item.recruiter.EmployeeName}</td>
+                                            )}
+                                            <td>{candidate.firstName} {candidate.lastName}</td>
+                                            <td>{candidate.role}</td>
+                                            <td>{candidate.ectc}</td>
+                                            <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
+                                            <td style={{ color: textColor }}>
+                                                <b>{recentStatus}</b>
+                                            </td>
+                                            <td
+                                                style={{ cursor: "pointer", color: "blue" }}
+                                                onClick={() => CandidateData(candidate._id)}>
+                                                <b>
+                                                    <img
+                                                        style={{
+                                                            backgroundColor: "lightblue",
+                                                            margin: "5px",
+                                                            padding: "10px",
+                                                            borderRadius: "10px",
+                                                        }}
+                                                        src='./Images/view.svg'
+                                                        alt="View"
+                                                    />
+                                                </b>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            ) : (
+                                <tr key={i}>
+                                    <td>{item.recruiter.EmpCode}</td>
+                                    <td>{item.recruiter.EmployeeName}</td>
+                                    <td colSpan={6}>No Candidates</td>
+                                </tr>
+                            )}
+                        </React.Fragment>
+                    ))}
                 </tbody>
+            </Table>
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
+                </td>
+              </tr>
+            )}
+          </React.Fragment>
+        ))}
+    </tbody>
+
             </Table>
             
                 <Modal show={show} onHide={() => setShow(false)} dialogClassName="modal-90w" aria-labelledby="example-custom-modal-styling-title">
@@ -730,7 +857,7 @@ const unassignReqFromUser = async (userId) => {
                     </Modal.Header>
                     <Modal.Body>
                         <center>
-                            <Table style={{textAlign:"center"}} responsive striped hover>
+                            <Table style={{textAlign:"center"}} responsive  hover>
                                 <thead>
                                     <tr>
                                         <th>Employee Code</th>
@@ -781,7 +908,7 @@ const unassignReqFromUser = async (userId) => {
                 </select>
             </div>
 
-            <Table striped bordered hover responsive className="table-sm" style={{ textAlign: "center" }}>
+            <Table  bordered hover responsive className="table-sm" style={{ textAlign: "center" }}>
                 <thead>
                     <tr>
                         <th>Employee Name</th>
@@ -877,7 +1004,7 @@ const unassignReqFromUser = async (userId) => {
     </Modal.Header>
     <Modal.Body>
     <div className="table-responsive">
-    <Table striped bordered hover className="table-sm">
+    <Table  bordered hover className="table-sm">
                     <tbody>
                         <tr>
                             <td><b>Client:</b></td>
@@ -964,7 +1091,7 @@ const unassignReqFromUser = async (userId) => {
             <Modal.Body>        
             { candidateDetails && (
     <div className="table-responsive">
-    <Table striped bordered hover className="table-sm">
+    <Table  bordered hover className="table-sm">
         <tbody>
         <tr>
       <td> <Image  src={`https://hrbackend-1.onrender.com/${candidateDetails.candidateImage}`} style={{width:"100px",borderRadius:"100px"}} alt='Candidate Image' ></Image>
