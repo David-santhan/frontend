@@ -54,7 +54,7 @@ function Signup() {
 const sendLink = async (e)=>{
   // e.preventDefault();
 
-  const res = await fetch ("https://hrbackend-2.onrender.com/sendpasswordlink",{
+  const res = await fetch ("https://ornnovabackend.onrender.com/sendpasswordlink",{
     method:"POST",
     headers:{
       "Content-Type":"application/json"
@@ -82,7 +82,7 @@ const sendLink = async (e)=>{
 //   }
 
 //   try {
-//     const res = await fetch("https://hrbackend-2.onrender.com/sendpasswordlink", {
+//     const res = await fetch("https://ornnovabackend.onrender.com/sendpasswordlink", {
 //       method: "POST",
 //       headers: {
 //         "Content-Type": "application/json"
@@ -108,7 +108,7 @@ const sendLink = async (e)=>{
 
   
   // let sendUserData= async()=>{
-  //   const res = await fetch("https://hrbackend-2.onrender.com/forgot-password",{
+  //   const res = await fetch("https://ornnovabackend.onrender.com/forgot-password",{
   //     method:"POST",
   //     headers:{
   //       "Content-Type":"application/json"
