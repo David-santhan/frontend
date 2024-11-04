@@ -45,7 +45,7 @@ const [formData, setFormData] = useState({
 
 const fetchRequirement = async (id) => {
   try {
-      const response = await fetch(`https://hrbackend-2.onrender.com/getrequirements/${id}`);
+      const response = await fetch(`https://ornnovabackend.onrender.com/getrequirements/${id}`);
       if (response.ok) {
           const data = await response.json();
           setFormData({ ...data, id: data._id }); // Set ID for the PUT request
@@ -96,7 +96,7 @@ const deleteAssessment = (index) => {
 const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-      const response = await axios.put(`https://hrbackend-2.onrender.com/editRequirement/${formData.id}`, formData); // Use the correct ID and data
+      const response = await axios.put(`https://ornnovabackend.onrender.com/editRequirement/${formData.id}`, formData); // Use the correct ID and data
       alert("Updated Successfully ✅"); // Ensure your API returns a message
       setShowEditModal(false); // Close the modal after successful update
       // Optionally, refresh the requirements list or update the UI accordingly
@@ -113,7 +113,7 @@ const handleSubmit = async (e) => {
       method: 'GET',
     };
     try {
-      let JSONData = await fetch(`https://hrbackend-2.onrender.com/getrequirements/${id}`, reqOption);
+      let JSONData = await fetch(`https://ornnovabackend.onrender.com/getrequirements/${id}`, reqOption);
       let JSOData = await JSONData.json();
       
       setViewReq([JSOData]); // Wrap in an array to iterate properly in the table
@@ -133,7 +133,7 @@ const handleSubmit = async (e) => {
         let reqOption = {
             method: "GET",
         };
-        let JSONData = await fetch(`https://hrbackend-2.onrender.com/loggedinuserdata/${email}`, reqOption);
+        let JSONData = await fetch(`https://ornnovabackend.onrender.com/loggedinuserdata/${email}`, reqOption);
         let JSOData = await JSONData.json();
         setLoginUserData(JSOData);
     };
@@ -179,7 +179,7 @@ const decryptData = (ciphertext, secret) => {
         let reqOption = {
             method: "GET"
         };
-        const response = await fetch(`https://hrbackend-2.onrender.com/requirementDetailsWithAssignedUsers/${userId}`, reqOption);
+        const response = await fetch(`https://ornnovabackend.onrender.com/requirementDetailsWithAssignedUsers/${userId}`, reqOption);
         let data = await response.json();
         setShowCandidateDetailsHome(data);
         // console.log(data)    
@@ -204,7 +204,7 @@ const decryptData = (ciphertext, secret) => {
         }
     
         try {
-          const response = await fetch(`https://hrbackend-2.onrender.com/deleteRequirement/${id}`, {
+          const response = await fetch(`https://ornnovabackend.onrender.com/deleteRequirement/${id}`, {
             method: 'DELETE',
           });
     
@@ -267,7 +267,7 @@ const decryptData = (ciphertext, secret) => {
                                 </Nav>
                                 <Nav>
                                     <Navbar.Brand href="/Profile">
-                                        <Img src={`https://hrbackend-2.onrender.com/${item.ProfilePic}`} style={{ width: "70px", borderRadius: "50px", margin: '10px' }} />
+                                        <Img src={`https://ornnovabackend.onrender.com/${item.ProfilePic}`} style={{ width: "70px", borderRadius: "50px", margin: '10px' }} />
                                     </Navbar.Brand>
                                     <Navbar.Text style={{ margin: "5px" }}>
                                         <b style={{ color: "black", textDecoration: "underline", fontFamily: "initial" }}>Welcome:</b>
