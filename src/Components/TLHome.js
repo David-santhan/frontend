@@ -64,11 +64,47 @@ function TLHome() {
 const [searchRole, setSearchRole] = useState('');
 const [searchClient, setSearchClient] = useState('');
 const [searchStatus, setSearchStatus] = useState('');
+const [savedStatus,setSavedStatus] = useState('');
 const [totalfilteredCandidates, setTotalfilteredCandidates] = useState([]);
 const [displayedCandidates, setDisplayedCandidates] = useState([]);
-// State for displaying filtered user candidates
-const [displayedUserCandidates, setDisplayedUserCandidates] = useState([]);
-// const [candidates, setCandidates] = useState(displayedCandidates);
+const [updateshow, setUpdateshow] = useState(false);
+
+const [updateCandidateDetails, setUpdateCandidateDetails] = useState({
+  candidateImage: '',
+  firstName: '',
+  lastName: '',
+  email: '',
+  mobileNumber: '',
+  dob: '',
+  ctc: '',
+  ectc: '',
+  totalYoe: '',
+  relevantYoe: '',
+  lwd: '',
+  currentLocation: '',
+  prefLocation: '',
+  resignationServed: '',
+  currentOrg: '',
+  candidateSkills: '',
+  role: '',
+  internalScreening: '',
+  sharedWithClient: '',
+  feedback: '',
+  details: '',
+  interviewDate: '',
+  educationalQualification: '',
+  offerInHand: '',
+  remark: '',
+  updatedResume: '',
+  ornnovaProfile: '',
+  assessments: [],
+});
+const [updateCandidateName,setUpdateCandidateName]= useState("");
+function handleUpdateShow() {
+    
+  setUpdateshow(true);
+}
+function handleUpdateClose () {setUpdateshow(false);}
 
 // Function to delete a candidate
 const deleteCandidate = async (candidateId) => {
@@ -89,6 +125,66 @@ const deleteCandidate = async (candidateId) => {
     alert('Failed to delete candidate');
   }
 };
+
+const updateCandidate = async(id)=>{
+  try {
+    const response = await axios.get(`https://hrbackend-1.onrender.com/candidate/${id}`)
+    console.log(response.data)
+    setUpdateCandidateDetails(response.data);
+    handleUpdateShow();
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const handleInputChange = (field, value) => {
+  setUpdateCandidateDetails(prevDetails => ({
+    ...prevDetails,
+    [field]: value,
+  }));
+};
+
+const handleAssessmentChange = (index, field, value) => {
+  const updatedAssessments = [...updateCandidateDetails.assessments];
+  updatedAssessments[index] = {
+    ...updatedAssessments[index],
+    [field]: value,
+  };
+  setUpdateCandidateDetails(prevDetails => ({
+    ...prevDetails,
+    assessments: updatedAssessments,
+  }));
+};
+
+// Function that saves changes, with conditional logic for "Upload"
+const handleSaveChanges = async (status) => {
+const candidateId = updateCandidateDetails._id;
+
+try {
+  // Prepare updated details based on whether it's a save or upload action
+  const updatedDetails = {
+    ...updateCandidateDetails,
+    ...(status === "Uploaded" ? { savedStatus: "Uploaded", uploadedDate: new Date().toISOString() } : {})
+  };
+
+  const response = await axios.put(`https://hrbackend-1.onrender.com/candidates/${candidateId}`, updatedDetails);
+
+  if (response.status === 200) {
+    alert('Candidate details updated successfully ✅');
+    setUpdateshow(false); // Close the modal after successful update
+    window.location.reload();
+  } else {
+    alert('Failed to update candidate details.');
+  }
+} catch (error) {
+  console.error('Error updating candidate:', error);
+  alert('An error occurred while updating candidate details.');
+}
+};
+
+// Separate functions for Save and Upload buttons
+const saveChanges = () => handleSaveChanges("Saved");
+const uploadChanges = () => handleSaveChanges("Uploaded");
 
 
   // Status options array
@@ -196,21 +292,27 @@ const handleTotalSearch = () => {
     setDisplayedCandidates(filteredCandidates); // Store the filtered candidates
   };
   //  Handle search logic for user candidates
-const handleUserCandidatesSearch = () => {
-  const filteredUserCandidates = selectedCandidates.filter(candidate => {
-    const nameMatches = `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(name.toLowerCase());
-    const roleMatches = candidate.role.toLowerCase().includes(role.toLowerCase());
-    const statusMatches = status
-      ? candidate.Status && candidate.Status.length
-        ? candidate.Status[candidate.Status.length - 1].Status.toLowerCase().includes(status.toLowerCase())
-        : "no status".includes(status.toLowerCase())
-      : true; // if no status selected, include all statuses
-
-    return nameMatches && roleMatches && statusMatches;
-  });
-
-  setDisplayedCandidates(filteredUserCandidates); // Update the displayed user candidates state
-};
+  const handleUserCandidatesSearch = () => {
+    const filteredUserCandidates = selectedCandidates.filter(candidate => {
+      const nameMatches = `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(name.toLowerCase());
+      const roleMatches = candidate.role.toLowerCase().includes(role.toLowerCase());
+      const statusMatches = status
+        ? candidate.Status && candidate.Status.length
+          ? candidate.Status[candidate.Status.length - 1].Status.toLowerCase().includes(status.toLowerCase())
+          : "no status".includes(status.toLowerCase())
+        : true; // if no status selected, include all statuses
+  
+      // Check for savedStatus match if it's selected
+      const savedStatusMatches = savedStatus
+        ? candidate.savedStatus && candidate.savedStatus.toLowerCase() === savedStatus.toLowerCase()
+        : true; // if no savedStatus selected, include all
+  
+      return nameMatches && roleMatches && statusMatches && savedStatusMatches;
+    });
+  
+    setDisplayedCandidates(filteredUserCandidates); // Update the displayed user candidates state
+  };
+  
   const handleShowCandidates = (candidates) => {
     setSelectedCandidates(candidates);
     setShowModal(true); // Open the modal
@@ -414,6 +516,42 @@ const assignReqToUser = async (userId) => {
   } else {
       // User canceled the assignment, so no action is taken
       alert('Requirement assignment was canceled ❌');
+  }
+};
+
+const unassignReqFromUser = async (userId) => {
+  const ReqId = selectedReqId; // Ensure you have a way to store the selected requirement ID
+
+  // Show a confirmation dialog to the user
+  const isConfirmed = window.confirm(`Are you sure you want to unassign this Requirement?`);
+
+  // If the user confirms, proceed with the unassignment
+  if (isConfirmed) {
+      try {
+          const response = await axios.post(`https://hrbackend-1.onrender.com/unassignReq/${userId}/${ReqId}`, 
+          {
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          });
+
+          const result = response.data;
+
+          if (result.status === 'success') {
+              alert('Requirement unassigned successfully ✅');
+              setShowAssign(false);
+              window.location.reload();
+              // Optionally refresh the user list or perform any other updates
+          } else {
+              alert(result.msg);
+          }
+      } catch (error) {
+          console.error('Error unassigning requirement:', error.response ? error.response.data : error.message);
+          alert('An error occurred while unassigning the requirement. Please try again later.');
+      }
+  } else {
+      // User canceled the unassignment, so no action is taken
+      alert('Requirement unassignment was canceled ❌');
   }
 };
 
@@ -1535,12 +1673,12 @@ style={{backgroundColor:"lightgray"}}
   {/* Displaying Team Information */}
   {userData && userData.length > 0 ? ( // Ensure userData is not null or undefined
     <div>
-      <Table responsive style={{textAlign: "center"}}>
+      <Table hover responsive style={{textAlign: "center"}}>
         <thead>
           <tr>
             <th>Employee Code</th>
             <th>Employee Name</th>
-            {/* <th>Email</th> */}
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -1555,10 +1693,11 @@ style={{backgroundColor:"lightgray"}}
               {/* <td>{team.Email}</td>  */}
               {/* Replace with actual fields */}
               <td>
-                <Button onClick={() => assignReqToUser(team._id)} style={{backgroundColor: "lightsteelblue", color: "black", border: "1.5px solid black"}}>
-                  <b>Assign</b>
+                <Button onClick={() => assignReqToUser(team._id)} onMouseMove={(e)=>{e.target.style.backgroundColor = "lightgreen"}} onMouseLeave={(e)=>{e.target.style.backgroundColor = "lightsteelblue"}} style={{backgroundColor: "lightsteelblue", color: "black", border: "0px",fontWeight:"bold"}}>
+                  Assign
                 </Button>
               </td>
+             
             </tr>
           ))}
         </tbody>
@@ -1582,12 +1721,12 @@ style={{backgroundColor:"lightgray"}}
 
   {assignedUsersData && assignedUsersData.length > 0 ? (
     <div>
-      <Table  responsive style={{ textAlign: "center" }}>
+      <Table hover responsive style={{ textAlign: "center" }}>
         <thead>
           <tr>
             <th>Employee Code</th>
             <th>Employee Name</th>
-            {/* <th>Email</th> */}
+            <th colSpan={2}>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -1602,8 +1741,14 @@ style={{backgroundColor:"lightgray"}}
               {/* <td>{team.Email}</td> */}
                {/* Replace with actual fields */}
               <td>
-                <Button style={{ backgroundColor: "lightgreen", color: "black", border: "1.5px solid black" }}>
+                <Button style={{ backgroundColor: "lightgreen", color: "black", border: "0px" }}>
                   <b>Assigned</b>
+                </Button>
+
+              </td>
+              <td>
+                <Button onClick={()=> unassignReqFromUser(team._id)} onMouseMove={(e)=>{e.target.style.backgroundColor = "lightsteelblue"}} onMouseLeave={(e)=>{e.target.style.backgroundColor = "indianred"}}  style={{backgroundColor: "indianred", color: "white", border: "0px",fontWeight:"bold"}}>
+                  Un Assign
                 </Button>
               </td>
             </tr>
@@ -2106,105 +2251,157 @@ style={{backgroundColor:"lightgray"}}
     </Modal.Header>
 
     <Modal.Body>
-      {/* Search Inputs for User Candidates */}
-      <FormControl
-        type="search"
-        placeholder="Search by Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-      />
+  {/* Search Inputs for User Candidates */}
+  <Row className="justify-content-center" style={{ gap: "10px", marginBottom: "20px" }}>
+  {/* Search by Name */}
+  <Col xs={12} sm={6} md={3}>
+    <FormControl
+      type="search"
+      placeholder="Search by Name"
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      style={{ width: "100%", border: "1px solid black", borderRadius: "15px" }}
+    />
+  </Col>
 
-      <FormControl
-        type="search"
-        placeholder="Search by Role"
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}
-      />
+  {/* Search by Role */}
+  <Col xs={12} sm={6} md={3}>
+    <FormControl
+      type="search"
+      placeholder="Search by Role"
+      value={role}
+      onChange={(e) => setRole(e.target.value)}
+      style={{ width: "100%", border: "1px solid black", borderRadius: "15px" }}
+    />
+  </Col>
 
-      <FormControl as="select" value={status} onChange={(e) => setStatus(e.target.value)} style={{ marginBottom: '10px', width: "300px", border: "1px solid black", borderRadius: "15px" }}>
-        <option value="">All</option>
-        {statusSearchOptions.map((option, idx) => (
-          <option key={idx} value={option}>
-            {option}
-          </option>
-        ))}
-      </FormControl>
+  {/* Status Select */}
+  <Col xs={12} sm={6} md={3}>
+    <FormControl
+      as="select"
+      value={status}
+      onChange={(e) => setStatus(e.target.value)}
+      style={{ width: "100%", border: "1px solid black", borderRadius: "15px" }}
+    >
+      <option value="">All Statuses</option>
+      {statusSearchOptions.map((option, idx) => (
+        <option key={idx} value={option}>
+          {option}
+        </option>
+      ))}
+    </FormControl>
+  </Col>
 
-      <center>
-        <Button variant="primary" onClick={handleUserCandidatesSearch} style={{ marginBottom: '20px' }}>
-          Search 
-        </Button>
-      </center>
+  {/* Saved Status Select */}
+  <Col xs={12} sm={6} md={3}>
+    <FormControl
+      as="select"
+      value={savedStatus}
+      onChange={(e) => setSavedStatus(e.target.value)}
+      style={{ width: "100%", border: "1px solid black", borderRadius: "15px" }}
+    >
+      <option value="">All Types</option>
+      <option value="Saved">Saved</option>
+      <option value="Uploaded">Uploaded</option>
+    </FormControl>
+  </Col>
 
-      {/* User Candidate Table */}
-      {displayedCandidates && displayedCandidates.length > 0 ? (
-  <Table striped bordered hover responsive style={{ textAlign: "center" }}>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Total YOE</th>
-        <th>LWD</th>
-        <th>ECTC</th>
-        <th>Status</th>
-        <th>Uploaded Date</th>
-        <th colSpan={2}>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {displayedCandidates.map((candidate, idx) => {
-        const recentStatus = candidate.Status && candidate.Status.length
-          ? candidate.Status[candidate.Status.length - 1].Status
-          : "No Action Taken";
+  {/* Search Button */}
+  <Col xs={12} className="text-center mt-2">
+    <Button variant="primary" onClick={handleUserCandidatesSearch} style={{ width: "100%", maxWidth: "300px" }}>
+      Search
+    </Button>
+  </Col>
+</Row> <hr></hr>
 
-        let textColor;
-        if (recentStatus === "No Action Taken") {
-          textColor = "blue";
-        } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-          textColor = "red";
-        } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-          textColor = "orange";
-        } else {
-          textColor = "green";
-        }
 
-        return (
-          <tr key={idx}>
-            <td>{candidate.firstName} {candidate.lastName}</td>
-            <td>{candidate.role}</td>
-            <td>{candidate.totalYoe}</td>
-            <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
-            <td>{candidate.ectc}</td>
-            <td style={{ color: textColor }}><b>{recentStatus}</b></td>
-            <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
-            <td>
-              <Link onClick={() => CandidateData(candidate._id)}>
-                <Image 
-                  style={{ backgroundColor: "lightblue", margin: "5px", padding: "10px", borderRadius: "10px" }} 
-                  src='./Images/view.svg' 
-                />
-              </Link>
-            </td>
-            <td>
-              <Link onClick={ () => deleteCandidate(candidate._id)}  style={{ pointerEvents: recentStatus === "No Action Taken" ? "auto" : "none" }}>
-                <Image 
-                  style={{ backgroundColor: recentStatus === "No Action Taken" ? "indianred" : "lightgray", margin: "5px", padding: "10px", borderRadius: "10px", opacity: recentStatus === "No Action Taken" ? 1 : 0.5 }} 
-                  src='./Images/trash.svg' 
-                />
-              </Link>
-            </td>
-          </tr>
-        );
-      })}
-    </tbody>
-  </Table>
-) : (
-  <p>No user candidates match your search criteria.</p>
-)}
+  {/* User Candidate Table */}
+  {displayedCandidates && displayedCandidates.length > 0 ? (
+    <Table striped bordered hover responsive style={{ textAlign: "center" }}>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Total YOE</th>
+          <th>LWD</th>
+          <th>ECTC</th>
+          <th>Status</th>
+          <th>Uploaded Date</th>
+          <th colSpan={4}>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {displayedCandidates.map((candidate, idx) => {
+          const recentStatus = candidate.Status && candidate.Status.length
+            ? candidate.Status[candidate.Status.length - 1].Status
+            : "No Action Taken";
 
-    </Modal.Body>
+          let textColor;
+          if (recentStatus === "No Action Taken") {
+            textColor = "blue";
+          } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+            textColor = "red";
+          } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+            textColor = "orange";
+          } else {
+            textColor = "green";
+          }
+
+          return (
+            <tr key={idx}>
+              <td>{candidate.firstName} {candidate.lastName}</td>
+              <td>{candidate.role}</td>
+              <td>{candidate.totalYoe}</td>
+              <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
+              <td>{candidate.ectc}</td>
+              <td style={{ color: textColor }}><b>{recentStatus}</b></td>
+              <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
+              <td>
+                <Link onClick={() => CandidateData(candidate._id)}>
+                  <Image 
+                    style={{ backgroundColor: "lightblue", margin: "5px", padding: "10px", borderRadius: "10px" }} 
+                    src='./Images/view.svg' 
+                  />
+                </Link>
+              </td>
+              <td>
+                <Link onClick={() => deleteCandidate(candidate._id)} style={{ pointerEvents: recentStatus === "No Action Taken" ? "auto" : "none" }}>
+                  <Image 
+                    style={{ backgroundColor: recentStatus === "No Action Taken" ? "indianred" : "lightgray", margin: "5px", padding: "10px", borderRadius: "10px", opacity: recentStatus === "No Action Taken" ? 1 : 0.5 }} 
+                    src='./Images/trash.svg' 
+                  />
+                </Link>
+              </td>
+              <td>
+                <Link onClick={() => updateCandidate(candidate._id)} style={{ pointerEvents: recentStatus === "No Action Taken" ? "auto" : "none" }}>
+                  <Image 
+                    style={{ backgroundColor: recentStatus === "No Action Taken" ? "lightgreen" : "lightgray", margin: "5px", padding: "10px", borderRadius: "10px", opacity: recentStatus === "No Action Taken" ? 1 : 0.5 }} 
+                    src='/Images/edit.svg' 
+                  />
+                </Link>
+              </td>
+              <td>
+                {candidate.savedStatus === 'Saved' && (
+                  <Button 
+                    onClick={() => updateCandidate(candidate._id)} 
+                    style={{ fontWeight: "bold", backgroundColor: "green", border: "0px", padding: "5px", borderRadius: "20px" }} 
+                    onMouseMove={(e) => { e.target.style.backgroundColor = "gray"; e.target.style.padding = "10px"; }} 
+                    onMouseLeave={(e) => { e.target.style.backgroundColor = "green"; e.target.style.padding = "5px"; }}
+                  >
+                    Upload
+                  </Button>
+                )}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </Table>
+  ) : (
+    <p>No user candidates match your search criteria.</p>
+  )}
+</Modal.Body>
+
 
     <Modal.Footer>
       <Button variant="secondary" onClick={handleCloseUserModal}>
@@ -2476,6 +2673,348 @@ style={{backgroundColor:"lightgray"}}
 )}
     </Modal.Body>
                </Modal>
+
+               <Modal
+      style={{ backgroundColor: "lightgray", opacity: "98%" }}
+      show={updateshow}
+      size="lg"
+      onHide={handleUpdateClose}
+      dialogClassName="modal-90w"
+      aria-labelledby="example-custom-modal-styling-title"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="example-custom-modal-styling-title">
+          <h5>
+            <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img>
+            <b style={{ fontFamily: "monospace" }}>Update Candidate Information</b>
+          </h5>
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+      <form style={{backgroundColor:"lightsteelblue",borderRadius:"20px"}}>
+            <div className="container">
+                <div className="row">
+                    <div className="col-md-6 form-group">
+                        <label><strong>Candidate Image:</strong></label>
+                        <div>
+                            <img
+                                src={`https://hrbackend-1.onrender.com/${updateCandidateDetails.candidateImage}`}
+                                style={{ width: "100px", borderRadius: "100px" }}
+                                alt='Candidate Image'
+                            />
+                        </div>
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>First Name:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.firstName}
+                            onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Last Name:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.lastName}
+                            onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Email:</strong></label>
+                        <input
+                            type="email"
+                            className="form-control"
+                            value={updateCandidateDetails.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Mobile Number:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.mobileNumber}
+                            onChange={(e) => handleInputChange('mobileNumber', e.target.value)}
+                        />
+                    </div>
+                   
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Date of Birth:</strong></label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={new Date(updateCandidateDetails.dob).toLocaleDateString('en-CA')}
+                            onChange={(e) => handleInputChange('dob', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>CTC:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.ctc}
+                            onChange={(e) => handleInputChange('ctc', e.target.value)}
+                        />
+                    </div>
+                   
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>ECTC:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.ectc}
+                            onChange={(e) => handleInputChange('ectc', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Total YOE:</strong></label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={updateCandidateDetails.totalYoe}
+                            onChange={(e) => handleInputChange('totalYoe', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Relevant YOE:</strong></label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={updateCandidateDetails.relevantYoe}
+                            onChange={(e) => handleInputChange('relevantYoe', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>LWD:</strong></label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={new Date(updateCandidateDetails.lwd).toLocaleDateString('en-CA')}
+                            onChange={(e) => handleInputChange('lwd', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Current Location:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.currentLocation}
+                            onChange={(e) => handleInputChange('currentLocation', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Preferred Location:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.prefLocation}
+                            onChange={(e) => handleInputChange('prefLocation', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Resignation Served:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.resignationServed}
+                            onChange={(e) => handleInputChange('resignationServed', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Current Organization:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.currentOrg}
+                            onChange={(e) => handleInputChange('currentOrg', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Candidate Skills:</strong></label>
+                        <textarea
+                            className="form-control"
+                            value={updateCandidateDetails.candidateSkills}
+                            onChange={(e) => handleInputChange('candidateSkills', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Role:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.role}
+                            onChange={(e) => handleInputChange('role', e.target.value)}
+                        />
+                    </div>
+                   
+                </div>
+                {/* <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Internal Screening:</strong></label>
+                        <select
+                            className="form-control"
+                            value={updateCandidateDetails.internalScreening}
+                            onChange={(e) => handleInputChange('internalScreening', e.target.value)}
+                        >
+                            <option value="Selected">Selected</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Shared With Client:</strong></label>
+                        <select
+                            className="form-control"
+                            value={updateCandidateDetails.sharedWithClient}
+                            onChange={(e) => handleInputChange('sharedWithClient', e.target.value)}
+                        >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                   
+                </div> */}
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Feedback:</strong></label>
+                        <textarea
+                            className="form-control"
+                            value={updateCandidateDetails.feedback}
+                            onChange={(e) => handleInputChange('feedback', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Details:</strong></label>
+                        <textarea
+                            className="form-control"
+                            value={updateCandidateDetails.details}
+                            onChange={(e) => handleInputChange('details', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Interview Date:</strong></label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={new Date(updateCandidateDetails.interviewDate).toLocaleDateString('en-CA')}
+                            onChange={(e) => handleInputChange('interviewDate', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Educational Qualification:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.educationalQualification}
+                            onChange={(e) => handleInputChange('educationalQualification', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Offer In Hand:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.offerInHand}
+                            onChange={(e) => handleInputChange('offerInHand', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Last Interview Date:</strong></label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={new Date(updateCandidateDetails.interviewDate).toLocaleDateString('en-CA')}
+                            onChange={(e) => handleInputChange('lastInterviewDate', e.target.value)}
+                        />
+                    </div>
+                </div> <hr></hr>
+                <div className="row">
+            <div className="col-md-12 form-group">
+                <h3>
+                    <img style={{width: "30px", margin: "10px"}} src='/Images/icon.png' alt="icon" />
+                    <b style={{fontFamily: "monospace"}}>Assessment Details</b>
+                </h3>
+                {updateCandidateDetails.assessments.map((assessment, index) => (
+                    <div key={index} className="form-group">
+                        <label><strong>Assessment {index + 1}:</strong></label>
+                        <input
+                            readOnly
+                            type="text"
+                            className="form-control"
+                            value={assessment.assessment}
+                        />
+                        <label><strong>Years of Experience:</strong></label>
+                        <input
+                            readOnly
+                            type="text"
+                            className="form-control"
+                            value={assessment.yoe}
+                        />
+                        <label><strong>Score:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={assessment.score}
+                            onChange={(e) => handleAssessmentChange(index, 'score', e.target.value)}
+                        />
+                        <hr />
+                    </div>
+                ))}
+            </div>
+        </div>
+            </div>
+        </form>
+      </Modal.Body>
+      <Modal.Footer>
+      {updateCandidateDetails.savedStatus === "Saved" && (
+                    <Button style={{borderRadius:"20px",backgroundColor:"mediumseagreen",color:"white",border:"1.5px solid black",fontWeight:"bold"}}
+                        type="button"
+                        className="btn btn-secondary ml-2"
+                        onMouseMove={(e)=>{{e.target.style.backgroundColor = "lightgray";e.target.style.color = "black";e.target.style.padding = "10px"}}}
+                        onMouseLeave={(e)=>{{e.target.style.backgroundColor = "mediumseagreen";e.target.style.color = "white";e.target.style.padding = "7px"}}}
+                        onClick={uploadChanges}
+                        // onClick={handleUploadStatus}
+                    >
+                        Upload
+                    </Button>
+                )}
+        <Button                         onMouseMove={(e)=>{{e.target.style.backgroundColor = "green";e.target.style.color = "white";e.target.style.padding = "10px"}}}
+                        onMouseLeave={(e)=>{{e.target.style.backgroundColor = "lightgray";e.target.style.color = "green";e.target.style.padding = "7px"}}}
+ style={{borderRadius:"20px",backgroundColor:"lightgray",color:"green",border:"1.5px solid black",fontWeight:"bold"}} onClick={saveChanges}>
+          Save Changes
+        </Button>
+      </Modal.Footer>
+    </Modal>
  </div>
   );
 }
