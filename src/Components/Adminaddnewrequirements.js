@@ -73,7 +73,7 @@ function Adminaddnewrequirements() {
       let reqOption={
         method:"Get",
       }
-      let JSONData=await fetch("https://hrbackend-1.onrender.com/clientDetails",reqOption);
+      let JSONData=await fetch("https://hrbackend-2.onrender.com/clientDetails",reqOption);
         let JSOData=await JSONData.json();
         setClient(JSOData);
         console.log(JSOData)
@@ -134,7 +134,7 @@ const handleDelete = (index) => {
 //     method:"Post",
 //     body:dataToSend,
 //   };
-//   let JSONData= await fetch("https://hrbackend-1.onrender.com/newRequirment",reqOption);
+//   let JSONData= await fetch("https://hrbackend-2.onrender.com/newRequirment",reqOption);
 //   let JSOData = await JSONData.json();
 //   if (JSOData.status=="Success") {
 //     alert(JSOData.msg);
@@ -177,7 +177,7 @@ let sendUserDataToDataBase = async () => {
     body: JSON.stringify(dataToSend),
   };
 
-  let JSONData = await fetch("https://hrbackend-1.onrender.com/newRequirment", reqOption);
+  let JSONData = await fetch("https://hrbackend-2.onrender.com/newRequirment", reqOption);
   let JSOData = await JSONData.json();
   if (JSOData.status === "Success") {
     alert(JSOData.msg);
