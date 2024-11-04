@@ -41,7 +41,7 @@ let navigate = useNavigate();
         let reqOption={
           method:"GET"
         }
-        let JSONData= await fetch("https://hrbackend-2.onrender.com/userDetailsHome",reqOption)
+        let JSONData= await fetch("https://ornnovabackend.onrender.com/userDetailsHome",reqOption)
         let JSOData= await JSONData.json();
         setUserDetailsList(JSOData);   
       }
@@ -55,7 +55,7 @@ let navigate = useNavigate();
                 method: "DELETE",
             };
             try {
-                let JSONData = await fetch(`https://hrbackend-2.onrender.com/deleteUser/${id}`, reqOption);
+                let JSONData = await fetch(`https://ornnovabackend.onrender.com/deleteUser/${id}`, reqOption);
                 let JSOData = await JSONData.json();
     
                 if (JSOData.status === "success") {
@@ -82,7 +82,7 @@ let navigate = useNavigate();
   
       try {
           // Fetch user data and team details from the server
-          let JSONData = await fetch(`https://hrbackend-2.onrender.com/getUserData/${id}`, reqOption);
+          let JSONData = await fetch(`https://ornnovabackend.onrender.com/getUserData/${id}`, reqOption);
           let JSOData = await JSONData.json();
   
           // Extract user details and team details from the response
@@ -117,7 +117,7 @@ let navigate = useNavigate();
             <small><b style={{fontFamily:"monospace",margin:"5px"}}>Code:</b>{item.EmpCode}</small>
           </Toast.Header>
           <Toast.Body style={{textAlign:"start"}}>
-            <center>            <img style={{width:"200px"}}src={`https://hrbackend-2.onrender.com/${item.ProfilePic}`} ></img></center> <hr></hr>
+            <center>            <img style={{width:"200px"}}src={`https://ornnovabackend.onrender.com/${item.ProfilePic}`} ></img></center> <hr></hr>
             <p><b style={{fontFamily:"monospace",margin:"20px"}}>Email:</b>{item.Email}</p>
             <p><b style={{fontFamily:"monospace",margin:"20px"}}>User Type:</b>{item.UserType}</p>
             <p><b style={{fontFamily:"monospace",margin:"20px"}}>Status:</b>{item.Status}</p>
@@ -152,7 +152,7 @@ let navigate = useNavigate();
           {showUserData.userDetails.ProfilePic ? (
             <img
               style={{ width: "200px" }}
-              src={`https://hrbackend-2.onrender.com/${showUserData.userDetails.ProfilePic}`}
+              src={`https://ornnovabackend.onrender.com/${showUserData.userDetails.ProfilePic}`}
               alt="Profile"
             />
           ) : (
