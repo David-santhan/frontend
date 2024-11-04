@@ -153,7 +153,7 @@ const UserType = getDecryptedData("User Type")
 
 //   const fetchRequirements = async (userId) => {
 //     try {
-//         const response = await axios.get(`https://hrbackend-2.onrender.com/getHomeReqData/${userId}`);
+//         const response = await axios.get(`https://ornnovabackend.onrender.com/getHomeReqData/${userId}`);
 //         const data = response.data;
 
 //         const newData = data.filter(req => req.update === 'New' && !req.claimedBy.some(claim => claim.userId === userId));
@@ -169,7 +169,7 @@ const UserType = getDecryptedData("User Type")
 //         // Fetch candidate counts for each claimed requirement
 //         for (let req of claimedData) {
 //             try {
-//                 const res = await axios.get(`https://hrbackend-2.onrender.com/viewactions/${req._id}/${userId}`);
+//                 const res = await axios.get(`https://ornnovabackend.onrender.com/viewactions/${req._id}/${userId}`);
 //                 setCandidateCounts(res.data.candidateCount)
                 
 //                 console.log(res)
@@ -193,7 +193,7 @@ const UserType = getDecryptedData("User Type")
 
 const fetchRequirements = async (userId) => {
   try {
-    const response = await axios.get(`https://hrbackend-2.onrender.com/getHomeReqData/${userId}`);
+    const response = await axios.get(`https://ornnovabackend.onrender.com/getHomeReqData/${userId}`);
     // const data = await response.json();
     const data = response.data;
     const newData = data.filter(req => req.update === 'New' && !req.claimedBy.some(claim => claim.userId === userId));
@@ -205,7 +205,7 @@ const fetchRequirements = async (userId) => {
     const counts = {};
     for (let req of claimedData) {
       try {
-        const res = await axios.get(`https://hrbackend-2.onrender.com/viewactions/${req._id}/${userId}`);
+        const res = await axios.get(`https://ornnovabackend.onrender.com/viewactions/${req._id}/${userId}`);
         counts[req._id] = res.data.candidates.length || 0;
       } catch (err) {
         // console.error(`Error fetching candidates for ${req._id}:`, err);
@@ -282,7 +282,7 @@ const fetchRequirements = async (userId) => {
     };
 
     try {
-      const response = await fetch(`https://hrbackend-2.onrender.com/claim/${id}`, {
+      const response = await fetch(`https://ornnovabackend.onrender.com/claim/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user),
@@ -304,7 +304,7 @@ const fetchRequirements = async (userId) => {
 
   const viewCandidates = async(id)=>{
     try {
-      const response = await axios.get(`https://hrbackend-2.onrender.com/viewactions/${id}/${userId}`)
+      const response = await axios.get(`https://ornnovabackend.onrender.com/viewactions/${id}/${userId}`)
       setCandidateData(response.data.candidates);
       console.log(response.data)
       handleShow()
@@ -315,7 +315,7 @@ const fetchRequirements = async (userId) => {
 
 //   const viewCandidates = async (id) => {
 //     try {
-//         const response = await axios.get(`https://hrbackend-2.onrender.com/viewactions/${id}/${userId}`);
+//         const response = await axios.get(`https://ornnovabackend.onrender.com/viewactions/${id}/${userId}`);
         
 //         // Destructure the response data to get counts and candidates details
 //         const { savedCount, uploadedCount, savedCandidates, uploadedCandidates,candidates,candidateCount} = response.data;
@@ -365,7 +365,7 @@ const getDropdownTitle = () => {
 
 const ViewCandidateData = async(id)=>{
   try {
-      const response = await axios.get(`https://hrbackend-2.onrender.com/candidate/${id}`);
+      const response = await axios.get(`https://ornnovabackend.onrender.com/candidate/${id}`);
      
       setSelectedCandidate(response.data);
       console.log(selectedCandidate)
@@ -380,7 +380,7 @@ const ViewCandidateData = async(id)=>{
   
     if (confirmDelete) {
       try {
-        const response = await fetch(`https://hrbackend-2.onrender.com/api/candidates/${candidateId}`, {
+        const response = await fetch(`https://ornnovabackend.onrender.com/api/candidates/${candidateId}`, {
           method: 'DELETE',
         });
   
@@ -403,7 +403,7 @@ const ViewCandidateData = async(id)=>{
 
   const updateCandidate = async(id)=>{
     try {
-      const response = await axios.get(`https://hrbackend-2.onrender.com/candidate/${id}`)
+      const response = await axios.get(`https://ornnovabackend.onrender.com/candidate/${id}`)
       console.log(response.data)
       setUpdateCandidateDetails(response.data);
       handleUpdateShow();
@@ -442,7 +442,7 @@ const handleSaveChanges = async (status) => {
       ...(status === "Uploaded" ? { savedStatus: "Uploaded", uploadedDate: new Date().toISOString() } : {})
     };
 
-    const response = await axios.put(`https://hrbackend-2.onrender.com/candidates/${candidateId}`, updatedDetails);
+    const response = await axios.put(`https://ornnovabackend.onrender.com/candidates/${candidateId}`, updatedDetails);
 
     if (response.status === 200) {
       alert('Candidate details updated successfully ✅');
@@ -464,7 +464,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
 
   const requirementDetails = async (id) => {
     try {
-        const response = await axios.get(`https://hrbackend-2.onrender.com/getrequirements/${id}`);
+        const response = await axios.get(`https://ornnovabackend.onrender.com/getrequirements/${id}`);
         SetRequirementData(response.data); // Ensure this returns an object
         setLgShow(true);
     } catch (err) {
@@ -819,7 +819,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                         <label><strong>Candidate Image:</strong></label>
                         <div>
                             <img
-                                src={`https://hrbackend-2.onrender.com/${updateCandidateDetails.candidateImage}`}
+                                src={`https://ornnovabackend.onrender.com/${updateCandidateDetails.candidateImage}`}
                                 style={{ width: "100px", borderRadius: "100px" }}
                                 alt='Candidate Image'
                             />
@@ -1246,7 +1246,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
               <tr>
                 <td>
                   <Image
-                    src={`https://hrbackend-2.onrender.com/${selectedCandidate.candidateImage}`}
+                    src={`https://ornnovabackend.onrender.com/${selectedCandidate.candidateImage}`}
                     style={{ width: "100px", borderRadius: "100px" }}
                     alt="Candidate Image"
                   />
@@ -1390,7 +1390,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
     <td>
         {typeof selectedCandidate.updatedResume === 'string' ? (
             <div style={{ marginBottom: '5px' }}>
-                <a href={`https://hrbackend-2.onrender.com/${selectedCandidate.updatedResume}`} target="_blank" rel="noopener noreferrer">
+                <a href={`https://ornnovabackend.onrender.com/${selectedCandidate.updatedResume}`} target="_blank" rel="noopener noreferrer">
                     View Resume
                 </a>
             </div>
@@ -1404,7 +1404,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
     <td>
         {typeof selectedCandidate.ornnovaProfile === 'string' ? (
             <div style={{ marginBottom: '5px' }}>
-                <a href={`https://hrbackend-2.onrender.com/${selectedCandidate.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
+                <a href={`https://ornnovabackend.onrender.com/${selectedCandidate.ornnovaProfile}`} target="_blank" rel="noopener noreferrer">
                     View Ornnova Profile
                 </a>
             </div>
