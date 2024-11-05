@@ -461,7 +461,7 @@ const unassignClientFromUser = async (userId) => {
 
     {/* Table to Display Assigned Users */}
     <div className="table-responsive">
-        <Table responsive hover className="table table-striped">
+        <Table bordered responsive hover className="table ">
             <thead>
                 <tr>
                     <th scope="col">Sno</th>
