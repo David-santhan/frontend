@@ -1686,7 +1686,7 @@ const unassignReqFromUser = async (userId) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body> 
-                    <Table responsive style={{textAlign:"center"}}>
+                    <Table bordered hover responsive style={{textAlign:"center"}}>
                         <thead>
                             <tr>
                               <th>Sno</th>
@@ -1716,7 +1716,7 @@ const unassignReqFromUser = async (userId) => {
             />
             <b style={{ fontFamily: "monospace" }}>Assign Users</b>
           </h4> <hr></hr>
-                    <Table responsive style={{textAlign:"center"}} >
+                    <Table bordered hover responsive style={{textAlign:"center"}} >
                 <thead>
                     <tr>
                         <th >Sno</th>
