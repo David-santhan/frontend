@@ -220,7 +220,7 @@ let navigate = useNavigate();
 </Col>
 
     </Row>
-      <Table style={{border:"1px solid lightgray"}}   responsive="sm">
+      <Table hover bordered style={{border:"1px solid lightgray"}}   responsive="sm">
             <thead style={{textAlign:"center"}} >
               <tr >
                 <th>Employee Code</th>
@@ -229,6 +229,7 @@ let navigate = useNavigate();
                 <th> User Type  </th>
                 <th> Status</th>
                   <th>Initiated By</th>
+      <th colSpan={3}>Actions</th>
                 
               </tr>
             </thead>
@@ -245,9 +246,13 @@ let navigate = useNavigate();
                 <td>{item.UserType}</td>
                 <td>{item.Status}</td>
                 <td>{item.CreatedBy}</td>
-                <Image onClick={()=>{ readUserDatafun(item._id)}} style={{backgroundColor:"lightblue",margin:"10px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image> 
-               <Image onClick={()=>{ deleteUserDetails(item._id)}} style={{backgroundColor:"IndianRed",margin:"10px",padding:"10px",borderRadius:"10px"}} src='./Images/trash.svg'></Image>      
-               <Link to={`/UpdateUser/${item._id}`}><Image  style={{backgroundColor:"lightgreen",padding:"10px",margin:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link>
+                 <td>
+                  <Image onClick={()=>{ readUserDatafun(item._id)}} style={{backgroundColor:"lightblue",margin:"10px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image> 
+                 </td>
+              <td>
+                 <Image onClick={()=>{ deleteUserDetails(item._id)}} style={{backgroundColor:"IndianRed",margin:"10px",padding:"10px",borderRadius:"10px"}} src='./Images/trash.svg'></Image> </td>
+                 <td>  
+               <Link to={`/UpdateUser/${item._id}`}><Image  style={{backgroundColor:"lightgreen",padding:"10px",margin:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link> </td>
               </tr>
               </tbody>
             )
