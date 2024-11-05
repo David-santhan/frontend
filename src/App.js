@@ -58,7 +58,9 @@ function App() {
         ? <Adminhome /> 
         : localStorageType === "TeamLead" 
           ? <TLHome /> 
-          : <Home />
+          : localStorageType === "User" 
+          ? <Home /> 
+          : <Loginpage />
     ) : (
       <Loginpage />
     )
