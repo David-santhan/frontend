@@ -145,7 +145,7 @@ const sendLink = async (e)=>{
  <center>
   
 <Form  style={{backgroundColor:"lightgray",padding:"50px",borderRadius:"20px",width:"370px",marginTop:"15px"}}>
-<Img src='./Images/LOGO_ORNNOVA.avif' style={{width:"200px",borderRadius:"50px"}}></Img><hr></hr>
+<Img src='./Images/LOGO_ORNNOVA.avif' style={{width:"200px"}}></Img><hr></hr>
 <h4 style={{fontFamily:"inherit",textDecoration:"underline"}}><b><img style={{width:"30px",margin:"10px"}} src='/Images/icon.png'></img>Forgot Password</b></h4> <br></br>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label><b>Enter Your Email</b></Form.Label>   
