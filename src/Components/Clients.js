@@ -389,7 +389,7 @@ const unassignClientFromUser = async (userId) => {
 
     {/* Table to Display Filtered Users */}
     <div className="table-responsive mb-3">
-        <Table bordered responsive hover className="table ">
+        <Table style={{ textAlign: "center" }} bordered responsive hover className="table ">
             <thead>
                 <tr>
                     <th scope="col">Sno</th>
@@ -461,7 +461,7 @@ const unassignClientFromUser = async (userId) => {
 
     {/* Table to Display Assigned Users */}
     <div className="table-responsive">
-        <Table bordered responsive hover className="table ">
+        <Table style={{ textAlign: "center" }} bordered responsive hover className="table ">
             <thead>
                 <tr>
                     <th scope="col">Sno</th>
