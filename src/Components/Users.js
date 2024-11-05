@@ -247,12 +247,12 @@ let navigate = useNavigate();
                 <td>{item.Status}</td>
                 <td>{item.CreatedBy}</td>
                  <td>
-                  <Image onClick={()=>{ readUserDatafun(item._id)}} style={{backgroundColor:"lightblue",margin:"10px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image> 
+                  <Image onClick={()=>{ readUserDatafun(item._id)}} style={{backgroundColor:"lightblue",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image> 
                  </td>
               <td>
-                 <Image onClick={()=>{ deleteUserDetails(item._id)}} style={{backgroundColor:"IndianRed",margin:"10px",padding:"10px",borderRadius:"10px"}} src='./Images/trash.svg'></Image> </td>
+                 <Image onClick={()=>{ deleteUserDetails(item._id)}} style={{backgroundColor:"IndianRed",padding:"10px",borderRadius:"10px"}} src='./Images/trash.svg'></Image> </td>
                  <td>  
-               <Link to={`/UpdateUser/${item._id}`}><Image  style={{backgroundColor:"lightgreen",padding:"10px",margin:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link> </td>
+               <Link to={`/UpdateUser/${item._id}`}><Image  style={{backgroundColor:"lightgreen",padding:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link> </td>
               </tr>
               </tbody>
             )
