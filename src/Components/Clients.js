@@ -389,7 +389,7 @@ const unassignClientFromUser = async (userId) => {
 
     {/* Table to Display Filtered Users */}
     <div className="table-responsive mb-3">
-        <Table  responsive hover className="table table-striped">
+        <Table bordered responsive hover className="table ">
             <thead>
                 <tr>
                     <th scope="col">Sno</th>
