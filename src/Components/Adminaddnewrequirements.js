@@ -269,7 +269,7 @@ const handleSubmit=(event)=>{
           <Form.Control value={relevantExperience} onChange={(e)=> setRelevantExperience(e.target.value)} style={{width:"300px",textAlign:"center",margin:"10px",border:"1px solid gray",borderRadius:"15px"}} placeholder="Enter Relevant Experience" />
         </Form.Group>
         <Form.Group as={Col} >
-          <Form.Label><b>Skill</b></Form.Label>
+          <Form.Label><b>Skill</b></Form.Label> <br></br>
           <textarea value={skill} onChange={(e)=> setSkill(e.target.value)} style={{width:"300px",textAlign:"center",margin:"10px",border:"1px solid gray",borderRadius:"15px"}} placeholder="Enter Skills" ></textarea>
         </Form.Group> 
         <Form.Group as={Col} >
