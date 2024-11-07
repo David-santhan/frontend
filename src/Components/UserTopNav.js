@@ -110,7 +110,7 @@ function UserTopNav() {
                                         <b style={{ color: "black", textDecoration: "underline", fontFamily: "initial" }}>Welcome:</b>
                                         <b style={{ fontFamily: "fantasy" }}> {localStoreEmpName}</b>
                                     </Navbar.Text>
-                                    <Button onClick={logout} style={{ width: "45px", height: "45px", margin: "10px", backgroundColor: "lightgray", color: "red", fontWeight: "bold", borderRadius: "90px", border: "1.5px solid indianred", fontSize: "small" }}>
+                                    <Button onMouseMove={(e)=>{{e.target.style.border="gray"}}} onMouseLeave={(e)=>{{e.target.style.border="1.5px solid indianred"}}} onClick={logout} style={{ width: "45px", height: "45px", margin: "10px", backgroundColor: "lightgray", color: "red", fontWeight: "bold", borderRadius: "90px", border: "1.5px solid indianred", fontSize: "small" }}>
                                         <Img src='/Images/logout.svg' style={{ width: "130%" }} />
                                     </Button>
                                 </Nav>
