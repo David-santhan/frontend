@@ -346,167 +346,115 @@ const submitAssessment=()=>{
         <div>
             {/* <UserTopNav /> */}
             {userType === "TeamLead" ? <TeamLeadTopNav/> : <UserTopNav/>}
-            <center>
-                <h4 style={{fontFamily:"monospace", backgroundColor:"lightgray", borderRadius:"20px", padding:"5px", margin:"10px"}}><b>Requirement Details</b></h4>
-                <Form style={{margin:"10px", backgroundColor:"linen", padding:"10px", borderRadius:"20px"}}>
-                <Row className="mb-3">
-        <Form.Group as={Col} md={3} controlId="formRegId">
-          <Form.Label><b>Reg Id</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.regId} />
-          <hr />
-        </Form.Group>
+            <center> <hr></hr>
+           <center>
+           <h3 style={{ textAlign: "center", }}>
+                <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
+                <b style={{ fontFamily: "monospace" }}>Requirement Details</b>
+            </h3>
+           </center>
 
-        <Form.Group as={Col} md={3} controlId="formClient">
-          <Form.Label><b>Client</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.client} />
-          <hr />
-        </Form.Group>
-        <Form.Group as={Col} md={3} controlId="formTypeOfContract">
-          <Form.Label><b>Type Of Contract</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.typeOfContract} />
-          <hr />
-        </Form.Group>
-        <Form.Group as={Col} md={3} controlId="formStartDate">
-          <Form.Label><b>Start Date</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={new Date(requirValues.startDate).toLocaleDateString()} />
-          <hr />
-        </Form.Group>
-      </Row>
+            {/* Requirement and Assessment Table */}
+            <Table style={{textAlign:"center"}} bordered hover responsive>
+                <thead>
+                    <tr>
+                        <th>Reg Id</th>
+                        <th>Client</th>
+                        <th>Type Of Contract</th>
+                        <th>Start Date</th>
+                        <th>Duration</th>
+                        <th>Source Ctc</th>
+                        <th>Location</th>
+                        <th>Qualification</th>
+                        <th>Years of Experience</th>
+                        <th>Relevant Experience</th>
+                        <th>Skills</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{requirValues.regId}</td>
+                        <td>{requirValues.client}</td>
+                        <td>{requirValues.typeOfContract}</td>
+                        <td>{new Date(requirValues.startDate).toLocaleDateString()}</td>
+                        <td>{requirValues.duration}</td>
+                        <td>{requirValues.sourceCtc}</td>
+                        <td>{requirValues.location}</td>
+                        <td>{requirValues.qualification}</td>
+                        <td>{requirValues.yearsExperience}</td>
+                        <td>{requirValues.relevantExperience}</td>
+                        <td>{requirValues.skill}</td>
+                    </tr>
+                </tbody>
+            </Table> <hr></hr>
 
-      <Row className="mb-3">
-        <Form.Group as={Col} md={3} controlId="formDuration">
-          <Form.Label><b>Duration</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.duration} />
-          <hr />
-        </Form.Group>
+            {/* Assessment Details */}
+            <h3 style={{ textAlign: "center", }}>
+                <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
+                <b style={{ fontFamily: "monospace" }}>Assessment </b>
+            </h3>
+            <Table striped bordered hover responsive>
+                <thead>
+                    <tr>
+                        <th>Assessment</th>
+                        <th>Years of Experience</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {requirValues.assessments.map((assessment, index) => (
+                        <tr key={index}>
+                            <td>{assessment.assessment}</td>
+                            <td>{assessment.yoe}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table> <hr></hr>
 
-        <Form.Group as={Col} md={3} controlId="formSourceCtc">
-          <Form.Label><b>Source Ctc</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.sourceCtc} />
-          <hr />
-        </Form.Group>
+            {/* Candidates Uploaded Table */}
+            <h3 style={{ textAlign: "center", }}>
+                <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
+                <b style={{ fontFamily: "monospace" }}>Candidates Uploaded </b>
+            </h3>
+            <Table style={{textAlign:"center"}} bordered hover responsive>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>ECTC</th>
+                        <th>Status</th>
+                        <th>Uploaded On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {candidateData && candidateData.length > 0 ? (
+                        candidateData.map((item, index) => {
+                            const recentStatus = item.Status && item.Status.length > 0
+                                ? item.Status[item.Status.length - 1].Status
+                                : "No Action Taken";
 
-        <Form.Group as={Col} md={3} controlId="formLocation">
-          <Form.Label><b>Location</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.location} />
-          <hr />
-        </Form.Group>
+                            let textColor;
+                            if (recentStatus === "No Action Taken") textColor = "blue";
+                            else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) textColor = "red";
+                            else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) textColor = "orange";
+                            else textColor = "green";
 
-        <Form.Group as={Col} md={3} controlId="formQualification">
-          <Form.Label><b>Qualification</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.qualification} />
-          <hr />
-        </Form.Group>
-      </Row>
-
-      <Row className="mb-3">
-        <Form.Group as={Col} md={3} controlId="formYearsExperience">
-          <Form.Label><b>Years Of Experience</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.yearsExperience} />
-          <hr />
-        </Form.Group>
-
-        <Form.Group as={Col} md={3} controlId="formRelevantExperience">
-          <Form.Label><b>Relevant Experience</b></Form.Label>
-          <Form.Control style={{ border: "1px solid gray" }} type="text" readOnly value={requirValues.relevantExperience} />
-          <hr />
-        </Form.Group>
-
-        <Form.Group as={Col} controlId="formSkills">
-          <Form.Label><b>Skills</b></Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            readOnly
-            value={requirValues.skill}
-            style={{ resize: 'none', border: "1px solid gray" }}
-          />
-          <hr />
-        </Form.Group>
-      </Row> <hr></hr>
-      {/* Displaying single requirement detail */}
-      <h3 style={{ textAlign: "left", display: "flex", alignItems: "center" }}>
-  <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
-  <b style={{ fontFamily: "monospace" }}>Assessment</b>
-</h3>
-<div className="container">
-      <Row className="mb-3">
-        {/* Assessment Details Section */}
-        <Col md={6}>
-          <div style={{ border: "1px solid gray", padding: "10px", borderRadius: "5px" }}>
-            <Form.Group controlId="formAssessments">
-              {requirValues.assessments.map((assessment, index) => (
-                <div key={index}>
-                  <FormLabel><b>Assessment</b></FormLabel>
-                  <Form.Control style={{ width: "100%" }} type='text' readOnly value={assessment.assessment}></Form.Control>
-                  <FormLabel><b>Years Of Experience</b></FormLabel>
-                  <Form.Control style={{ width: "100%" }} type='text' readOnly value={assessment.yoe}></Form.Control>
-                  <hr />
-                </div>
-              ))}
-            </Form.Group>
-          </div>
-        </Col>
-       
-        {/* Candidate Table Section */}
-        <Col md={6}>   <hr></hr>
-        <h3 style={{ textAlign: "left", display: "flex", alignItems: "center" }}>
-  <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon" />
-  <b style={{ fontFamily: "monospace" }}>Candidates Uploaded</b>
-</h3>
-        <Table style={{textAlign:"center",}}  responsive>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>ECTC</th>
-            <th>Status</th>
-            <th>Uploaded On</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-    {candidateData && candidateData.length > 0 ? (
-        candidateData.map((item, index) => {
-            // Get the most recent status
-            const recentStatus = item.Status && item.Status.length > 0
-                ? item.Status[item.Status.length - 1].Status
-                : "No Action Taken";
-
-            // Determine the text color based on the status
-            let textColor;
-            if (recentStatus === "No Action Taken") {
-                textColor = "blue"; // No Action Taken
-            } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-                textColor = "red"; // Rejected statuses
-            } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-                textColor = "orange"; // Pending statuses
-            } else {
-                textColor = "green"; // Other statuses
-            }
-
-            return (
-                <tr key={index}>
-                    <td>{item.firstName} {item.lastName}</td>
-                    <td>{item.ectc}</td>
-                    <td style={{ color: textColor }}>
-                        <b>{recentStatus}</b> {/* Display the most recent status */}
-                    </td>
-                    <td>{item.uploadedOn ? new Date(item.uploadedOn).toLocaleDateString() : "N/A"}</td>               
-                </tr>
-            );
-        })
-    ) : (
-        <tr>
-            <td colSpan="4">No data available</td>
-        </tr>
-    )}
-</tbody>
-
-
-      </Table>
-        </Col>
-      </Row>
-    </div>
+                            return (
+                                <tr key={index}>
+                                    <td>{item.firstName} {item.lastName}</td>
+                                    <td>{item.ectc}</td>
+                                    <td style={{ color: textColor }}>
+                                        <b>{recentStatus}</b>
+                                    </td>
+                                    <td>{item.uploadedOn ? new Date(item.uploadedOn).toLocaleDateString() : "N/A"}</td>
+                                </tr>
+                            );
+                        })
+                    ) : (
+                        <tr>
+                            <td colSpan="4">No data available</td>
+                        </tr>
+                    )}
+                </tbody>
+            </Table> <hr></hr>
                     <Row>
                         <center>
                         <Button onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightsteelblue";e.target.style.color="black"}}} style={{borderRadius:"20px",fontWeight:"bold",border:"0px",backgroundColor:"lightsteelblue",color:"black"}} onClick={() => setShow(true)}>
@@ -772,7 +720,7 @@ const submitAssessment=()=>{
                         </center>
                     </Row>
                   
-                </Form>
+              
             </center>
             {/* Additional form code for uploading candidate details (commented out) */}
         </div>
