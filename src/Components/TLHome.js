@@ -68,6 +68,8 @@ const [savedStatus,setSavedStatus] = useState('');
 const [totalfilteredCandidates, setTotalfilteredCandidates] = useState([]);
 const [displayedCandidates, setDisplayedCandidates] = useState([]);
 const [updateshow, setUpdateshow] = useState(false);
+const [newRequirements, setNewRequirements] = useState([]);
+
 
 const [updateCandidateDetails, setUpdateCandidateDetails] = useState({
   candidateImage: '',
@@ -356,7 +358,6 @@ const handleShowUserCandidates = (userCandidates)=>{
     try {
       let response = await axios.get(`https://ornnovabackend.onrender.com/TlHome/${userId}`);
       let data = response.data;
-
       setUserData(data.user);
       setTeamData(data.Team);
     } catch (error) {
@@ -402,8 +403,7 @@ const handleShowUserCandidates = (userCandidates)=>{
   try {
     let JSONData = await fetch(`https://ornnovabackend.onrender.com/getTeamrequirements/${userId}`, reqOption);
     let JSOData = await JSONData.json();
-    console.log(JSOData);
-
+  
     setRequirements(JSOData);  // Set the fetched requirements
     setFilteredRequirements(JSOData);  // Initially, all requirements are shown
     setShowfl(true);  // Show the table or section
@@ -563,7 +563,7 @@ const Reqcounts = async () => {
   try {
     const response = await fetch(`https://ornnovabackend.onrender.com/getTeamRequirementsCount/${userId}`, reqOption);
     let data = await response.json();
-
+      
     // Log the complete data for debugging
   
 
@@ -581,28 +581,41 @@ const Reqcounts = async () => {
   }
 };
 
-const RequirmentCandidates = async (id)=>{
-  let reqOption = {
-    method:"GET"
-  }
-  let response = await fetch(`https://ornnovabackend.onrender.com/getRequirementsCandidatesCount/${id}`,reqOption)
-  // let data = response.json();
-  // console.log('Response data:', data);
-  if (!response.ok) {
-    throw new Error(`Error: ${response.statusText}`);
-  }
+const RequirmentCandidates = async (id) => {
+  try {
+    // Define the options for the fetch request
+    const reqOption = {
+      method: "GET",
+    };
 
-  // Parsing the JSON response
-  const data = await response.json();
-  
-  if (data.status === "Success" && data.requirements) {
-    setRequirementsData(data.requirements); // Store requirements in state
-    setShowRequirmentCount(true);
-    setSelectedRecruiterId(id);
-  } else {
-    throw new Error(data.msg || "Unexpected data format");
+    // Fetching the data from the backend
+    const response = await fetch(`https://ornnovabackend.onrender.com/getRequirementsCandidatesCount/${id}/${userId}`, reqOption);
+
+    // Check if the response is not ok
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    // Parsing the JSON response
+    const data = await response.json();
+    console.log(data)
+    // Check if the response status is Success
+    if (data.status === "Success" && data.requirements) {
+      // Update the state with the fetched requirements
+      setRequirementsData(data.requirements); // Store requirements in state
+      setShowRequirmentCount(true);
+      setSelectedRecruiterId(id);
+    } else {
+      // Handle unexpected data format or error messages
+      throw new Error(data.msg || "Unexpected data format");
+    }
+  } catch (error) {
+    // Handle any errors that occurred during the fetch
+    console.error("Failed to fetch requirement candidates:", error);
+    alert(error.message); // Optional: alert the error message to the user
   }
-}
+};
+
 const fetchCandidates = async (id) => {
   setLoading(true); // Show loading indicator
   setError(""); // Reset error state
@@ -642,6 +655,8 @@ const CandidateData = async(id)=>{
   } 
 }
 
+
+
 const requirementDetailsWithAssignedUsers = async () => {
   let reqOption = {
       method: "GET"
@@ -661,13 +676,11 @@ useEffect(()=>{
     setShowTotalModal(true); // renamed from setShowModal
   };
 
-
   // Close the modal
   const handleCloseTotalCandidates = () => { // renamed from handleCloseModal
     setShowTotalModal(false); // renamed from setShowModal
     setSelectedRequirement(null);
   };
-
 
 // // Updated options based on your logic
 // const options = [
@@ -752,12 +765,57 @@ const postStatus = async (id) => {
   }
 };
 
+// const fetchRequirements = async () => {
+//   try {
+//     const response = await axios.get(`https://ornnovabackend.onrender.com/getHomeReqData/${userId}`);
+//     // const data = await response.json();
+//     const data = response.data;
+//     const newData = data.filter(req => req.update === 'New' && !req.claimedBy.some(claim => claim.userId === userId));
+//     const claimedData = data.filter(req => req.update === 'Old' || req.claimedBy.some(claim => claim.userId === userId));
+//     setNewRequirements(newData);
+//     setShowCandidateDetailsHome(claimedData);
+  
+//   } catch (err) {
+//     console.error('Error fetching requirements:', err);
+//   }
+// }; 
+// useEffect=()=>{
+//   fetchRequirements();
+// }
+
+// const updateClaim = async (id) => {
+//   const user = {
+//     userId,
+//     claimedDate: new Date(),
+//   };
+
+//   try {
+//     const response = await fetch(`https://ornnovabackend.onrender.com/claim/${id}`, {
+//       method: 'PUT',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify(user),
+//     });
+
+//     const result = await response.json();
+//     if (result.status === "Success") {
+//       alert(result.msg);
+//       fetchRequirements(); // Refresh the requirements list
+//       window.location.reload();
+//     } else {
+//       alert(result.msg);
+//     }
+//   } catch (error) {
+//     console.error('Error updating claim:', error);
+//     alert('Error updating claim. Please try again later.');
+//   }
+// };
+
   return (
  <div>
   <TeamLeadTopNav/>
 <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 <CardGroup>
-  <Link  style={{ textDecoration: "none", color: "black" }} to="/TLNewReq">
+  <Link   style={{ textDecoration: "none", color: "black" }} to="/TLNewReq">
     <Card style={{ margin: "20px", width: "270px",borderRadius:"70px" }} className="text-center">
       <Card.Body>
         <Card.Title style={{ fontFamily: "initial" }}>
@@ -804,6 +862,48 @@ const postStatus = async (id) => {
 </CardGroup>
 </div> <hr></hr>
 
+{/* <Table style={{ textAlign: "center" }} responsive="sm">
+          <thead>
+            <tr>
+              <th>Reg Id</th>
+              <th>Client</th>
+              
+              <th>Requirement Type</th>
+              <th>Role</th>
+              <th>Skills</th>
+              <th>
+                <button style={{ borderRadius: "20px" }} >
+                  <b>Start Date</b> 
+                </button>
+              </th>
+              <th>
+                <button style={{ borderRadius: "20px" }} >
+                  <b>Uploaded On</b> 
+                </button>
+              </th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {newRequirements.map((req, index) => (
+              <tr key={index}>
+                <td>{req.regId}</td>
+                <td>{req.client}</td>
+                <td>{req.requirementtype}</td>
+                <td>{req.role}</td>
+                <td>{req.skill}</td>
+                <td>{new Date(req.startDate).toLocaleDateString()}</td>
+                <td>{new Date(req.uploadedDate).toLocaleDateString()}</td>
+                <td>
+                  <Button onClick={()=>{updateClaim(req._id)}}  style={{ border: "1px solid gray", backgroundColor: "lightgreen", borderRadius: "20px" }}>
+                    <b>Claim</b>
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table> <hr></hr> */}
+
 <h3 style={{textAlign:"center"}}>
           <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png'alt="icon"/>
           <b style={{ fontFamily: "monospace" }}>Requirements</b>    
@@ -811,7 +911,7 @@ const postStatus = async (id) => {
         <input type="search"placeholder="🔍 Search by ID, Client, or Role"value={searchQuery}onChange={(e) => setSearchQuery(e.target.value)} style={{ marginBottom: "20px", padding: "8px", width: "300px",borderRadius:"15px" }} // optional styling
         />
             {/* Your Table */}
-            <Table style={{ textAlign: "center" }} striped bordered hover responsive>
+            <Table style={{ textAlign: "center" }}  bordered hover responsive>
                 <thead>
                     <tr>
                         <th>Requirement ID</th>
@@ -857,16 +957,17 @@ const postStatus = async (id) => {
             )}
           </span>
           <div style={{ width: "20%", height: "20%" }}>
-            <Button
+            <Button onMouseMove={(e)=>{{e.target.style.backgroundColor="lightpink";e.target.style.color="black"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor= req.userCount === 0 ? "indianred" : "lightslategray";e.target.style.color="white"}}}
               style={{
                 backgroundColor: req.userCount === 0 ? "indianred" : "lightslategray",
                 borderRadius: "20px",
                 textAlign: "center",
-                border: "1px solid black"
+                border: "1px solid black",
+                fontWeight:"bold"
               }}
               onClick={() => userDetailstoAssignClient(req.requirementDetails?._id)}
             >
-              <b>{req.userCount}</b>
+              {req.userCount}
             </Button>
           </div>
         </div>
@@ -875,11 +976,11 @@ const postStatus = async (id) => {
       {/* Today Candidates Count */}
       <td>
         {req.todayCandidateCount > 0 ? (
-          <div
-            style={{ cursor: "pointer", color: "blue" }}
+          <div onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}}onMouseLeave={(e)=>{{e.target.style.backgroundColor="";e.target.style.color="blue"}}}
+            style={{ cursor: "pointer", color: "blue",fontWeight:"bold",padding:"10px",borderRadius:"10px" }}
             onClick={() => handleShowCandidates(req.combinedTodayCandidates)}
           >
-            <b>{req.todayCandidateCount}</b>
+           {req.todayCandidateCount}
           </div>
         ) : (
           <strong>0</strong>
@@ -888,11 +989,11 @@ const postStatus = async (id) => {
        {/* User Candidates Count */}
        <td>
         {req.userCandidatesCount > 0 ? (
-          <div
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => handleShowUserCandidates(req.totalUserCandidatesDetails)}
+          <div onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}}onMouseLeave={(e)=>{{e.target.style.backgroundColor="";e.target.style.color="blue"}}}
+          style={{ cursor: "pointer", color: "blue",fontWeight:"bold",padding:"10px",borderRadius:"10px" }}
+          onClick={() => handleShowUserCandidates(req.totalUserCandidatesDetails)}
           >
-            <b>{req.userCandidatesCount}</b>
+            {req.userCandidatesCount}
           </div>
         ) : (
           <strong>0</strong>
@@ -902,11 +1003,11 @@ const postStatus = async (id) => {
       {/* Team Candidates Count */}
       <td>
         {req.teamCandidatesCount > 0 ? (
-          <div
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => handleShowTeamCandidates(req.totalTeamCandidatesDetails)}
+          <div onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}}onMouseLeave={(e)=>{{e.target.style.backgroundColor="";e.target.style.color="blue"}}}
+          style={{ cursor: "pointer", color: "blue",fontWeight:"bold",padding:"10px",borderRadius:"10px" }}
+          onClick={() => handleShowTeamCandidates(req.totalTeamCandidatesDetails)}
           >
-            <b>{req.teamCandidatesCount}</b>
+            {req.teamCandidatesCount}
           </div>
         ) : (
           <strong>0</strong>
@@ -916,11 +1017,11 @@ const postStatus = async (id) => {
       {/* Total Candidates Count */}
       <td>
         {req.totalCandidateCount > 0 ? (
-          <div
-            style={{ cursor: "pointer", color: "blue" }}
-            onClick={() => handleShowTotalCandidates(req)}
+          <div onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}}onMouseLeave={(e)=>{{e.target.style.backgroundColor="";e.target.style.color="blue"}}}
+          style={{ cursor: "pointer", color: "blue",fontWeight:"bold",padding:"10px",borderRadius:"10px" }}
+          onClick={() => handleShowTotalCandidates(req)}
           >
-            <b>{req.totalCandidateCount}</b>
+            {req.totalCandidateCount}
           </div>
         ) : (
           <strong>0</strong>
@@ -994,7 +1095,7 @@ const postStatus = async (id) => {
 
       {/* // Table displaying filtered candidates */}
 {filteredCandidates.length > 0 ? (
-  <Table style={{ textAlign: "center" }} striped bordered hover responsive>
+  <Table style={{ textAlign: "center" }}  bordered hover responsive>
     <thead>
       <tr>
         <th>Name</th>
@@ -1126,7 +1227,7 @@ const postStatus = async (id) => {
 </center> <hr></hr>
           {/* Display Candidate Details in Table */}
           {displayedCandidates && displayedCandidates.length > 0 ? (
-            <Table style={{ textAlign: "center", marginTop: "20px" }} striped bordered hover responsive>
+            <Table style={{ textAlign: "center", marginTop: "20px" }}  bordered hover responsive>
               <thead>
                 <tr>
                   <th>Name</th>
@@ -1384,10 +1485,10 @@ style={{backgroundColor:"lightgray"}}
                   <td>{item.requirement.typeOfContract}</td>
                   <td><b style={{backgroundColor: ` ${item.assignedCount === item.totalTeamCount ? "MediumSeaGreen" : "orange"}`,color:`${item.assignedCount === item.totalTeamCount ? "white" : "black"}`,borderRadius: "30px",padding: "5px",border: `1px solid black`,}}>{item.assignedCount}/{item.totalTeamCount}</b></td>
                   <td>
-                    <Button
+                    <Button onMouseMove={(e)=>{{e.target.style.backgroundColor="lightgray";e.target.style.color="black"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightseagreen";e.target.style.color="white"}}}
                       onClick={() => userDetailstoAssignClient(item.requirement._id)}
-                      style={{padding: "5px",borderRadius: "8px",backgroundColor: "lightseagreen",color: "white",border: "1.5px solid black"}}>
-                    <b>Assign</b>
+                      style={{padding: "5px",borderRadius: "8px",backgroundColor: "lightseagreen",color: "white",border: "1.5px solid black",fontWeight:"bold"}}>
+                   Assign
                     </Button>
                   </td>
                 
@@ -1512,7 +1613,7 @@ style={{backgroundColor:"lightgray"}}
         </Modal.Header>
         <Modal.Body>
         {showReq && viewReq.length > 0 ? (
-  <Table  striped bordered hover responsive>
+  <Table   bordered hover responsive>
     <tbody>
       {viewReq.map((item, index) => (
         <React.Fragment key={index}>
@@ -1902,7 +2003,7 @@ style={{backgroundColor:"lightgray"}}
 
                         {filteredRecruiters.length > 0 ? (
                             <div style={{ overflowX: 'auto' }}>
-                                <Table style={{textAlign:"center"}} striped bordered hover responsive>
+                                <Table style={{textAlign:"center"}}  bordered hover responsive>
                                     <thead style={{ textAlign: 'center' }}>
                                         <tr>
                                             <th>Emp Code</th>
@@ -1975,7 +2076,7 @@ style={{backgroundColor:"lightgray"}}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Table style={{textAlign:"center"}} striped bordered hover responsive>
+                    <Table style={{textAlign:"center"}}  bordered hover responsive>
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -2035,7 +2136,7 @@ style={{backgroundColor:"lightgray"}}
       <Modal.Body>
         
         {candidates.length > 0 ? (
-          <Table style={{textAlign:"center"}} striped bordered hover responsive>
+          <Table style={{textAlign:"center"}}  bordered hover responsive>
             <thead>
               <tr>
                 <th>Name</th>
@@ -2100,7 +2201,7 @@ style={{backgroundColor:"lightgray"}}
       {requirementsData.length === 0 ? (
         <p>No requirements found.</p>
       ) : (
-        <Table style={{textAlign:"center"}} striped bordered hover responsive>
+        <Table style={{textAlign:"center"}}  bordered hover responsive>
           <thead>
             <tr>
               <th>Requirement ID</th>
@@ -2179,7 +2280,7 @@ style={{backgroundColor:"lightgray"}}
 
         {/* Candidate Table */}
         {displayedCandidates && displayedCandidates.length > 0 ? (
-          <Table striped bordered hover responsive style={{textAlign:"center"}}>
+          <Table  bordered hover responsive style={{textAlign:"center"}}>
             <thead>
               <tr>
                 <th>Name</th>
@@ -2317,7 +2418,7 @@ style={{backgroundColor:"lightgray"}}
 
   {/* User Candidate Table */}
   {displayedCandidates && displayedCandidates.length > 0 ? (
-    <Table striped bordered hover responsive style={{ textAlign: "center" }}>
+    <Table  bordered hover responsive style={{ textAlign: "center" }}>
       <thead>
         <tr>
           <th>Name</th>
@@ -2420,7 +2521,7 @@ style={{backgroundColor:"lightgray"}}
     <Modal.Body>
     { candidateDetails && (
     <div className="table-responsive">
-    <Table striped bordered hover className="table-sm">
+    <Table  bordered hover className="table-sm">
         <tbody>
         <tr>
             <td>
@@ -3015,6 +3116,8 @@ style={{backgroundColor:"lightgray"}}
         </Button>
       </Modal.Footer>
     </Modal>
+
+
  </div>
   );
 }
