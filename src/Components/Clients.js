@@ -200,11 +200,12 @@ const filtereData = filteredData
     );
 
 
-  const assignClientToUser = async (userId) => {
+// Function to assign client to user
+const assignClientToUser = async (userId) => {
     const clientId = selectedClientId; // Ensure you have a way to store the selected client ID
 
     // Show a confirmation dialog to the user
-    const isConfirmed = window.confirm(`Are you sure you want to assign this client ?`);
+    const isConfirmed = window.confirm(`Are you sure you want to assign this client?`);
 
     // If the user confirms, proceed with the assignment
     if (isConfirmed) {
@@ -220,8 +221,9 @@ const filtereData = filteredData
 
             if (result.status === 'success') {
                 alert('Client assigned successfully ✅');
-                setLgShow(false);
-                // Optionally refresh the user list or perform any other updates
+                userDetailsofAssignedClient(clientId);
+                userDetailstoAssignClient(clientId);
+               
             } else {
                 alert(result.msg);
             }
@@ -235,6 +237,7 @@ const filtereData = filteredData
     }
 };
 
+// Function to unassign client from user
 const unassignClientFromUser = async (userId) => {
     const clientId = selectedClientId; // Ensure you have a way to store the selected client ID
 
@@ -254,8 +257,9 @@ const unassignClientFromUser = async (userId) => {
 
             if (result.status === 'success') {
                 alert('Client unassigned successfully ✅');
-                setLgShow(false);
-                // Optionally refresh the user list or perform any other updates
+                userDetailsofAssignedClient(clientId);
+                userDetailstoAssignClient(clientId);
+                
             } else {
                 alert(result.msg);
             }
@@ -336,21 +340,20 @@ const unassignClientFromUser = async (userId) => {
                     <td>{item.clientName}</td>
                     <td>{item.clientDetails.typeOfService || "N/A"}</td>
                     <td>{item.clientDetails.location || "N/A"}</td>
-                    <td onClick={() => userDetailstoAssignClient(item.clientId)}>
-                         <strong style={{backgroundColor: item.userCount === item.userTypeCounts ? "lightgreen" : "lightgray",padding: "8px",borderRadius: "10px",color: "white" // You can change the text color to enhance visibility on green background
-                           }}><Link style={{ textDecoration: "none", color: "black" }}>{item.userCount}/{item.userTypeCounts}</Link></strong></td>                    
+                    <td  onClick={() => userDetailstoAssignClient(item.clientId)}>
+                         <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue";e.target.style.color="black"}}} style={{ textDecoration: "none", color: "black",padding: "8px",borderRadius: "10px",color: "black",backgroundColor: "lightblue",fontWeight:"bold"  }}>{item.userCount}/{item.userTypeCounts}</Link></td>                    
                     {/* <td>
                         <Link onClick={() => userDetailstoAssignClient(item.clientId)}>
                             <Image style={{ backgroundColor: "lightgray", padding: "10px", borderRadius: "10px" }} src='./Images/assign.svg' alt='assign' />
                         </Link>
                     </td> */}
                     <td>
-                        <Link onClick={() => { deleteClientDetails(item.clientId); }}>
+                        <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="indianred";e.target.style.color="black"}}} onClick={() => { deleteClientDetails(item.clientId); }}>
                             {userType === 'Admin' ? <Image style={{ backgroundColor: "IndianRed", padding: "10px", borderRadius: "10px" }} src='./Images/trash.svg' alt='delete' /> : ""}
                         </Link>
                     </td>
                     <td>
-                        <Link to={`/UptadeClient/${item.clientId}`}>
+                        <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgreen";e.target.style.color="black"}}} to={`/UptadeClient/${item.clientId}`}>
                             {userType === 'Admin' ? <Image style={{ backgroundColor: "lightgreen", padding: "10px", borderRadius: "10px" }} src='./Images/edit.svg' alt='edit' /> : ""}
                         </Link>
                     </td>
@@ -389,7 +392,7 @@ const unassignClientFromUser = async (userId) => {
 
     {/* Table to Display Filtered Users */}
     <div className="table-responsive mb-3">
-        <Table style={{ textAlign: "center" }} bordered responsive hover className="table ">
+        <Table style={{ textAlign: "center" }}  responsive bordered hover className="table">
             <thead>
                 <tr>
                     <th scope="col">Sno</th>
@@ -461,7 +464,7 @@ const unassignClientFromUser = async (userId) => {
 
     {/* Table to Display Assigned Users */}
     <div className="table-responsive">
-        <Table style={{ textAlign: "center" }} bordered responsive hover className="table ">
+        <Table  style={{ textAlign: "center" }}  responsive bordered hover className="table">
             <thead>
                 <tr>
                     <th scope="col">Sno</th>
