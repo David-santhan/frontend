@@ -273,7 +273,7 @@ const decryptData = (ciphertext, secret) => {
                                         <b style={{ color: "black", textDecoration: "underline", fontFamily: "initial" }}>Welcome:</b>
                                         <b style={{ fontFamily: "fantasy" }}> {item.EmployeeName}</b>
                                     </Navbar.Text>
-                                    <Button onClick={logout} style={{ width: "45px", height: "45px", margin: "10px", backgroundColor: "lightgray", color: "red", fontWeight: "bold", borderRadius: "90px", border: "1.5px solid indianred", fontSize: "small" }}>
+                                    <Button onMouseMove={(e)=>{{e.target.style.border="gray"}}} onMouseLeave={(e)=>{{e.target.style.border="1.5px solid indianred"}}} onClick={logout} style={{ width: "45px", height: "45px", margin: "10px", backgroundColor: "lightgray", color: "red", fontWeight: "bold", borderRadius: "90px", border: "1.5px solid indianred", fontSize: "small" }}>
                                         <Img src='/Images/logout.svg' style={{ width: "130%" }} />
                                     </Button>
                                 </Nav>
@@ -341,13 +341,13 @@ const decryptData = (ciphertext, secret) => {
                 <td>{new Date(req.requirementDetails.startDate).toLocaleDateString()}</td>
                 <td>{new Date(req.requirementDetails.uploadedDate).toLocaleDateString()}</td>
                 <td>
-                  <Link onClick={() => handleDelete(req.requirementDetails._id)}>
-                    <Image style={{ backgroundColor: "IndianRed", padding: "10px", borderRadius: "10px" }} src='./Images/trash.svg' />
+                  <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="indianred"}}}   onClick={() => handleDelete(req.requirementDetails._id)}>
+                    <Image style={{ backgroundColor: "IndianRed", padding: "10px", borderRadius: "10px" }} src='/Images/trash.svg' />
                   </Link>
                   </td>
                   <td>
-                  <Link onClick={() => fetchRequirement(req.requirementDetails._id)}>
-                    <Image style={{ backgroundColor: "lightgreen", padding: "10px", borderRadius: "10px" }} src='./Images/edit.svg' />
+                  <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgreen"}}}  onClick={() => fetchRequirement(req.requirementDetails._id)}>
+                    <Image style={{ backgroundColor: "lightgreen", padding: "10px", borderRadius: "10px" }} src='/Images/edit.svg' />
                   </Link>
                 </td>
               </tr>
