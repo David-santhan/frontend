@@ -514,8 +514,8 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                 <td>{new Date(req.startDate).toLocaleDateString()}</td>
                 <td>{new Date(req.uploadedDate).toLocaleDateString()}</td>
                 <td>
-                  <Button onClick={() => updateClaim(req._id)} style={{ border: "1px solid gray", backgroundColor: "lightgreen", borderRadius: "20px" }}>
-                    <b>Claim</b>
+                  <Button onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgreen";e.target.style.color="black"}}} onClick={() => updateClaim(req._id)} style={{ border: "1px solid gray", backgroundColor: "lightgreen", borderRadius: "20px",fontWeight:"bold" }}>
+                    Claim
                   </Button>
                 </td>
               </tr>
@@ -581,7 +581,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                 </DropdownButton>
             </div>
 
-            <Table style={{ textAlign: 'center' }} responsive="sm">
+            <Table hover  style={{ textAlign: 'center' }} responsive="sm">
                 <thead>
                     <tr>
                         <th>Reg Id</th>
@@ -627,10 +627,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                                     <td>{req.skill}</td>
                                     <td>{userClaim ? new Date(userClaim.claimedDate).toLocaleDateString() : 'N/A'}</td>
                                     <td>
-                                        <Link onClick={() => viewCandidates(req._id)} style={{ textDecoration: 'none' }}>
-                                            <b
-                                                style={{
-                                                    width: '45px',
+                                        <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="lightgray";e.target.style.color="black"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor=countColor;e.target.style.color="white"}}} onClick={() => viewCandidates(req._id)} style={{ textDecoration: 'none',width: '45px',
                                                     height: '45px',
                                                     margin: '10px',
                                                     fontWeight: 'bold',
@@ -638,17 +635,18 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                                                     borderRadius: '90px',
                                                     border: '1.5px solid black',
                                                     padding: '8px',
-                                                    color: 'white',
-                                                }}
-                                            >
+                                                    color: 'white', }}>
+                                            
+                                               
+                                            
                                                 {count}
-                                            </b>
+                                         
                                         </Link>
                                     </td>
                                     <td>
                                         <Link to={`/UserAction/${req._id}/${userId}`}>
-                                            <Button style={{ border: '1px solid gray',backgroundColor: buttonColor,borderRadius: '20px',color: textColor,}}>
-                                                <b>Take Action</b>
+                                            <Button onMouseMove={(e)=>{e.target.style.backgroundColor="gray"}} onMouseLeave={(e)=>{e.target.style.backgroundColor=buttonColor}} style={{ border: '1px solid gray',backgroundColor: buttonColor,borderRadius: '20px',color: textColor,fontWeight:"bold"}}>
+                                              Take Action
                                             </Button>
                                         </Link>
                                     </td>
@@ -706,13 +704,13 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
         value={savedStatusSearchTerm}
         onChange={(e) => setSavedStatusSearchTerm(e.target.value)}
         style={{ marginBottom: "20px", padding: "10px", width: "300px", border: "2px solid black", borderRadius: "20px",margin:"5px" }}
-    >        <option value="">Select Saved Status</option>
+    >        <option value="">Select Type</option>
         <option value="">All</option>
         <option value="saved">Saved</option>
         <option value="uploaded">Uploaded</option>
     </select></center> <hr></hr>
 
-    <Table responsive style={{ textAlign: "center" }}>
+    <Table hover bordered responsive style={{ textAlign: "center" }}>
         <thead>
             <tr>
                 <th>Name</th>
@@ -722,8 +720,8 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                 <th>ECTC</th>
                 <th>Status</th>
                 <th>Uploaded On</th>
-                <th>Actions</th>
-                <th></th>
+                <th colSpan={4}>Actions</th>
+              
             </tr>
         </thead>
         <tbody>
@@ -759,14 +757,16 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                         </td>
                         <td>{new Date(item.uploadedOn).toLocaleDateString()}</td>
                         <td>
-                            <Link onClick={() => ViewCandidateData(item._id)}>
-                                <Image style={{ backgroundColor: "lightblue", margin: "10px", padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
+                            <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue"}}} onClick={() => ViewCandidateData(item._id)}>
+                                <Image style={{ backgroundColor: "lightblue",  padding: "10px", borderRadius: "10px" }} src='/Images/view.svg' />
                             </Link>
-                            <Link onClick={isDeleteEnabled ? () => handleDeleteClick(item._id) : undefined}>
+                            </td>
+                            <td>
+                            <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor= isDeleteEnabled ? "IndianRed" : "lightgray"}}} onClick={isDeleteEnabled ? () => handleDeleteClick(item._id) : undefined}>
                                 <Image
                                     style={{
                                         backgroundColor: isDeleteEnabled ? "IndianRed" : "lightgray", // Change color if disabled
-                                        margin: "10px",
+                                        
                                         padding: "10px",
                                         borderRadius: "10px",
                                         cursor: isDeleteEnabled ? "pointer" : "not-allowed" // Change cursor style if disabled
@@ -775,8 +775,10 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                                     alt="Delete"
                                 />
                             </Link>
-                            <Link onClick={() => updateCandidate(item._id)}>
-                                <Image style={{ backgroundColor: "lightgreen", padding: "10px", margin: "10px", borderRadius: "10px" }} src='/Images/edit.svg' />
+                            </td>
+                            <td>
+                            <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor= isDeleteEnabled ? "lightgreen" : "lightgray"}}} onClick={isDeleteEnabled ? () => updateCandidate(item._id): undefined}>
+                                <Image style={{ backgroundColor: isDeleteEnabled ? "lightgreen" : "lightgray", padding: "10px",  borderRadius: "10px",cursor: isDeleteEnabled ? "pointer" : "not-allowed" }} src='/Images/edit.svg' />
                             </Link>
                            
                         </td>
@@ -1145,7 +1147,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
     </Modal.Header>
     <Modal.Body>
     <div className="table-responsive">
-    <Table striped bordered hover className="table-sm">
+    <Table responsive  bordered hover className="table-sm">
                     <tbody>
                         <tr>
                             <td><b>Client:</b></td>
@@ -1241,7 +1243,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
         {viewCandidate && selectedCandidate && (
         <div>
           {/* Your existing code to display the selected candidate's details goes here */}
-          <Table striped bordered hover className="table-sm">
+          <Table responsive bordered hover className="table-sm">
             <tbody>
               <tr>
                 <td>
