@@ -53,7 +53,39 @@ function UserActions() {
     const [savedStatus, setSavedStatus] = useState();
     const [hover, setHover] = useState(false);
     const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false); // Tracks submission status
+    const [updateshow, setUpdateshow] = useState(false);
     const [candidateData,setCandidateData]= useState([]);
+    const [updateCandidateDetails, setUpdateCandidateDetails] = useState({
+      candidateImage: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      mobileNumber: '',
+      dob: '',
+      ctc: '',
+      ectc: '',
+      totalYoe: '',
+      relevantYoe: '',
+      lwd: '',
+      currentLocation: '',
+      prefLocation: '',
+      resignationServed: '',
+      currentOrg: '',
+      candidateSkills: '',
+      role: '',
+      internalScreening: '',
+      sharedWithClient: '',
+      feedback: '',
+      details: '',
+      interviewDate: '',
+      educationalQualification: '',
+      offerInHand: '',
+      remark: '',
+      updatedResume: '',
+      ornnovaProfile: '',
+      assessments: [],
+    });
+    const [updateCandidateName,setUpdateCandidateName]= useState("");
     
     // const [updatedResume,setUpdatedResume]=useState();
     // const [ornnovaProfile,setOrnnovaProfile]=useState();
@@ -68,9 +100,6 @@ if (!isNaN(date)) {
 } else {
   // console.error("Invalid date");
 }
-
-
-
 
   // Function to decrypt data
   const decryptData = (ciphertext, secret) => {
@@ -341,6 +370,73 @@ const submitAssessment=()=>{
   }
  
 }
+function handleUpdateShow() {
+    
+  setUpdateshow(true);
+}
+function handleUpdateClose () {setUpdateshow(false);}
+const onHide = () => {
+  setShow(false);
+};
+const updateCandidate = async(id)=>{
+  try {
+    const response = await axios.get(`https://ornnovabackend.onrender.com/candidate/${id}`)
+    console.log(response.data)
+    setUpdateCandidateDetails(response.data);
+    handleUpdateShow();
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const handleInputChange = (field, value) => {
+  setUpdateCandidateDetails(prevDetails => ({
+    ...prevDetails,
+    [field]: value,
+  }));
+};
+
+const handleAssessmentChange = (index, field, value) => {
+  const updatedAssessments = [...updateCandidateDetails.assessments];
+  updatedAssessments[index] = {
+    ...updatedAssessments[index],
+    [field]: value,
+  };
+  setUpdateCandidateDetails(prevDetails => ({
+    ...prevDetails,
+    assessments: updatedAssessments,
+  }));
+};
+
+// Function that saves changes, with conditional logic for "Upload"
+const handleSaveChanges = async (status) => {
+const candidateId = updateCandidateDetails._id;
+
+try {
+  // Prepare updated details based on whether it's a save or upload action
+  const updatedDetails = {
+    ...updateCandidateDetails,
+    ...(status === "Uploaded" ? { savedStatus: "Uploaded", uploadedDate: new Date().toISOString() } : {})
+  };
+
+  const response = await axios.put(`https://ornnovabackend.onrender.com/candidates/${candidateId}`, updatedDetails);
+
+  if (response.status === 200) {
+    alert('Candidate details updated successfully ✅');
+    setUpdateshow(false); // Close the modal after successful update
+    window.location.reload();
+  } else {
+    alert('Failed to update candidate details.');
+  }
+} catch (error) {
+  console.error('Error updating candidate:', error);
+  alert('An error occurred while updating candidate details.');
+}
+};
+
+// Separate functions for Save and Upload buttons
+const saveChanges = () => handleSaveChanges("Saved");
+const uploadChanges = () => handleSaveChanges("Uploaded");
 
     return (
         <div>
@@ -422,6 +518,7 @@ const submitAssessment=()=>{
                         <th>ECTC</th>
                         <th>Status</th>
                         <th>Uploaded On</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -445,6 +542,11 @@ const submitAssessment=()=>{
                                         <b>{recentStatus}</b>
                                     </td>
                                     <td>{item.uploadedOn ? new Date(item.uploadedOn).toLocaleDateString() : "N/A"}</td>
+                                    <td>
+                                    {item.savedStatus === 'Saved' && ( // Only show Upload button if savedStatus is 'Saved'
+                                <Button onClick={()=> updateCandidate(item._id)}  style={{fontWeight:"bold",backgroundColor:"green",border:"0px",padding:"5px",borderRadius:"20px"}} onMouseMove={(e)=>{{e.target.style.backgroundColor = "gray";e.target.style.padding = "7px"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor = "green";e.target.style.padding = "5px"}}}>Upload</Button>
+                            )}
+                                    </td>
                                 </tr>
                             );
                         })
@@ -723,6 +825,348 @@ const submitAssessment=()=>{
               
             </center>
             {/* Additional form code for uploading candidate details (commented out) */}
+
+            <Modal
+      style={{ backgroundColor: "lightgray", opacity: "98%" }}
+      show={updateshow}
+      size="lg"
+      onHide={handleUpdateClose}
+      dialogClassName="modal-90w"
+      aria-labelledby="example-custom-modal-styling-title"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="example-custom-modal-styling-title">
+          <h5>
+            <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img>
+            <b style={{ fontFamily: "monospace" }}>Update Candidate Information</b>
+          </h5>
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+      <form style={{backgroundColor:"lightsteelblue",borderRadius:"20px"}}>
+            <div className="container">
+                <div className="row">
+                    <div className="col-md-6 form-group">
+                        <label><strong>Candidate Image:</strong></label>
+                        <div>
+                            <img
+                                src={`https://ornnovabackend.onrender.com/${updateCandidateDetails.candidateImage}`}
+                                style={{ width: "100px", borderRadius: "100px" }}
+                                alt='Candidate Image'
+                            />
+                        </div>
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>First Name:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.firstName}
+                            onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Last Name:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.lastName}
+                            onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Email:</strong></label>
+                        <input
+                            type="email"
+                            className="form-control"
+                            value={updateCandidateDetails.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Mobile Number:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.mobileNumber}
+                            onChange={(e) => handleInputChange('mobileNumber', e.target.value)}
+                        />
+                    </div>
+                   
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Date of Birth:</strong></label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={new Date(updateCandidateDetails.dob).toLocaleDateString('en-CA')}
+                            onChange={(e) => handleInputChange('dob', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>CTC:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.ctc}
+                            onChange={(e) => handleInputChange('ctc', e.target.value)}
+                        />
+                    </div>
+                   
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>ECTC:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.ectc}
+                            onChange={(e) => handleInputChange('ectc', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Total YOE:</strong></label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={updateCandidateDetails.totalYoe}
+                            onChange={(e) => handleInputChange('totalYoe', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Relevant YOE:</strong></label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={updateCandidateDetails.relevantYoe}
+                            onChange={(e) => handleInputChange('relevantYoe', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>LWD:</strong></label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={new Date(updateCandidateDetails.lwd).toLocaleDateString('en-CA')}
+                            onChange={(e) => handleInputChange('lwd', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Current Location:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.currentLocation}
+                            onChange={(e) => handleInputChange('currentLocation', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Preferred Location:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.prefLocation}
+                            onChange={(e) => handleInputChange('prefLocation', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Resignation Served:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.resignationServed}
+                            onChange={(e) => handleInputChange('resignationServed', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Current Organization:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.currentOrg}
+                            onChange={(e) => handleInputChange('currentOrg', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Candidate Skills:</strong></label>
+                        <textarea
+                            className="form-control"
+                            value={updateCandidateDetails.candidateSkills}
+                            onChange={(e) => handleInputChange('candidateSkills', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Role:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.role}
+                            onChange={(e) => handleInputChange('role', e.target.value)}
+                        />
+                    </div>
+                   
+                </div>
+                {/* <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Internal Screening:</strong></label>
+                        <select
+                            className="form-control"
+                            value={updateCandidateDetails.internalScreening}
+                            onChange={(e) => handleInputChange('internalScreening', e.target.value)}
+                        >
+                            <option value="Selected">Selected</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Shared With Client:</strong></label>
+                        <select
+                            className="form-control"
+                            value={updateCandidateDetails.sharedWithClient}
+                            onChange={(e) => handleInputChange('sharedWithClient', e.target.value)}
+                        >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                   
+                </div> */}
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Feedback:</strong></label>
+                        <textarea
+                            className="form-control"
+                            value={updateCandidateDetails.feedback}
+                            onChange={(e) => handleInputChange('feedback', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Details:</strong></label>
+                        <textarea
+                            className="form-control"
+                            value={updateCandidateDetails.details}
+                            onChange={(e) => handleInputChange('details', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Interview Date:</strong></label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={new Date(updateCandidateDetails.interviewDate).toLocaleDateString('en-CA')}
+                            onChange={(e) => handleInputChange('interviewDate', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Educational Qualification:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.educationalQualification}
+                            onChange={(e) => handleInputChange('educationalQualification', e.target.value)}
+                        />
+                    </div>
+                    
+                </div>
+                <div className="row">
+                <div className="col-md-6 form-group">
+                        <label><strong>Offer In Hand:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={updateCandidateDetails.offerInHand}
+                            onChange={(e) => handleInputChange('offerInHand', e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-6 form-group">
+                        <label><strong>Last Interview Date:</strong></label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={new Date(updateCandidateDetails.interviewDate).toLocaleDateString('en-CA')}
+                            onChange={(e) => handleInputChange('lastInterviewDate', e.target.value)}
+                        />
+                    </div>
+                </div> <hr></hr>
+                <div className="row">
+            <div className="col-md-12 form-group">
+                <h3>
+                    <img style={{width: "30px", margin: "10px"}} src='/Images/icon.png' alt="icon" />
+                    <b style={{fontFamily: "monospace"}}>Assessment Details</b>
+                </h3>
+                {updateCandidateDetails.assessments.map((assessment, index) => (
+                    <div key={index} className="form-group">
+                        <label><strong>Assessment {index + 1}:</strong></label>
+                        <input
+                            readOnly
+                            type="text"
+                            className="form-control"
+                            value={assessment.assessment}
+                        />
+                        <label><strong>Years of Experience:</strong></label>
+                        <input
+                            readOnly
+                            type="text"
+                            className="form-control"
+                            value={assessment.yoe}
+                        />
+                        <label><strong>Score:</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={assessment.score}
+                            onChange={(e) => handleAssessmentChange(index, 'score', e.target.value)}
+                        />
+                        <hr />
+                    </div>
+                ))}
+            </div>
+        </div>
+            </div>
+        </form>
+      </Modal.Body>
+      <Modal.Footer>
+      {updateCandidateDetails.savedStatus === "Saved" && (
+                    <Button style={{borderRadius:"20px",backgroundColor:"mediumseagreen",color:"white",border:"1.5px solid black",fontWeight:"bold"}}
+                        type="button"
+                        className="btn btn-secondary ml-2"
+                        onMouseMove={(e)=>{{e.target.style.backgroundColor = "lightgray";e.target.style.color = "black";e.target.style.padding = "10px"}}}
+                        onMouseLeave={(e)=>{{e.target.style.backgroundColor = "mediumseagreen";e.target.style.color = "white";e.target.style.padding = "7px"}}}
+                        onClick={uploadChanges}
+                        // onClick={handleUploadStatus}
+                    >
+                        Upload
+                    </Button>
+                )}
+        <Button                         onMouseMove={(e)=>{{e.target.style.backgroundColor = "green";e.target.style.color = "white";e.target.style.padding = "10px"}}}
+                        onMouseLeave={(e)=>{{e.target.style.backgroundColor = "lightgray";e.target.style.color = "green";e.target.style.padding = "7px"}}}
+ style={{borderRadius:"20px",backgroundColor:"lightgray",color:"green",border:"1.5px solid black",fontWeight:"bold"}} onClick={saveChanges}>
+          Save Changes
+        </Button>
+      </Modal.Footer>
+    </Modal>
         </div>
     );
 }
