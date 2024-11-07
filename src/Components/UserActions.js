@@ -543,9 +543,21 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                                     </td>
                                     <td>{item.uploadedOn ? new Date(item.uploadedOn).toLocaleDateString() : "N/A"}</td>
                                     <td>
-                                    {item.savedStatus === 'Saved' && ( // Only show Upload button if savedStatus is 'Saved'
-                                <Button onClick={()=> updateCandidate(item._id)}  style={{fontWeight:"bold",backgroundColor:"green",border:"0px",padding:"5px",borderRadius:"20px"}} onMouseMove={(e)=>{{e.target.style.backgroundColor = "gray";e.target.style.padding = "7px"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor = "green";e.target.style.padding = "5px"}}}>Upload</Button>
-                            )}
+                                    {item.savedStatus === 'Saved' ? (
+    // Show the "Upload" button if savedStatus is 'Saved'
+    <Button
+        onClick={() => updateCandidate(item._id)}
+        style={{ fontWeight: "bold", backgroundColor: "green", border: "0px", padding: "5px", borderRadius: "20px" }}
+        onMouseMove={(e) => { e.target.style.backgroundColor = "gray"; e.target.style.padding = "7px"; }}
+        onMouseLeave={(e) => { e.target.style.backgroundColor = "green"; e.target.style.padding = "5px"; }}
+    >
+        Upload
+    </Button>
+) : (
+    // Show "--" when savedStatus is not 'Saved'
+    <span>--</span>
+)}
+
                                     </td>
                                 </tr>
                             );
