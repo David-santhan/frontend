@@ -64,6 +64,14 @@ function Requirements() {
     const [selectedCandidateStatus, setSelectedCandidateStatus] = useState('');
     const [candidateName, setCandidateName] = useState('');
     const [expandedId, setExpandedId] = useState(null);
+    const [openItems, setOpenItems] = useState({}); // Track open/close state by item ID
+
+  const toggleFlip = (id) => {
+    setOpenItems((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],  // Toggle the specific item’s state by ID
+    }));
+  };
 
    
 
@@ -254,7 +262,8 @@ const toggleAccordion = async (id) => {
     } else {
       const response = await axios.get(`https://ornnovabackend.onrender.com/api/recruiters/${id}`);
       setRecruitersData(response.data.recruiters);
-        setExpandedId(id); // Set the current ID as expanded
+      toggleFlip(id);
+      setExpandedId(id); // Set the current ID as expanded
     }
 };
     const requirementDetails = async (id) => {
@@ -470,40 +479,47 @@ const fetchRequirementDetails = async (reqId) => {
   try {
       // Send GET request using the Fetch API
       const response = await fetch(`https://ornnovabackend.onrender.com/admingetrequirements/${reqId}`);
+      
       // Check if the response is okay (status 200)
       if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
       }
+      
       // Check if the response is JSON
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
-          console.log(data)
+          console.log(data);
+          
+          // Update the assigned user details in the state
           setAssignedUserDetails(data.userDetails);
+          
+          // Fetch the remaining users
           fetchRemainingUsers(reqId);
+          
+          // Open the modal for assignment
           setShowAssigns(true);
           setSelectedReqId(reqId);
       } else {
           throw new Error("Received non-JSON response from server");
       }
   } catch (err) {
-      // Handle any errors (such as non-JSON responses or network issues)
       console.error('Error fetching requirement details:', err);
   }
 };
 
 const fetchRemainingUsers = async (reqId) => {
   try {
-      // Make a GET request to the /remainingusers/:id API
+      // Make a GET request to the /remainingusers/:id API using Axios
       const response = await axios.get(`https://ornnovabackend.onrender.com/remainingusers/${reqId}`);
       
-      // Set the remaining users in state
+      // Set the remaining users in the state
       setRemainingUsers(response.data);
   } catch (err) {
       console.error('Error fetching remaining users:', err.message);
-      // setError('Failed to load remaining users.');
-  } 
+  }
 };
+
 // Fetch user count from the API
 const fetchUsersCount = async () => {
   try {
@@ -520,10 +536,10 @@ useEffect(() => {
 }, []); // empty dependency array to run it once on mount
   
 const assignReqToUser = async (userId) => {
-  const ReqId = selectedReqId; // Ensure you have a way to store the selected client ID
+  const ReqId = selectedReqId; // Ensure you have a way to store the selected requirement ID
 
   // Show a confirmation dialog to the user
-  const isConfirmed = window.confirm(`Are you sure you want to assign this Requirement ?`);
+  const isConfirmed = window.confirm(`Are you sure you want to assign this Requirement?`);
 
   // If the user confirms, proceed with the assignment
   if (isConfirmed) {
@@ -539,56 +555,58 @@ const assignReqToUser = async (userId) => {
 
           if (result.status === 'success') {
               alert('Requirement assigned successfully ✅');
-              setShowAssigns(false)
-              window.location.reload();
-              // Optionally refresh the user list or perform any other updates
+
+              // Re-fetch the requirement details (assigned users and remaining users)
+              fetchRequirementDetails(ReqId);
           } else {
               alert(result.msg);
           }
       } catch (error) {
-          console.error('Error assigning client:', error.response ? error.response.data : error.message);
-          alert('An error occurred while assigning the client. Please try again later.');
+          console.error('Error assigning requirement:', error.response ? error.response.data : error.message);
+          alert('An error occurred while assigning the requirement. Please try again later.');
       }
   } else {
       // User canceled the assignment, so no action is taken
       alert('Requirement assignment was canceled ❌');
   }
 };
+
+// Function to unassign requirement from a user
 const unassignReqFromUser = async (userId) => {
-  const ReqId = selectedReqId; // Ensure you have a way to store the selected requirement ID
+  const ReqId = selectedReqId; // Ensure you have the selected requirement ID
 
   // Show a confirmation dialog to the user
   const isConfirmed = window.confirm(`Are you sure you want to unassign this Requirement?`);
 
   // If the user confirms, proceed with the unassignment
   if (isConfirmed) {
-      try {
-          const response = await axios.post(`https://ornnovabackend.onrender.com/unassignReq/${userId}/${ReqId}`, 
-          {
-              headers: {
-                  'Content-Type': 'application/json'
-              }
-          });
+    try {
+      const response = await fetch(`https://ornnovabackend.onrender.com/unassignReq/${userId}/${ReqId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-          const result = response.data;
+      const result = await response.json();
 
-          if (result.status === 'success') {
-              alert('Requirement unassigned successfully ✅');
-              setShowAssigns(false);
-              window.location.reload();
-              // Optionally refresh the user list or perform any other updates
-          } else {
-              alert(result.msg);
-          }
-      } catch (error) {
-          console.error('Error unassigning requirement:', error.response ? error.response.data : error.message);
-          alert('An error occurred while unassigning the requirement. Please try again later.');
+      if (response.ok && result.status === 'success') {
+        alert('Requirement unassigned successfully ✅');
+        // Refresh the UI or re-fetch data if necessary
+        fetchRequirementDetails(ReqId); // Re-fetch requirement details to update the user list
+      } else {
+        alert(result.msg || 'An error occurred while unassigning the requirement. Please try again later.');
       }
+    } catch (error) {
+      console.error('Error unassigning requirement:', error);
+      alert('An error occurred while unassigning the requirement. Please try again later.');
+    }
   } else {
-      // User canceled the unassignment, so no action is taken
-      alert('Requirement unassignment was canceled ❌');
+    // User canceled the unassignment, so no action is taken
+    alert('Requirement unassignment was canceled ❌');
   }
 };
+
 
     return (
         <div>
@@ -707,41 +725,50 @@ const unassignReqFromUser = async (userId) => {
               <td>{new Date(item.startDate).toLocaleDateString()}</td>
               <td>{new Date(item.uploadedDate).toLocaleDateString()}</td>
               <td>
-                <Link style={{ textDecoration: "none" }} onClick={() => fetchRequirementDetails(item._id)}>
+                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="lightpink";e.target.style.color="black"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} style={{ textDecoration: "none" }} onClick={() => fetchRequirementDetails(item._id)}>
                   <strong style={{ backgroundColor: "dimgrey", borderRadius: "8px", padding: "9px", color: "white" }}>
                     {item.userCount}/{usersCount}
                   </strong>
                 </Link>
               </td>
               <td>
-                <Link style={{ textDecoration: "none" }} onClick={() => fetchRecruiterDetails(item._id)}>
+                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="bisque";e.target.style.color="black"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightsteelblue";e.target.style.color="black"}}} style={{ textDecoration: "none" }} onClick={() => fetchRecruiterDetails(item._id)}>
                   <b style={{ backgroundColor: "lightsteelblue", borderRadius: "8px", padding: "9px", color: "black" }}>
                     {candidateCounts[item._id] || 0}
                   </b>
                 </Link>
               </td>
               <td>
-                <Link style={{ textDecoration: "none" }} onClick={() => fetchClaimedUsersDetails(item._id)}>
+                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgray";e.target.style.color="black"}}} style={{ textDecoration: "none" }} onClick={() => fetchClaimedUsersDetails(item._id)}>
                   <b style={{ backgroundColor: "lightgray", borderRadius: "8px", padding: "9px", color: "black" }}>
                     {claimedByCounts[item._id]}
                   </b>
                 </Link>
               </td>
               <td>
-                <Link onClick={() => handleDelete(item._id)}>
+                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="grey";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="Indianred";e.target.style.color="black"}}} onClick={() => handleDelete(item._id)}>
                   <Image style={{ backgroundColor: "IndianRed", padding: "10px", borderRadius: "10px" }} src='./Images/trash.svg' />
                 </Link>
               </td>
               <td>
-                <Link onClick={() => fetchRequirement(item._id)}>
+                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgreen";e.target.style.color="black"}}} onClick={() => fetchRequirement(item._id)}>
                   <Image style={{ backgroundColor: "lightgreen", padding: "10px", borderRadius: "10px" }} src='./Images/edit.svg' />
                 </Link>
               </td>
               <td>
-                <Link onClick={() => toggleAccordion(item._id)}>
-                  <Image style={{  padding: "10px", borderRadius: "10px" }} src='./Images/expand.svg' />
-                </Link>
-              </td>
+              <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="";e.target.style.color="black"}}} onClick={() => toggleAccordion(item._id)}>
+                <Image
+                  style={{
+                    padding: "10px",
+                    borderRadius: "10px",
+                    transform: openItems[item._id] ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.3s ease',  // Smooth rotation
+                  }}
+                  src='./Images/expand.svg'
+                  alt="Expand Icon"
+                />
+              </Link>
+            </td>
             </tr>
 
             {/* Conditionally render the accordion row below the main row */}
@@ -901,7 +928,7 @@ const unassignReqFromUser = async (userId) => {
                     style={{ padding:"10px",width:"300px",margin:"10px",border:"2px solid black",borderRadius:"20px" }}
                 /> <br></br>
                 <select style={{padding:"10px",width:"300px",margin:"10px",border:"2px solid black",borderRadius:"20px"}} onChange={(e) => setSelectedCandidateStatus(e.target.value)} value={selectedCandidateStatus}>
-                    <option value="">All</option>
+                    <option value="">All Statuses</option>
                     {statusSearchOptions.map((status, index) => (
                         <option key={index} value={status}>{status}</option>
                     ))}
@@ -1672,7 +1699,7 @@ const unassignReqFromUser = async (userId) => {
 
 
 <Modal size='lg' show={showAssigns} onHide={
-  ()=>{setShowAssigns(false)}}>
+  ()=>{setShowAssigns(false);window.location.reload();}}>
         <Modal.Header closeButton>
           <Modal.Title>
           <h3>
