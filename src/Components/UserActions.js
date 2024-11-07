@@ -509,8 +509,8 @@ const submitAssessment=()=>{
     </div>
                     <Row>
                         <center>
-                        <Button variant="primary" style={{borderRadius:"20px"}} onClick={() => setShow(true)}>
-                       <b>Upload Candidate</b>
+                        <Button onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightsteelblue";e.target.style.color="black"}}} style={{borderRadius:"20px",fontWeight:"bold",border:"0px",backgroundColor:"lightsteelblue",color:"black"}} onClick={() => setShow(true)}>
+                       Upload Candidate
                        </Button>
 
       <Modal
@@ -613,11 +613,11 @@ const submitAssessment=()=>{
               <Form.Control value={role} onChange={(e)=> setRole(e.target.value)} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Role" />
             <hr></hr> </Col>
             <Col md={6} lg={4}>
-              <FormLabel><b>Feedback</b></FormLabel>
+              <FormLabel><b>About Candidate</b></FormLabel>
               <Form.Control value={feedback} onChange={(e)=> setFeedback(e.target.value)} as="textarea" rows={5} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Feedback" />
             <hr></hr> </Col>
             <Col md={6} lg={4}>
-              <FormLabel><b>Details</b></FormLabel>
+              <FormLabel><b>Recruiter Feedback</b></FormLabel>
               <Form.Control value={details} onChange={(e)=> setDetails(e.target.value)} as="textarea" rows={5} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Details" />
             <hr></hr> </Col>
             <Col md={6} lg={4}>
