@@ -220,7 +220,7 @@ let navigate = useNavigate();
 </Col>
 
     </Row>
-      <Table hover bordered style={{border:"1px solid lightgray"}}   responsive="sm">
+      <Table bordered hover style={{border:"1px solid lightgray"}}   responsive="sm">
             <thead style={{textAlign:"center"}} >
               <tr >
                 <th>Employee Code</th>
@@ -229,7 +229,7 @@ let navigate = useNavigate();
                 <th> User Type  </th>
                 <th> Status</th>
                   <th>Initiated By</th>
-      <th colSpan={3}>Actions</th>
+                  <th colSpan={3}>Actions</th>
                 
               </tr>
             </thead>
@@ -246,13 +246,15 @@ let navigate = useNavigate();
                 <td>{item.UserType}</td>
                 <td>{item.Status}</td>
                 <td>{item.CreatedBy}</td>
-                 <td>
-                  <Image onClick={()=>{ readUserDatafun(item._id)}} style={{backgroundColor:"lightblue",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image> 
-                 </td>
-              <td>
-                 <Image onClick={()=>{ deleteUserDetails(item._id)}} style={{backgroundColor:"IndianRed",padding:"10px",borderRadius:"10px"}} src='./Images/trash.svg'></Image> </td>
-                 <td>  
-               <Link to={`/UpdateUser/${item._id}`}><Image  style={{backgroundColor:"lightgreen",padding:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link> </td>
+                <td>
+                <Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue";e.target.style.color="black"}}} onClick={()=>{ readUserDatafun(item._id)}} style={{backgroundColor:"lightblue",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image> 
+                </td>
+                <td>
+                <Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="indianred";e.target.style.color="black"}}} onClick={()=>{ deleteUserDetails(item._id)}} style={{backgroundColor:"IndianRed",padding:"10px",borderRadius:"10px"}} src='./Images/trash.svg'></Image>      
+                </td>
+                <td>
+                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgreen";e.target.style.color="black"}}} to={`/UpdateUser/${item._id}`}><Image  style={{backgroundColor:"lightgreen",padding:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link>
+                </td>
               </tr>
               </tbody>
             )
