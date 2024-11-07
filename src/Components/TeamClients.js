@@ -82,29 +82,40 @@ function TeamClients() {
         </h3>
 
       {/* Displaying Team Information */}
-      {clientData.length > 0 && (
-        <div>
-          <Table style={{textAlign:"center"}} >
-            <thead>
-              <tr>
-              <th>Employee Code</th>
-                <th>Employee Name</th>
-                <th>Services</th>
-                
-              </tr>
-            </thead>
-            <tbody>
-              {clientData.map((team, index) => (
-                <tr key={index}>
-                 <td><Link style={{textDecoration:"none"}} onClick={()=>{ readClientList(team._id)}} ><b>{team.ClientCode}</b></Link></td>
-                  <td>{team.ClientName}</td>
-                  <td>{team.Services}</td> {/* Replace with actual fields */}
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
-      )}
+      {clientData.length > 0 ? (
+  <div>
+    <Table style={{ textAlign: "center" }}>
+      <thead>
+        <tr>
+          <th>Client Code</th>
+          <th>Client Name</th>
+          <th>Services</th>
+        </tr>
+      </thead>
+      <tbody>
+        {clientData.map((team, index) => (
+          <tr key={index}>
+            <td>
+              <Link
+                style={{ textDecoration: "none" }}
+                onClick={() => readClientList(team._id)}
+              >
+                <b>{team.ClientCode}</b>
+              </Link>
+            </td>
+            <td>{team.ClientName}</td>
+            <td>{team.Services}</td> {/* Replace with actual fields */}
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  </div>
+) : (
+  <h5 style={{ textAlign: "center", marginTop: "20px",fontFamily:"serif" }}>
+    No clients are assigned to you , Please request your Administrator to assign clients.
+  </h5>
+)}
+
       </center>
       <center>
     <Row>
