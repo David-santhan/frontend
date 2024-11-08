@@ -8,6 +8,8 @@ import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
 import TeamLeadTopNav from './TeamLeadTopNav';
 import CryptoJS from 'crypto-js';
+import Accordion from 'react-bootstrap/Accordion';
+
 
 
 
@@ -37,6 +39,9 @@ function Home() {
   const [uploadedCounts,setUploadedCount]= useState(0);
   const [candidateType, setCandidateType] = useState(); // Default to 'uploaded'
   const [savedStatusSearchTerm, setSavedStatusSearchTerm] = useState('');
+  const [expandedId, setExpandedId] = useState(null);
+  const [selectedCandidateStatus, setSelectedCandidateStatus] = useState('');
+  const [candidateName, setCandidateName] = useState('');
 
   let JWT_SECRET="ygsiahndCieqtkeresimsrcattoersmaigutiubliyellaueprtnernar"
    // State to hold the search terms
@@ -472,6 +477,19 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
     }
 };
   const requirementTypes = [ 'hot', 'warm', 'cold','hold','closed'];
+
+  const toggleAccordion = async (id) => {
+    if (expandedId === id) {
+        // If the accordion is being closed
+        setExpandedId(null); // Reset expanded ID
+    } else {
+      const response = await axios.get(`https://ornnovabackend.onrender.com/userUploads/${id}`);
+      setCandidateData(response.data.recruiters);
+      // toggleFlip(id);
+      setExpandedId(id); // Set the current ID as expanded
+    }
+};
+   
   return (
     <div>
       <UserTopNav/>
@@ -514,7 +532,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                 <td>{new Date(req.startDate).toLocaleDateString()}</td>
                 <td>{new Date(req.uploadedDate).toLocaleDateString()}</td>
                 <td>
-                  <Button onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgreen";e.target.style.color="black"}}} onClick={() => updateClaim(req._id)} style={{ border: "1px solid gray", backgroundColor: "lightgreen", borderRadius: "20px",fontWeight:"bold" }}>
+                  <Button onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgreen";e.target.style.color="black"}}} onClick={() => updateClaim(req._id)} style={{ border: "1px solid gray", backgroundColor: "lightgreen", borderRadius: "20px",fontWeight:"bold",color:"black" }}>
                     Claim
                   </Button>
                 </td>
@@ -581,7 +599,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                 </DropdownButton>
             </div>
 
-            <Table hover  style={{ textAlign: 'center' }} responsive="sm">
+            <Table bordered hover  style={{ textAlign: 'center' }} responsive="sm">
                 <thead>
                     <tr>
                         <th>Reg Id</th>
@@ -595,65 +613,223 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                             </button>
                         </th>
                         <th>Your Profiles</th>
-                        <th>Action</th>
+                        <th colSpan={2}>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedClaimedDateRequirements
-                        .filter((req) => {
-                            const reqType = req.requirementtype.toLowerCase();
+    {sortedClaimedDateRequirements
+        .filter((req) => {
+            const reqType = req.requirementtype.toLowerCase();
+            return selectedTypes.includes('all') || selectedTypes.includes(reqType);
+        })
+        .map((req, index) => {
+            const userClaim = req.claimedBy.find((claim) => claim.userId === userId);
+            const count = candidateCounts[req._id] || 0;
+            const countColor = count > 5 ? 'MediumSeaGreen' : count >= 3 ? 'rgb(255, 200, 0)' : 'indianred';
+            const buttonColor = count > 5 ? 'MediumSeaGreen' : count >= 3 ? 'rgb(255, 200, 0)' : 'indianred';
+            const textColor = buttonColor === '' ? 'black' : 'white';
 
-                            // If 'All' is selected, show all types
-                            if (selectedTypes.includes('all')) {
-                                return true;
-                            }
+            return (
+                <React.Fragment key={index}>
+                    <tr>
+                        <td><Link style={{ textDecoration: "none" }} onClick={() => requirementDetails(req._id)}><b>{req.regId}</b></Link></td>
+                        <td>{req.client}</td>
+                        <td>{req.requirementtype}</td>
+                        <td>{req.role}</td>
+                        <td>{req.skill}</td>
+                        <td>{userClaim ? new Date(userClaim.claimedDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                            <Link 
+                                onMouseMove={(e) => {
+                                    e.target.style.backgroundColor = "lightgray";
+                                    e.target.style.color = "black";
+                                }} 
+                                onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = countColor;
+                                    e.target.style.color = "white";
+                                }} 
+                                onClick={() => viewCandidates(req._id)} 
+                                style={{ 
+                                    textDecoration: 'none',
+                                    width: '45px',
+                                    height: '45px',
+                                    margin: '10px',
+                                    fontWeight: 'bold',
+                                    backgroundColor: countColor,
+                                    borderRadius: '90px',
+                                    border: '1.5px solid black',
+                                    padding: '8px',
+                                    color: 'white' 
+                                }}
+                            >
+                                {count}
+                            </Link>
+                        </td>
+                        <td>
+    <Link 
+        to={`/UserAction/${req._id}/${userId}`}
+        onClick={(e) => {
+            if (req.requirementtype === 'Closed' || req.requirementtype === 'Hold') {
+                e.preventDefault(); // Prevent navigation if Closed or Hold
+            }
+        }}
+    >
+        <Button 
+            onMouseMove={(e) => { 
+                if (req.requirementtype !== 'Closed' && req.requirementtype !== 'Hold') {
+                    e.target.style.backgroundColor = "gray"; 
+                }
+            }} 
+            onMouseLeave={(e) => { 
+                if (req.requirementtype !== 'Closed' && req.requirementtype !== 'Hold') {
+                    e.target.style.backgroundColor = buttonColor; 
+                }
+            }} 
+            style={{ 
+                border: '1px solid gray',
+                backgroundColor: req.requirementtype === 'Closed' || req.requirementtype === 'Hold' ? 'lightgray' : buttonColor, // Disabled style
+                borderRadius: '20px',
+                color: req.requirementtype === 'Closed' || req.requirementtype === 'Hold' ? 'darkgray' : textColor, // Disabled text color
+                fontWeight: "bold",
+                cursor: req.requirementtype === 'Closed' || req.requirementtype === 'Hold' ? 'not-allowed' : 'pointer' // Disable pointer on hover
+            }}
+            disabled={req.requirementtype === 'Closed' || req.requirementtype === 'Hold'} // Disable button entirely
+        >
+            Take Action
+        </Button>
+    </Link>
+</td>
 
-                            // Otherwise, filter based on selected requirement types
-                            return selectedTypes.includes(reqType);
-                        })
-                        .map((req, index) => {
-                            const userClaim = req.claimedBy.find((claim) => claim.userId === userId);
-                            const count = candidateCounts[req._id] || 0;
-                            const countColor = count > 5 ? 'MediumSeaGreen' : count >= 3 ? 'rgb(255, 200, 0)' : 'indianred';
-                            const buttonColor = count > 5 ? 'MediumSeaGreen' : count >= 3 ? 'rgb(255, 200, 0)' : 'indianred';
-                            const textColor = buttonColor === '' ? 'black' : 'white';
+                        <td>
+                            <Link 
+                                onClick={() => toggleAccordion(req._id)} 
+                                onMouseMove={(e) => {
+                                    e.target.style.backgroundColor = "gray";
+                                    e.target.style.color = "white";
+                                }} 
+                                onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = "";
+                                    e.target.style.color = "black";
+                                }}
+                            >
+                                <Image
+                                    style={{
+                                        padding: "10px",
+                                        borderRadius: "10px",
+                                    }}
+                                    src='./Images/expand.svg'
+                                    alt="Expand Icon"
+                                />
+                            </Link>
+                        </td>
+                    </tr>
 
-                            return (
-                                <tr key={index}>
-                                    <td><Link style={{ textDecoration: "none" }} onClick={() => requirementDetails(req._id)}><b>{req.regId}</b></Link></td>
-                                    <td>{req.client}</td>
-                                    <td>{req.requirementtype}</td>
-                                    <td>{req.role}</td>
-                                    <td>{req.skill}</td>
-                                    <td>{userClaim ? new Date(userClaim.claimedDate).toLocaleDateString() : 'N/A'}</td>
-                                    <td>
-                                        <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="lightgray";e.target.style.color="black"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor=countColor;e.target.style.color="white"}}} onClick={() => viewCandidates(req._id)} style={{ textDecoration: 'none',width: '45px',
-                                                    height: '45px',
-                                                    margin: '10px',
-                                                    fontWeight: 'bold',
-                                                    backgroundColor: countColor,
-                                                    borderRadius: '90px',
-                                                    border: '1.5px solid black',
-                                                    padding: '8px',
-                                                    color: 'white', }}>
-                                            
-                                               
-                                            
-                                                {count}
-                                         
-                                        </Link>
-                                    </td>
-                                    <td>
-                                        <Link to={`/UserAction/${req._id}/${userId}`}>
-                                            <Button onMouseMove={(e)=>{e.target.style.backgroundColor="gray"}} onMouseLeave={(e)=>{e.target.style.backgroundColor=buttonColor}} style={{ border: '1px solid gray',backgroundColor: buttonColor,borderRadius: '20px',color: textColor,fontWeight:"bold"}}>
-                                              Take Action
-                                            </Button>
-                                        </Link>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                </tbody>
+                    {expandedId === req._id && (
+                        <tr>
+                            <td colSpan="12">
+                                <Accordion activeKey="0">
+                                    <Accordion.Item eventKey="0">
+                                        <Accordion.Body>
+                                            <Table bordered hover responsive className="table-sm" style={{ textAlign: "center" }}>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Employee Name</th>
+                                                        <th>Candidate Name</th>
+                                                        <th>Role</th>
+                                                        <th>ECTC</th>
+                                                        <th>LWD</th>
+                                                        <th>Status</th>
+                                                        <th colSpan={2}>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {candidateData.map((item, i) => (
+                                                        <React.Fragment key={i}>
+                                                            {item.candidates.length > 0 ? (
+                                                                item.candidates.filter(candidate => {
+                                                                    const recentStatus = candidate.Status && candidate.Status.length > 0
+                                                                        ? candidate.Status[candidate.Status.length - 1].Status
+                                                                        : "No Action Taken";
+
+                                                                    const matchesStatus = selectedCandidateStatus ? recentStatus === selectedCandidateStatus : true;
+                                                                    const matchesName = candidateName 
+                                                                        ? `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(candidateName.toLowerCase())
+                                                                        : true;
+
+                                                                    return matchesStatus && matchesName;
+                                                                }).map((candidate, index) => {
+                                                                    const recentStatus = candidate.Status && candidate.Status.length > 0
+                                                                        ? candidate.Status[candidate.Status.length - 1].Status
+                                                                        : "No Action Taken";
+
+                                                                    let textColor;
+                                                                    if (recentStatus === "No Action Taken") {
+                                                                        textColor = "blue";
+                                                                    } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+                                                                        textColor = "red";
+                                                                    } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+                                                                        textColor = "orange";
+                                                                    } else {
+                                                                        textColor = "green";
+                                                                    }
+
+                                                                    return (
+                                                                        <tr key={index}>
+                                                                            {index === 0 && (
+                                                                                <td rowSpan={item.candidates.length}>{item.recruiter.EmployeeName}</td>
+                                                                            )}
+                                                                            <td>{candidate.firstName} {candidate.lastName}</td>
+                                                                            <td>{candidate.role}</td>
+                                                                            <td>{candidate.ectc}</td>
+                                                                            <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
+                                                                            <td style={{ color: textColor }}>
+                                                                                <b>{recentStatus}</b>
+                                                                            </td>
+                                                                            <td  onClick={() => ViewCandidateData(candidate._id)}
+                                                                                style={{ cursor: "pointer", color: "blue" }}
+                                                                            >                                                                   
+                                                                                    <img onMouseMove={(e)=>{{e.target.style.backgroundColor = "gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor = "lightblue"}}} 
+                                                                                        style={{
+                                                                                            backgroundColor: "lightblue",
+                                                                                            margin: "5px",
+                                                                                            padding: "10px",
+                                                                                            borderRadius: "10px",
+                                                                                        }}
+                                                                                        src='./Images/view.svg'
+                                                                                        alt="View"
+                                                                                    />
+                                                                                
+                                                                            </td>
+                                                                            <td>
+                        {candidate.savedStatus === 'Saved' && ( // Only show Upload button if savedStatus is 'Saved'
+                                <Button onClick={() => updateCandidate(candidate._id)} style={{fontWeight:"bold",backgroundColor:"green",border:"0px",padding:"5px",borderRadius:"20px"}} onMouseMove={(e)=>{{e.target.style.backgroundColor = "gray";e.target.style.padding = "10px"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor = "green";e.target.style.padding = "5px"}}}>Upload</Button>
+                            )}
+                        </td>
+                                                                        </tr>
+                                                                    );
+                                                                })
+                                                            ) : (
+                                                                <tr key={i}>
+                                                                    <td>{item.recruiter.EmpCode}</td>
+                                                                    <td>{item.recruiter.EmployeeName}</td>
+                                                                    <td colSpan={6}>No Candidates</td>
+                                                                </tr>
+                                                            )}
+                                                        </React.Fragment>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+                                </Accordion>
+                            </td>
+                        </tr>
+                    )}
+                </React.Fragment>
+            );
+        })}
+</tbody>
+
             </Table> 
 
         </center>
