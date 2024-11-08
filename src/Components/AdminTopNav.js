@@ -92,7 +92,7 @@ function AdminTopNav() {
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                   <Nav className="justify-content-center flex-grow-1 pe-3">
-                    <NavDropdown style={{ margin: "30px", border: "2px solid gray", padding: "5px", borderRadius: "20px", fontWeight: "bold", textAlign: "center" }} title="Requirments">
+                    <NavDropdown style={{ margin: "30px", border: "2px solid gray", padding: "5px", borderRadius: "20px", fontWeight: "bold", textAlign: "center" }} title="Requirements">
                       <NavDropdown.Item style={{ border: "1px solid gray", borderRadius: "20px", textAlign: "center" }} href="/Adminaddnewrequirements"><b>Add New Requirement</b></NavDropdown.Item>
                       <NavDropdown.Item style={{ border: "1px solid gray", borderRadius: "20px", marginTop: "10px", textAlign: "center" }} href="/Requirments"><b>Requirements</b></NavDropdown.Item>
                     </NavDropdown>
