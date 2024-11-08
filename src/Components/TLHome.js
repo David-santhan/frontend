@@ -2290,7 +2290,7 @@ style={{backgroundColor:"lightgray"}}
                 <th>ECTC</th>
                 <th>Status</th>
                 <th>Uploaded Date</th>
-                <th>Action</th>
+                <th colSpan={2}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -2320,6 +2320,7 @@ style={{backgroundColor:"lightgray"}}
                     <td style={{ color: textColor }}><b>{recentStatus}</b></td>
                     <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
                     <td> <Link onClick={()=> CandidateData(candidate._id)}><Image  style={{backgroundColor:"lightblue",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image></Link> </td>
+                    <td> <Link onClick={()=> updateCandidate(candidate._id)}><Image  style={{backgroundColor:"lightgreen",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link> </td>
 
                   </tr>
                 );
