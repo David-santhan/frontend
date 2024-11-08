@@ -921,8 +921,9 @@ const unassignReqFromUser = async (userId) => {
                                             <td
                                                 style={{ cursor: "pointer", color: "blue" }}
                                                 onClick={() => CandidateData(candidate._id)}>
-                                                <b>
+                                                
                                                     <img
+                                                    onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue"}}}
                                                         style={{
                                                             backgroundColor: "lightblue",
                                                             margin: "5px",
@@ -932,7 +933,7 @@ const unassignReqFromUser = async (userId) => {
                                                         src='./Images/view.svg'
                                                         alt="View"
                                                     />
-                                                </b>
+                                                
                                             </td>
                                         </tr>
                                     );
@@ -1078,8 +1079,8 @@ const unassignReqFromUser = async (userId) => {
                                     style={{ cursor: "pointer", color: "blue" }}
                                     onClick={() => CandidateData(candidate._id)}
                                 >
-                                    <b>
-                                        <img
+                                  
+                                        <img onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue"}}}
                                             style={{
                                                 backgroundColor: "lightblue",
                                                 margin: "5px",
@@ -1089,7 +1090,7 @@ const unassignReqFromUser = async (userId) => {
                                             src='./Images/view.svg'
                                             alt="View"
                                         />
-                                    </b>
+                                   
                                 </td>
                             </tr>
                         );
@@ -1367,11 +1368,11 @@ const unassignReqFromUser = async (userId) => {
                 <td>{new Date(candidateDetails.interviewDate).toLocaleDateString()}</td>
             </tr>
             <tr>
-                <td><b>Details:</b></td>
+                <td><b>About Candidate:</b></td>
                 <td>{candidateDetails.details}</td>
             </tr>
             <tr>
-                <td><b>Feedback:</b></td>
+                <td><b>Recruiter Feedback:</b></td>
                 <td>{candidateDetails.feedback}</td>
             </tr>
             <tr>
