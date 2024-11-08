@@ -1139,7 +1139,7 @@ const postStatus = async (id) => {
             <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
             <td>
               <Link onClick={() => CandidateData(candidate._id)}>
-                <Image
+                <Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue"}}}
                   style={{
                     backgroundColor: "lightblue",
                     margin: "5px",
@@ -1268,7 +1268,7 @@ const postStatus = async (id) => {
                       <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
                       <td>
                   <Link onClick={() => CandidateData(candidate._id)}>
-                    <Image
+                    <Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue"}}}
                       style={{
                         backgroundColor: "lightblue",
                         margin: "5px",
@@ -2319,8 +2319,8 @@ style={{backgroundColor:"lightgray"}}
                     <td>{candidate.ectc}</td>
                     <td style={{ color: textColor }}><b>{recentStatus}</b></td>
                     <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
-                    <td> <Link onClick={()=> CandidateData(candidate._id)}><Image  style={{backgroundColor:"lightblue",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image></Link> </td>
-                    <td> <Link onClick={()=> updateCandidate(candidate._id)}><Image  style={{backgroundColor:"lightgreen",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link> </td>
+                    <td> <Link onClick={()=> CandidateData(candidate._id)}  ><Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue"}}}  style={{backgroundColor:"lightblue",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/view.svg'></Image></Link> </td>
+                    <td> <Link onClick={()=> updateCandidate(candidate._id)}><Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgreen"}}}  style={{backgroundColor:"lightgreen",margin:"5px",padding:"10px",borderRadius:"10px"}} src='./Images/edit.svg'></Image></Link> </td>
 
                   </tr>
                 );
@@ -2460,7 +2460,7 @@ style={{backgroundColor:"lightgray"}}
               <td>{new Date(candidate.uploadedOn).toLocaleDateString()}</td>
               <td>
                 <Link onClick={() => CandidateData(candidate._id)}>
-                  <Image 
+                  <Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightblue"}}}
                     style={{ backgroundColor: "lightblue", margin: "5px", padding: "10px", borderRadius: "10px" }} 
                     src='./Images/view.svg' 
                   />
@@ -2468,7 +2468,7 @@ style={{backgroundColor:"lightgray"}}
               </td>
               <td>
                 <Link onClick={() => deleteCandidate(candidate._id)} style={{ pointerEvents: recentStatus === "No Action Taken" ? "auto" : "none" }}>
-                  <Image 
+                  <Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor= recentStatus === "No Action Taken" ? "indianred" : ""}}}
                     style={{ backgroundColor: recentStatus === "No Action Taken" ? "indianred" : "lightgray", margin: "5px", padding: "10px", borderRadius: "10px", opacity: recentStatus === "No Action Taken" ? 1 : 0.5 }} 
                     src='./Images/trash.svg' 
                   />
@@ -2476,7 +2476,7 @@ style={{backgroundColor:"lightgray"}}
               </td>
               <td>
                 <Link onClick={() => updateCandidate(candidate._id)} style={{ pointerEvents: recentStatus === "No Action Taken" ? "auto" : "none" }}>
-                  <Image 
+                <Image onMouseMove={(e)=>{{e.target.style.backgroundColor="gray"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor= recentStatus === "No Action Taken" ? "lightgreen" : ""}}}
                     style={{ backgroundColor: recentStatus === "No Action Taken" ? "lightgreen" : "lightgray", margin: "5px", padding: "10px", borderRadius: "10px", opacity: recentStatus === "No Action Taken" ? 1 : 0.5 }} 
                     src='/Images/edit.svg' 
                   />
