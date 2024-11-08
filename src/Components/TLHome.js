@@ -1031,12 +1031,40 @@ const postStatus = async (id) => {
      
 
       <td>
-        <Link to={`/UserAction/${req.requirementDetails?._id}/${userId}`}>
-          <Button style={{ border: '0px ', backgroundColor: "MediumSeaGreen", borderRadius: '20px',fontWeight:"bold",padding:"5px" }} onMouseMove={(e)=>{{e.target.style.backgroundColor = "gray";e.target.style.padding = "7px"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor = "MediumSeaGreen";e.target.style.padding = "5px"}}}>
-            Upload
-          </Button>
-        </Link>
-      </td>
+    <Link style={{ 
+      textDecoration:"none",
+                border: '0px',
+                backgroundColor: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? 'lightgray' : 'MediumSeaGreen', // Disabled color
+                borderRadius: '20px',
+                fontWeight: "bold",
+                padding: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? "5px" : "5px", // Default padding
+                color: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? 'darkgray' : 'white', // Disabled text color
+                cursor: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? 'not-allowed' : 'pointer'
+            }}
+            onMouseMove={(e) => {
+                if (req.requirementDetails.requirementtype !== 'Closed' && req.requirementDetails.requirementtype !== 'Hold') {
+                    e.target.style.backgroundColor = "gray"; 
+                    e.target.style.padding = "7px";
+                }
+            }}
+            onMouseLeave={(e) => {
+                if (req.requirementDetails.requirementtype !== 'Closed' && req.requirementDetails.requirementtype !== 'Hold') {
+                    e.target.style.backgroundColor = "MediumSeaGreen";
+                    e.target.style.padding = "5px";
+                }
+            }}
+            disabled={req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold'}
+        to={`/UserAction/${req.requirementDetails?._id}/${userId}`}
+        onClick={(e) => {
+            if (req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold') {
+                e.preventDefault(); // Prevent navigation if Closed or Hold
+            }
+        }}
+    > Upload
+      
+    </Link>
+</td>
+
     </tr>
   ))}
 </tbody>
