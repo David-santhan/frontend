@@ -195,28 +195,73 @@ const filteredCandidates = filterCandidates();
         fetchRequirements();
     }, []);
 
-    const fetchRequirements = async () => {
-        try {
-            const response = await fetch('https://ornnovabackend.onrender.com/admingetrequirements');
-            const data = await response.json();
-            SetRequirements(data);
-             console.log(data)
-            const counts = {};
-            for (let req of data) {
-                try {
-                    const candidateRes = await axios.get(`https://ornnovabackend.onrender.com/adminviewactions/${req._id}`);
-                    counts[req._id] = candidateRes.data.candidateCount || 0;
+    // const fetchRequirements = async () => {
+    //     try {
+    //         const response = await fetch('https://ornnovabackend.onrender.com/admingetrequirements');
+    //         const data = await response.json();
+    //         SetRequirements(data);
+    //          console.log(data)
+    //         const counts = {};
+    //         for (let req of data) {
+    //             try {
+    //                 const candidateRes = await axios.get(`https://ornnovabackend.onrender.com/adminviewactions/${req._id}`);
+    //                 counts[req._id] = candidateRes.data.candidateCount || 0;
                    
-                } catch (err) {
-                    counts[req._id] = 0;
-                }
-            }
-            setCandidateCounts(counts);
-        } catch (err) {
-            console.error('Error fetching requirements:', err);
-        }
-    };
+    //             } catch (err) {
+    //                 counts[req._id] = 0;
+    //             }
+    //         }
+    //         setCandidateCounts(counts);
+    //     } catch (err) {
+    //         console.error('Error fetching requirements:', err);
+    //     }
+    // };
 
+    const fetchRequirements = async () => {
+      try {
+          // Fetch all requirements data from the API
+          const response = await fetch('https://ornnovabackend.onrender.com/admingetrequirements');
+          const data = await response.json();
+  
+          // Check if the response is an error
+          if (data.status === 'Error') {
+              console.error('Error fetching requirements:', data.msg);
+              return;  // Exit early if there's an error in the response
+          }
+  
+          // Ensure the data is an array before using it
+          if (Array.isArray(data)) {
+              SetRequirements(data);  // Set the requirements data
+              console.log(data);
+          } else {
+              console.error('Fetched data is not an array:', data);
+          }
+  
+          // Initialize an object to store candidate counts by requirement ID
+          const counts = {};
+  
+          // Create an array of promises to fetch candidate counts for each requirement
+          const candidateCountPromises = data.map(async (req) => {
+              try {
+                  const candidateRes = await axios.get(`https://ornnovabackend.onrender.com/adminviewactions/${req._id}`);
+                  counts[req._id] = candidateRes.data.candidateCount || 0;
+              } catch (err) {
+                  console.error(`Error fetching candidate count for reqId ${req._id}:`, err);
+                  counts[req._id] = 0;  // Default to 0 if there’s an error
+              }
+          });
+  
+          // Await all candidate count promises to resolve
+          await Promise.all(candidateCountPromises);
+  
+          // Set the state for candidate counts
+          setCandidateCounts(counts);
+      } catch (err) {
+          console.error('Error fetching requirements:', err);
+      }
+  };
+  
+  
     useEffect(() => {
         const fetchClaimedByCounts = async () => {
             try {
@@ -244,15 +289,30 @@ const filteredCandidates = filterCandidates();
         }
     };
 
-const fetchRecruiterDetails = async (reqId) => {
-    try {
-        const response = await axios.get(`https://ornnovabackend.onrender.com/api/recruiters/${reqId}`);
-        setRecruitersData(response.data.recruiters);
-        console.log(response.data.recruiters);
-        setShowA(true); // Show the recruiter data when fetched
-    } catch (err) {
-        toggleShowB(); // Handle error
-    }
+// const fetchRecruiterDetails = async (reqId) => {
+//     try {
+//         const response = await axios.get(`https://ornnovabackend.onrender.com/api/recruiters/${reqId}`);
+//         setRecruitersData(response.data.recruiters);
+//         console.log(response.data.recruiters);
+//         setShowA(true); // Show the recruiter data when fetched
+//     } catch (err) {
+//         toggleShowB(); // Handle error
+//     }
+// };
+
+const fetchRecruiterDetails = async (reqId, isNoActionTaken = false) => {
+  try {
+      const response = await axios.get(`https://ornnovabackend.onrender.com/api/recruiters/${reqId}`);
+      setRecruitersData(response.data.recruiters);
+      setShowA(true); // Show the recruiter data when fetched
+
+      // If "No Action Taken" cell is clicked, set the default filter
+      if (isNoActionTaken) {
+          setSelectedCandidateStatus("No Action Taken");
+      }
+  } catch (err) {
+      toggleShowB(); // Handle error
+  }
 };
 
 const toggleAccordion = async (id) => {
@@ -270,6 +330,7 @@ const toggleAccordion = async (id) => {
         try {
             const response = await axios.get(`https://ornnovabackend.onrender.com/getrequirements/${id}`);
             SetRequirementData(response.data); // Ensure this returns an object
+            
             setLgShow(true);
         } catch (err) {
             console.log(err);
@@ -525,6 +586,7 @@ const fetchUsersCount = async () => {
   try {
     const response = await axios.get("https://ornnovabackend.onrender.com/allUsersCount"); // API call to get count
     setUsersCount(response.data); // update state with the count
+
   } catch (error) {
     console.error("Error fetching user count:", error);
   }
@@ -697,6 +759,7 @@ const unassignReqFromUser = async (userId) => {
                         <th>Uploaded On</th>
                         <th>Assigns</th>
                         <th>No of Profiles</th>
+                        <th>No Action Taken</th>
                         <th>No of Claims</th>
                         <th colSpan={3}>Actions</th>
                     </tr>
@@ -725,25 +788,46 @@ const unassignReqFromUser = async (userId) => {
               <td>{new Date(item.startDate).toLocaleDateString()}</td>
               <td>{new Date(item.uploadedDate).toLocaleDateString()}</td>
               <td>
-                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="lightpink";e.target.style.color="black"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} style={{ textDecoration: "none" }} onClick={() => fetchRequirementDetails(item._id)}>
-                  <strong style={{ backgroundColor: "dimgrey", borderRadius: "8px", padding: "9px", color: "white" }}>
-                    {item.userCount}/{usersCount}
-                  </strong>
-                </Link>
-              </td>
-              <td>
-                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="bisque";e.target.style.color="black"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightsteelblue";e.target.style.color="black"}}} style={{ textDecoration: "none" }} onClick={() => fetchRecruiterDetails(item._id)}>
-                  <b style={{ backgroundColor: "lightsteelblue", borderRadius: "8px", padding: "9px", color: "black" }}>
+  <Link
+    onMouseMove={(e) => {
+      e.target.style.backgroundColor = item.requirementtype === "Closed" || item.requirementtype === "Hold" ? "" : "lightpink";
+      e.target.style.color = item.requirementtype === "Closed" || item.requirementtype === "Hold" ? "" : "black";
+    }}
+    onMouseLeave={(e) => {
+      e.target.style.backgroundColor = item.requirementtype === "Closed" || item.requirementtype === "Hold" ? "" : "gray";
+      e.target.style.color = item.requirementtype === "Closed" || item.requirementtype === "Hold" ? "" : "white";
+    }}
+    style={{ textDecoration: "none", pointerEvents: item.requirementtype === "Closed" || item.requirementtype === "Hold" ? "none" : "auto" }}
+    onClick={() => item.requirementtype !== "Closed" && item.requirementtype !== "Hold" && fetchRequirementDetails(item._id)}
+  >
+    <strong style={{ backgroundColor: "dimgrey", borderRadius: "8px", padding: "9px", color: "white" }}>
+      {item.userCount}/{usersCount}
+    </strong>
+  </Link>
+</td>
+              <td onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="";e.target.style.color="black"}}}  style={{fontWeight:"bold"}} onClick={() => fetchRecruiterDetails(item._id)}>
+                
                     {candidateCounts[item._id] || 0}
-                  </b>
-                </Link>
+                  
+                
               </td>
-              <td>
-                <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="gray";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="lightgray";e.target.style.color="black"}}} style={{ textDecoration: "none" }} onClick={() => fetchClaimedUsersDetails(item._id)}>
-                  <b style={{ backgroundColor: "lightgray", borderRadius: "8px", padding: "9px", color: "black" }}>
+              <td 
+    onClick={() => fetchRecruiterDetails(item._id, true)} 
+    onMouseMove={(e) => { e.target.style.backgroundColor = "gray"; e.target.style.color = "white"; }} 
+    onMouseLeave={(e) => { e.target.style.backgroundColor = ""; e.target.style.color = item.noactionCandidatesCount === 0 ? "green" : "red"; }}  
+    style={{ fontWeight: "bold", color: item.noactionCandidatesCount === 0 ? "green" : "red", fontSize: "18px" }}
+>
+    {item.noactionCandidatesCount}
+</td>
+
+              <td onClick={(e)=>{fetchClaimedUsersDetails(item._id)}}     onMouseMove={(e) => { e.target.style.backgroundColor = "gray"; e.target.style.color = "white"; }} 
+    onMouseLeave={(e) => { e.target.style.backgroundColor = ""; e.target.style.color = "black"; }}  
+    style={{ fontWeight: "bold", color:"black", fontSize: "18px" }}
+>
+              
                     {claimedByCounts[item._id]}
-                  </b>
-                </Link>
+                 
+              
               </td>
               <td>
                 <Link onMouseMove={(e)=>{{e.target.style.backgroundColor="grey";e.target.style.color="white"}}} onMouseLeave={(e)=>{{e.target.style.backgroundColor="Indianred";e.target.style.color="black"}}} onClick={() => handleDelete(item._id)}>
@@ -908,7 +992,7 @@ const unassignReqFromUser = async (userId) => {
                     </Modal.Body>
                 </Modal>
 
-                <Modal show={showA} size="fullscreen"onHide={() => setShowA(false)}dialogClassName="modal-90w"aria-labelledby="example-custom-modal-styling-title" >
+                <Modal show={showA} size="fullscreen"onHide={() => {setShowA(false);window.location.reload()}}dialogClassName="modal-90w"aria-labelledby="example-custom-modal-styling-title" >
             <Modal.Header closeButton>
                 <Modal.Title id="example-custom-modal-styling-title">
                 <h5> <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png' alt="icon"></img><b style={{fontFamily:"monospace"}} >Recruiters Actions</b></h5> {/* Displaying single requirement detail */}
@@ -948,77 +1032,79 @@ const unassignReqFromUser = async (userId) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredRecruitersData.map((item, i) => (
-                        <React.Fragment key={i}>
-                            {item.candidates.length > 0 ? (
-                                item.candidates.filter(candidate => {
-                                    const recentStatus = candidate.Status && candidate.Status.length > 0
-                                        ? candidate.Status[candidate.Status.length - 1].Status
-                                        : "No Action Taken";
+    {filteredRecruitersData.map((item, i) => (
+        <React.Fragment key={i}>
+            {item.candidates.length > 0 ? (
+                item.candidates
+                    .filter(candidate => {
+                        const recentStatus = candidate.Status && candidate.Status.length > 0
+                            ? candidate.Status[candidate.Status.length - 1].Status
+                            : "No Action Taken";
 
-                                    const matchesStatus = selectedCandidateStatus ? recentStatus === selectedCandidateStatus : true;
-                                    const matchesName = candidateName 
-                                        ? `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(candidateName.toLowerCase())
-                                        : true;
+                        const matchesStatus = selectedCandidateStatus ? recentStatus === selectedCandidateStatus : true;
+                        const matchesName = candidateName 
+                            ? `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(candidateName.toLowerCase())
+                            : true;
 
-                                    return matchesStatus && matchesName;
-                                }).map((candidate, index) => {
-                                    const recentStatus = candidate.Status && candidate.Status.length > 0
-                                        ? candidate.Status[candidate.Status.length - 1].Status
-                                        : "No Action Taken";
+                        return matchesStatus && matchesName;
+                    })
+                    .map((candidate, index) => {
+                        const recentStatus = candidate.Status && candidate.Status.length > 0
+                            ? candidate.Status[candidate.Status.length - 1].Status
+                            : "No Action Taken";
 
-                                    let textColor;
-                                    if (recentStatus === "No Action Taken") {
-                                        textColor = "blue";
-                                    } else if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
-                                        textColor = "red";
-                                    } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
-                                        textColor = "orange";
-                                    } else {
-                                        textColor = "green";
-                                    }
+                        let textColor = "blue";
+                        if (["Client Rejected", "L1 Rejected", "L2 Rejected", "Rejected", "Declined"].includes(recentStatus)) {
+                            textColor = "red";
+                        } else if (["Shared with Client", "L1 Pending", "L2 Pending"].includes(recentStatus)) {
+                            textColor = "orange";
+                        } else if (recentStatus !== "No Action Taken") {
+                            textColor = "green";
+                        }
 
-                                    return (
-                                        <tr key={index}>
-                                            {index === 0 && (
-                                                <td rowSpan={item.candidates.length}>{item.recruiter.EmployeeName}</td>
-                                            )}
-                                            <td>{candidate.firstName} {candidate.lastName}</td>
-                                            <td>{candidate.role}</td>
-                                            <td>{candidate.ectc}</td>
-                                            <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
-                                            <td style={{ color: textColor }}>
-                                                <b>{recentStatus}</b>
-                                            </td>
-                                            <td
-                                                style={{ cursor: "pointer", color: "blue" }}
-                                                onClick={() => CandidateData(candidate._id)}>
-                                                <b>
-                                                    <img
-                                                        style={{
-                                                            backgroundColor: "lightblue",
-                                                            margin: "5px",
-                                                            padding: "10px",
-                                                            borderRadius: "10px",
-                                                        }}
-                                                        src='./Images/view.svg'
-                                                        alt="View"
-                                                    />
-                                                </b>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            ) : (
-                                <tr key={i}>
-                                    <td>{item.recruiter.EmpCode}</td>
-                                    <td>{item.recruiter.EmployeeName}</td>
-                                    <td colSpan={6}>No Candidates</td>
-                                </tr>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </tbody>
+                        return (
+                            <tr key={index}>
+                                {index === 0 && (
+                                    <td rowSpan={item.candidates.length}>{item.recruiter.EmployeeName}</td>
+                                )}
+                                <td>{candidate.firstName} {candidate.lastName}</td>
+                                <td>{candidate.role}</td>
+                                <td>{candidate.ectc}</td>
+                                <td>{new Date(candidate.lwd).toLocaleDateString()}</td>
+                                <td style={{ color: textColor }}>
+                                    <b>{recentStatus}</b>
+                                </td>
+                                <td
+                                    style={{ cursor: "pointer", color: "blue" }}
+                                    onClick={() => CandidateData(candidate._id)}
+                                >
+                                    <b>
+                                        <img
+                                            style={{
+                                                backgroundColor: "lightblue",
+                                                margin: "5px",
+                                                padding: "10px",
+                                                borderRadius: "10px",
+                                            }}
+                                            src='./Images/view.svg'
+                                            alt="View"
+                                        />
+                                    </b>
+                                </td>
+                            </tr>
+                        );
+                    })
+            ) : (
+                <tr key={i}>
+                    <td>{item.recruiter.EmpCode}</td>
+                    <td>{item.recruiter.EmployeeName}</td>
+                    <td colSpan={6}>No Candidates</td>
+                </tr>
+            )}
+        </React.Fragment>
+    ))}
+</tbody>
+
             </Table>
             </Modal.Body>
             </Modal>
