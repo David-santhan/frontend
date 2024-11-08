@@ -1199,7 +1199,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                 </div> */}
                 <div className="row">
                 <div className="col-md-6 form-group">
-                        <label><strong>Feedback:</strong></label>
+                        <label><strong>Recruiter Feedback:</strong></label>
                         <textarea
                             className="form-control"
                             value={updateCandidateDetails.feedback}
@@ -1207,7 +1207,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                         />
                     </div>
                     <div className="col-md-6 form-group">
-                        <label><strong>Details:</strong></label>
+                        <label><strong>About Candidate:</strong></label>
                         <textarea
                             className="form-control"
                             value={updateCandidateDetails.details}
@@ -1546,11 +1546,11 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
     <td>{new Date(selectedCandidate.interviewDate).toLocaleDateString()}</td>
 </tr>
 <tr>
-    <td><b>Details:</b></td>
+    <td><b>About Candidate:</b></td>
     <td>{selectedCandidate.details}</td>
 </tr>
 <tr>
-    <td><b>Feedback:</b></td>
+    <td><b>Recruiter Feedback:</b></td>
     <td>{selectedCandidate.feedback}</td>
 </tr>
 <tr>
