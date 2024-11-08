@@ -675,12 +675,12 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
               <Form.Control value={role} onChange={(e)=> setRole(e.target.value)} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Role" />
             <hr></hr> </Col>
             <Col md={6} lg={4}>
-              <FormLabel><b>About Candidate</b></FormLabel>
-              <Form.Control value={feedback} onChange={(e)=> setFeedback(e.target.value)} as="textarea" rows={5} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="About Candidate" />
+              <FormLabel><b>Recruiter Feedback</b></FormLabel>
+              <Form.Control value={feedback} onChange={(e)=> setFeedback(e.target.value)} as="textarea" rows={5} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Recruiter Feedback" />
             <hr></hr> </Col>
             <Col md={6} lg={4}>
-              <FormLabel><b>Recruiter Feedback</b></FormLabel>
-              <Form.Control value={details} onChange={(e)=> setDetails(e.target.value)} as="textarea" rows={5} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Recruiter Feedback" />
+              <FormLabel><b>About Candidate</b></FormLabel>
+              <Form.Control value={details} onChange={(e)=> setDetails(e.target.value)} as="textarea" rows={5} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="About Candidate" />
             <hr></hr> </Col>
             <Col md={6} lg={4}>
               <FormLabel><b>Interview Date</b></FormLabel>
