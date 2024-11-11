@@ -403,7 +403,6 @@ const handleShowUserCandidates = (userCandidates)=>{
   try {
     let JSONData = await fetch(`https://ornnovabackend.onrender.com/getTeamrequirements/${userId}`, reqOption);
     let JSOData = await JSONData.json();
-  
     setRequirements(JSOData);  // Set the fetched requirements
     setFilteredRequirements(JSOData);  // Initially, all requirements are shown
     setShowfl(true);  // Show the table or section
@@ -424,6 +423,7 @@ const handleSearchChange = (e) => {
   );
 
   setFilteredRequirements(filteredData);  // Update filtered requirements
+  
 };
 
 const filteredRecruiters = Array.isArray(recruiterStats) 
@@ -664,7 +664,6 @@ const requirementDetailsWithAssignedUsers = async () => {
   const response = await fetch(`https://ornnovabackend.onrender.com/requirementDetailsWithAssignedUsers/${userId}`, reqOption);
   let data = await response.json();
   setShowCandidateDetailsHome(data);
-  // console.log(data)    
 };
 
 useEffect(()=>{
@@ -765,50 +764,31 @@ const postStatus = async (id) => {
   }
 };
 
-// const fetchRequirements = async () => {
-//   try {
-//     const response = await axios.get(`https://ornnovabackend.onrender.com/getHomeReqData/${userId}`);
-//     // const data = await response.json();
-//     const data = response.data;
-//     const newData = data.filter(req => req.update === 'New' && !req.claimedBy.some(claim => claim.userId === userId));
-//     const claimedData = data.filter(req => req.update === 'Old' || req.claimedBy.some(claim => claim.userId === userId));
-//     setNewRequirements(newData);
-//     setShowCandidateDetailsHome(claimedData);
-  
-//   } catch (err) {
-//     console.error('Error fetching requirements:', err);
-//   }
-// }; 
-// useEffect=()=>{
-//   fetchRequirements();
-// }
+const updateClaim = async (id) => {
+  const user = {
+    userId:userId,
+    claimedDate: new Date(),
+  };
 
-// const updateClaim = async (id) => {
-//   const user = {
-//     userId,
-//     claimedDate: new Date(),
-//   };
+  try {
+    const response = await fetch(`https://ornnovabackend.onrender.com/claim/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(user),
+    });
 
-//   try {
-//     const response = await fetch(`https://ornnovabackend.onrender.com/claim/${id}`, {
-//       method: 'PUT',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify(user),
-//     });
-
-//     const result = await response.json();
-//     if (result.status === "Success") {
-//       alert(result.msg);
-//       fetchRequirements(); // Refresh the requirements list
-//       window.location.reload();
-//     } else {
-//       alert(result.msg);
-//     }
-//   } catch (error) {
-//     console.error('Error updating claim:', error);
-//     alert('Error updating claim. Please try again later.');
-//   }
-// };
+    const result = await response.json();
+    if (result.status === "Success") {
+      alert(result.msg);
+      window.location.reload();
+    } else {
+      alert(result.msg);
+    }
+  } catch (error) {
+    console.error('Error updating claim:', error);
+    alert('Error updating claim. Please try again later.');
+  }
+};
 
   return (
  <div>
@@ -862,48 +842,6 @@ const postStatus = async (id) => {
 </CardGroup>
 </div> <hr></hr>
 
-{/* <Table style={{ textAlign: "center" }} responsive="sm">
-          <thead>
-            <tr>
-              <th>Reg Id</th>
-              <th>Client</th>
-              
-              <th>Requirement Type</th>
-              <th>Role</th>
-              <th>Skills</th>
-              <th>
-                <button style={{ borderRadius: "20px" }} >
-                  <b>Start Date</b> 
-                </button>
-              </th>
-              <th>
-                <button style={{ borderRadius: "20px" }} >
-                  <b>Uploaded On</b> 
-                </button>
-              </th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {newRequirements.map((req, index) => (
-              <tr key={index}>
-                <td>{req.regId}</td>
-                <td>{req.client}</td>
-                <td>{req.requirementtype}</td>
-                <td>{req.role}</td>
-                <td>{req.skill}</td>
-                <td>{new Date(req.startDate).toLocaleDateString()}</td>
-                <td>{new Date(req.uploadedDate).toLocaleDateString()}</td>
-                <td>
-                  <Button onClick={()=>{updateClaim(req._id)}}  style={{ border: "1px solid gray", backgroundColor: "lightgreen", borderRadius: "20px" }}>
-                    <b>Claim</b>
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table> <hr></hr> */}
-
 <h3 style={{textAlign:"center"}}>
           <img style={{ width: "30px", margin: "10px" }} src='/Images/icon.png'alt="icon"/>
           <b style={{ fontFamily: "monospace" }}>Requirements</b>    
@@ -931,6 +869,7 @@ const postStatus = async (id) => {
                 </thead>
                 <tbody>
   {(filteredData || []).map((req, index) => (
+    
     <tr key={index}>
       <td>
         <Link
@@ -1027,43 +966,50 @@ const postStatus = async (id) => {
           <strong>0</strong>
         )}
       </td>
-
-     
-
       <td>
-    <Link style={{ 
-      textDecoration:"none",
-                border: '0px',
-                backgroundColor: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? 'lightgray' : 'MediumSeaGreen', // Disabled color
-                borderRadius: '20px',
-                fontWeight: "bold",
-                padding: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? "5px" : "5px", // Default padding
-                color: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? 'darkgray' : 'white', // Disabled text color
-                cursor: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? 'not-allowed' : 'pointer'
-            }}
-            onMouseMove={(e) => {
-                if (req.requirementDetails.requirementtype !== 'Closed' && req.requirementDetails.requirementtype !== 'Hold') {
-                    e.target.style.backgroundColor = "gray"; 
-                    e.target.style.padding = "7px";
-                }
-            }}
-            onMouseLeave={(e) => {
-                if (req.requirementDetails.requirementtype !== 'Closed' && req.requirementDetails.requirementtype !== 'Hold') {
-                    e.target.style.backgroundColor = "MediumSeaGreen";
-                    e.target.style.padding = "5px";
-                }
-            }}
-            disabled={req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold'}
-        to={`/UserAction/${req.requirementDetails?._id}/${userId}`}
-        onClick={(e) => {
-            if (req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold') {
-                e.preventDefault(); // Prevent navigation if Closed or Hold
-            }
-        }}
-    > Upload
-      
-    </Link>
+  <Link
+    style={{
+      textDecoration: "none",
+      border: '0px',
+      borderRadius: '20px',
+      fontWeight: "bold",
+      padding: "5px 10px",
+      color: 'white',
+      cursor: req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold' ? 'not-allowed' : 'pointer',
+      backgroundColor: req.requirementDetails.claimedBy.some(claim => claim.userId === userId) ? 'MediumSeaGreen'  : 'indianred'
+    }}
+    to={
+      !req.requirementDetails.claimedBy.some(claim => claim.userId === userId) 
+        ? '#' 
+        : `/UserAction/${req.requirementDetails._id}/${userId}`
+    }
+    onClick={(e) => {
+      if (req.requirementDetails.requirementtype === 'Closed' || req.requirementDetails.requirementtype === 'Hold') {
+        e.preventDefault();
+      } else if (!req.requirementDetails.claimedBy.some(claim => claim.userId === userId)) {
+        e.preventDefault();
+        updateClaim(req.requirementDetails._id);
+      }
+    }}
+    onMouseMove={(e) => {
+      if (req.requirementDetails.requirementtype !== 'Closed' && req.requirementDetails.requirementtype !== 'Hold') {
+        e.target.style.backgroundColor = req.requirementDetails.claimedBy.some(claim => claim.userId === userId) ?  'darkgreen' :'blue' ;
+        e.target.style.padding = "7px 12px";
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (req.requirementDetails.requirementtype !== 'Closed' && req.requirementDetails.requirementtype !== 'Hold') {
+        e.target.style.backgroundColor = req.requirementDetails.claimedBy.some(claim => claim.userId === userId) ? 'MediumSeaGreen'  : 'indianred';
+        e.target.style.padding = "5px 10px";
+      }
+    }}
+  >
+    {!req.requirementDetails.claimedBy.some(claim => claim.userId === userId) ? 'Claim' : 'Upload'}
+  </Link>
 </td>
+
+
+
 
     </tr>
   ))}
@@ -1423,45 +1369,7 @@ style={{backgroundColor:"lightgray"}}
           {showUserData.userDetails.Status || "N/A"}
         </p>
         <hr />
-        {/* <center>
-          <h5>
-            <img
-              style={{ width: "30px", margin: "10px" }}
-              src="/Images/icon.png"
-              alt="icon"
-            ></img>
-            <b style={{ fontFamily: "monospace" }}>Team Details</b>
-          </h5>
-        </center> */}
-        {/* <Table
-          disabled={showUserData.userDetails.UserType !== "TeamLead"}
-          responsive
-        >
-          <thead>
-            <tr>
-              <th>Emp Code</th>
-              <th>Employee Name</th>
-              <th>Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            {showUserData.teamDetails && showUserData.teamDetails.length > 0 ? (
-              showUserData.teamDetails.map((teamMember) => (
-                <tr key={teamMember._id}>
-                  <td>{teamMember.EmpCode || "N/A"}</td>
-                  <td>{teamMember.EmployeeName || "N/A"}</td>
-                  <td>{teamMember.Email || "N/A"}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" style={{ textAlign: "center",color:"indianRed" }}>
-                  No Team Member...!
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table> */}
+       
       </Modal.Body>
     </Modal>
   )}
@@ -2725,11 +2633,11 @@ style={{backgroundColor:"lightgray"}}
                 <td>{new Date(candidateDetails.interviewDate).toLocaleDateString()}</td>
             </tr>
             <tr>
-                <td><b>Details:</b></td>
+                <td><b>About Candidate:</b></td>
                 <td>{candidateDetails.details}</td>
             </tr>
             <tr>
-                <td><b>Feedback:</b></td>
+                <td><b>Recruiter Feedback:</b></td>
                 <td>{candidateDetails.feedback}</td>
             </tr>
             <tr>
@@ -3030,7 +2938,7 @@ style={{backgroundColor:"lightgray"}}
                 </div> */}
                 <div className="row">
                 <div className="col-md-6 form-group">
-                        <label><strong>Feedback:</strong></label>
+                        <label><strong>Recruiter Feedback:</strong></label>
                         <textarea
                             className="form-control"
                             value={updateCandidateDetails.feedback}
@@ -3038,7 +2946,7 @@ style={{backgroundColor:"lightgray"}}
                         />
                     </div>
                     <div className="col-md-6 form-group">
-                        <label><strong>Details:</strong></label>
+                        <label><strong>About Candidate:</strong></label>
                         <textarea
                             className="form-control"
                             value={updateCandidateDetails.details}
