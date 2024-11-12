@@ -55,6 +55,7 @@ function UserActions() {
     const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false); // Tracks submission status
     const [updateshow, setUpdateshow] = useState(false);
     const [candidateData,setCandidateData]= useState([]);
+    const [EmployeeName,setEmployeeName]=useState("")
     const [updateCandidateDetails, setUpdateCandidateDetails] = useState({
       candidateImage: '',
       firstName: '',
@@ -162,6 +163,7 @@ if (!isNaN(date)) {
 
     useEffect(()=>{
       viewCandidates();
+      
     })
 
     useEffect(() => {
@@ -227,72 +229,6 @@ useEffect(() => {
       yoe: assessment.yoe,
       score: scores[index] // Ensure scores[index] exists
   }));
-// const sendCandidateDataToDatabase = async () => {
-//   // Create a FormData object
-//   const formData = new FormData();
-
-//   // Append basic fields
-//   formData.append('reqId', id);
-//   formData.append('recruiterId', userId);
-
-//   // Create and append candidate data as a single JSON string
-//   const candidateData = {
-//       date: todayDate,
-//       firstName,
-//       lastName,
-//       dob: new Date(dob).toISOString(),
-//       mobileNumber,
-//       email,
-//       ctc,
-//       ectc,
-//       totalYoe,
-//       relevantYoe,
-//       lwd: new Date(lwd).toISOString(),
-//       currentLocation,
-//       prefLocation,
-//       resignationServed,
-//       currentOrg,
-//       candidateSkills,
-//       role,
-//       savedStatus,
-//       feedback,
-//       details,
-//       interviewDate: new Date(interviewDate).toISOString(),
-//       educationalQualification,
-//       offerInHand,
-//       remark,
-//       assessments: assessmentsWithScores,
-//       recruiterId:userId
-//   };
-
-//   formData.append('candidate', JSON.stringify(candidateData));
-
-//   // Append files if they exist
-//   if (updatedResumeRef.current?.files[0]) formData.append('updatedResume', updatedResumeRef.current.files[0]);
-//   if (ornnovaProfileRef.current?.files[0]) formData.append('ornnovaProfile', ornnovaProfileRef.current.files[0]);
-//   if (candidateimageRef.current?.files[0]) formData.append('candidateImage', candidateimageRef.current.files[0]);
-
-//   try {
-//       const response = await fetch('https://ornnovabackend.onrender.com/Candidates', {
-//           method: 'POST',
-//           body: formData // Send FormData object
-//       });
-
-//       if (!response.ok) {
-//           const errorData = await response.json();
-//           throw new Error(`HTTP error! status: ${response.status}, details: ${errorData.message}`);
-//       }
-
-//       const result = await response.json();
-//       console.log(result);
-//       window.location.reload();
-//       alert("Data saved successfully ✅");
-
-//   } catch (error) {
-//       console.error('Error:', error);
-//       alert("Failed to save data ❌");
-//   }
-// };
 
 const sendCandidateDataToDatabase = async (status) => {
   // Create a FormData object
@@ -314,7 +250,7 @@ const sendCandidateDataToDatabase = async (status) => {
       ectc,
       totalYoe,
       relevantYoe,
-      lwd: new Date(lwd).toISOString(),
+      lwd: lwd ? new Date(lwd).toISOString() : '0000-00-00T00:00:00.000Z',
       currentLocation,
       prefLocation,
       resignationServed,
@@ -324,14 +260,17 @@ const sendCandidateDataToDatabase = async (status) => {
       savedStatus: status, // Use the status passed as a parameter
       feedback,
       details,
-      interviewDate: new Date(interviewDate).toISOString(),
+      interviewDate: interviewDate ? new Date(interviewDate).toISOString() : '0000-00-00T00:00:00.000Z',
       educationalQualification,
       offerInHand,
       remark,
       assessments: assessmentsWithScores,
-      recruiterId: userId
+      recruiterId: userId,
+      recruiterName:EmployeeName
   };
-
+ 
+ 
+  
   formData.append('candidate', JSON.stringify(candidateData));
 
   // Append files if they exist
@@ -360,6 +299,13 @@ const sendCandidateDataToDatabase = async (status) => {
       alert("Failed to save data ❌");
   }
 };
+
+useEffect(() => {
+  if (loginUserData.length > 0) {
+    setEmployeeName(loginUserData[0]?.EmployeeName); // assuming the first user's name
+
+  }
+}, [loginUserData]);
 
 const submitAssessment=()=>{
   if (allFieldsFilled) {
@@ -642,9 +588,16 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
               <Form.Control value={relevantYoe} onChange={(e)=> setRelevantYoe(e.target.value)} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Relevant Years of Experience" />
             <hr></hr> </Col>
             <Col md={6} lg={4}>
-              <FormLabel><b>LWD</b></FormLabel>
-              <Form.Control value={lwd} onChange={(e)=> setLwd(e.target.value)} type='date' style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Last Working Day" />
-            <hr></hr> </Col>
+  <FormLabel><b>LWD</b></FormLabel>
+  <Form.Control 
+    value={lwd || '00-00-0000'} 
+    onChange={(e) => setLwd(e.target.value || '00-00-0000')} 
+    type='date' 
+    style={{ borderRadius: "15px", border: "1px solid black" }} 
+    placeholder="Last Working Day" 
+  />
+  <hr />
+</Col>
             <Col md={6} lg={4}>
               <FormLabel><b>Current Location</b></FormLabel>
               <Form.Control value={currentLocation} onChange={(e)=> setCurrentLocation(e.target.value)} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Current Location" />
@@ -683,9 +636,16 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
               <Form.Control value={details} onChange={(e)=> setDetails(e.target.value)} as="textarea" rows={5} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="About Candidate" />
             <hr></hr> </Col>
             <Col md={6} lg={4}>
-              <FormLabel><b>Interview Date</b></FormLabel>
-              <Form.Control value={interviewDate} onChange={(e)=> setInterviewDate(e.target.value)} type='date' style={{ borderRadius: "15px", border: "1px solid black" }}  />
-            <hr></hr> </Col>
+  <FormLabel><b>Interview Date</b></FormLabel>
+  <Form.Control 
+    value={interviewDate || '00-00-0000'} 
+    onChange={(e) => setInterviewDate(e.target.value || '00-00-0000')} 
+    type='date' 
+    style={{ borderRadius: "15px", border: "1px solid black" }}  
+  />
+  <hr />
+</Col>
+
             <Col md={6} lg={4}>
               <FormLabel><b>Educational Qualification</b></FormLabel>
               <Form.Control value={educationalQualification} onChange={(e)=> setEducationalQualification(e.target.value)} style={{ borderRadius: "15px", border: "1px solid black" }} placeholder="Educational Qualification" />
@@ -1064,7 +1024,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                 </div> */}
                 <div className="row">
                 <div className="col-md-6 form-group">
-                        <label><strong>Feedback:</strong></label>
+                        <label><strong>Recruiter Feedback:</strong></label>
                         <textarea
                             className="form-control"
                             value={updateCandidateDetails.feedback}
@@ -1072,7 +1032,7 @@ const uploadChanges = () => handleSaveChanges("Uploaded");
                         />
                     </div>
                     <div className="col-md-6 form-group">
-                        <label><strong>Details:</strong></label>
+                        <label><strong>About Candidate:</strong></label>
                         <textarea
                             className="form-control"
                             value={updateCandidateDetails.details}
