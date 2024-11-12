@@ -321,6 +321,7 @@ const handleTotalSearch = () => {
   };
   const handleShowTeamCandidates = (teamCandidatesDetails) => {
     setSelectedCandidates(teamCandidatesDetails);
+    console.log(teamCandidatesDetails)
     setShowTeamModal(true);
   };
   // Show all user candidates initially
@@ -406,7 +407,6 @@ const handleShowUserCandidates = (userCandidates)=>{
     setRequirements(JSOData);  // Set the fetched requirements
     setFilteredRequirements(JSOData);  // Initially, all requirements are shown
     setShowfl(true);  // Show the table or section
-
   } catch (error) {
     console.log(error);
   }
@@ -590,7 +590,7 @@ const RequirmentCandidates = async (id) => {
 
     // Fetching the data from the backend
     const response = await fetch(`https://ornnovabackend.onrender.com/getRequirementsCandidatesCount/${id}/${userId}`, reqOption);
-
+     
     // Check if the response is not ok
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
@@ -623,8 +623,7 @@ const fetchCandidates = async (id) => {
   try {
     const response = await fetch(`https://ornnovabackend.onrender.com/viewactions/${id}/${selectedRecruiterId}`);
     const data = await response.json();
-   
-
+  
     if (response.ok) {
       if (data.candidates) {
         setCandidates(data.uploadedCandidates);
@@ -663,6 +662,7 @@ const requirementDetailsWithAssignedUsers = async () => {
   };
   const response = await fetch(`https://ornnovabackend.onrender.com/requirementDetailsWithAssignedUsers/${userId}`, reqOption);
   let data = await response.json();
+  console.log(data)
   setShowCandidateDetailsHome(data);
 };
 
@@ -1072,7 +1072,8 @@ const updateClaim = async (id) => {
   <Table style={{ textAlign: "center" }}  bordered hover responsive>
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Employee Name</th>
+        <th>Candidate Name</th>
         <th>Role</th>
         <th>Total YOE</th>
         <th>LWD</th>
@@ -1102,6 +1103,7 @@ const updateClaim = async (id) => {
 
         return (
           <tr key={idx}>
+            <td>{candidate.recruiterName}</td>
             <td>{candidate.firstName} {candidate.lastName}</td>
             <td>{candidate.role}</td>
             <td>{candidate.totalYoe}</td>
@@ -1204,7 +1206,8 @@ const updateClaim = async (id) => {
             <Table style={{ textAlign: "center", marginTop: "20px" }}  bordered hover responsive>
               <thead>
                 <tr>
-                  <th>Name</th>
+                  <th>Employee Name</th>
+                  <th>Candidate Name</th>
                   <th>Role</th>
                   <th>Total YOE</th>
                   <th>LWD</th>
@@ -1233,6 +1236,7 @@ const updateClaim = async (id) => {
 
                   return (
                     <tr key={idx}>
+                      <td>{candidate.recruiterName}</td>
                       <td>{candidate.firstName} {candidate.lastName}</td>
                       <td>{candidate.role}</td>
                       <td>{candidate.totalYoe}</td>
@@ -2219,7 +2223,8 @@ style={{backgroundColor:"lightgray"}}
           <Table  bordered hover responsive style={{textAlign:"center"}}>
             <thead>
               <tr>
-                <th>Name</th>
+                <th>Employee Name</th>
+                <th>Candidate Name</th>
                 <th>Role</th>
                 <th>Total YOE</th>
                 <th>LWD</th>
@@ -2248,6 +2253,7 @@ style={{backgroundColor:"lightgray"}}
 
                 return (
                   <tr key={idx}>
+                    <td>{candidate.recruiterName}</td>
                     <td>{candidate.firstName} {candidate.lastName}</td>
                     <td>{candidate.role}</td>
                     <td>{candidate.totalYoe}</td>
